@@ -63,19 +63,9 @@ make test           # phantom tests
 To hand an image to a model today: send `renders/annotated.png` (or
 `canonical.png`) plus `context.md`. Nothing else is required.
 
-## Publishing to GitHub
+## Repository
 
-`gh` is not authenticated on this machine, so the remote was not created. Run:
-
-```bash
-gh auth login
-```
-
-then, from the repo root:
-
-```bash
-gh repo create open-image-protocol --private --source=. --remote=origin --push
-```
+https://github.com/HenrikStelling/open-image-protocol (private). Clone, then `make setup`.
 
 ## Licence
 Code: Apache-2.0 (see LICENSE). Specification and docs: CC-BY-4.0 (proposed, decision D-002).

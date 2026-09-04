@@ -16,7 +16,7 @@ also `docs/03-brainstorm/open-questions.md`.
 | context.md generator, annotated renders, measurement guardrails | v0 working |
 | Synthetic phantoms (DX MONOCHROME1, NM whole-body) + Tier-0 tests | working |
 | Example packages | generated in `spec/examples/` |
-| GitHub remote | **[needs you]** `gh auth login` |
+| GitHub remote | done — https://github.com/HenrikStelling/open-image-protocol (private) |
 | Kaggle credentials | **[needs you]** |
 
 ## 1. Principles (do not re-litigate without an OEP)
@@ -101,6 +101,5 @@ Exit criteria: a model in an MCP host answers the self-check questions correctly
 
 ## 5. Immediate next actions
 1. **[needs you]** Review `docs/03-brainstorm/open-questions.md` (12 items) and the decisions log; say which defaults to change.
-2. **[needs you]** `gh auth login`, then `gh repo create open-image-protocol --private --source=. --remote=origin --push`.
-3. **[needs you]** Kaggle API token in `~/.kaggle/kaggle.json`.
-4. Me: non-DICOM adapter, OCR burned-in check, remaining verbs, then Phase 2 conversions as soon as data is available.
+2. **[needs you]** Kaggle API token in `~/.kaggle/kaggle.json`.
+3. Me: non-DICOM adapter, OCR burned-in check, remaining verbs, then Phase 2 conversions as soon as data is available.
