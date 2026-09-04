@@ -1,0 +1,9 @@
+[
+ {"name": "vindr-cxr", "source": "kaggle-competition:vinbigdata-chest-xray-abnormalities-detection", "url": "https://www.kaggle.com/competitions/vinbigdata-chest-xray-abnormalities-detection", "licence": "competition rules (non-commercial research)", "use": "primary DX validation: original DICOM, multi-vendor, 14 findings with boxes", "phases": [2, 3]},
+ {"name": "rsna-pneumonia", "source": "kaggle-competition:rsna-pneumonia-detection-challenge", "url": "https://www.kaggle.com/competitions/rsna-pneumonia-detection-challenge", "licence": "competition rules", "use": "DICOM CXR with boxes; converter tests", "phases": [2, 3]},
+ {"name": "siim-acr-pneumothorax", "source": "kaggle-competition:siim-acr-pneumothorax-segmentation", "url": "https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation", "licence": "competition rules", "use": "DICOM + masks; mask-based measurement tests", "phases": [2]},
+ {"name": "nih-chestxray14", "source": "kaggle-dataset:nih-chest-xrays/data", "url": "https://www.kaggle.com/datasets/nih-chest-xrays/data", "licence": "CC0 (NIH)", "use": "non-DICOM path: PNG + CSV with OriginalImagePixelSpacing", "phases": [2]},
+ {"name": "bone-scans-paraguay", "source": "zenodo:13900966", "url": "https://zenodo.org/records/13900966", "licence": "CC-BY-4.0", "use": "real planar bone scintigraphy, anterior/posterior, metastasis labels", "phases": [4]},
+ {"name": "chexmask", "source": "manual:physionet", "url": "https://physionet.org/content/chexmask-cxr-segmentation-data/1.0.0/", "licence": "PhysioNet credentialed", "use": "heart/lung masks -> CTR reference", "phases": [2, 3]},
+ {"name": "bs-80k", "source": "manual:gdrive", "url": "https://pubmed.ncbi.nlm.nih.gov/36334360/", "licence": "verify", "use": "large bone scan set; region models", "phases": [4]}
+]

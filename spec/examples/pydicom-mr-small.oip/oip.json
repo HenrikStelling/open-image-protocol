@@ -1,0 +1,204 @@
+{
+  "oip": {
+    "version": "0.1.0",
+    "profile": "core",
+    "layers": [
+      "L0",
+      "L1",
+      "L2"
+    ],
+    "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
+  },
+  "identity": {
+    "package_id": "ff6d9356-9d77-4117-b328-f5ef170553e7",
+    "created": "2026-09-04T09:25:24+00:00",
+    "title": "MR slice",
+    "source_uids": {
+      "study": "e4c2d72eee037e98",
+      "series": "ca6fd753b2a00da3",
+      "instance": "9b559dc8cb350823"
+    },
+    "source_hash": "3f27d1c22f1a66e80d7bb7c911e8610fd0bb70325a76746a7adb1c0ddefcf2bb"
+  },
+  "provenance": {
+    "producer": "oip-python",
+    "producer_version": "0.1.0",
+    "source_format": "dicom",
+    "source_filename": "MR_small.dcm",
+    "image_type": [
+      "DERIVED",
+      "SECONDARY",
+      "OTHER"
+    ],
+    "sop_class": "MR Image Storage",
+    "pipeline": [
+      "read DICOM with pydicom",
+      "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
+      "apply Modality LUT / RescaleSlope+Intercept",
+      "apply VOI (WindowCenterWidth)",
+      "write lossless 16-bit PNG per frame",
+      "write canonical/annotated/thumbnail renders",
+      "generate context.md",
+      "validate against JSON Schema"
+    ]
+  },
+  "subject": {
+    "age_band": null,
+    "sex": "F",
+    "species": "human"
+  },
+  "acquisition": {
+    "modality": {
+      "value": "MR",
+      "assertion_level": "measured"
+    },
+    "modality_family": "tomography",
+    "body_part": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "view": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "laterality": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "patient_position": {
+      "value": "HFS",
+      "assertion_level": "measured"
+    },
+    "device": {
+      "manufacturer": "TOSHIBA_MEC",
+      "model": "MRT50H1",
+      "software": "V3.51*P25"
+    },
+    "acquisition_datetime_relative": null
+  },
+  "geometry": {
+    "rows": 64,
+    "columns": 64,
+    "number_of_frames": 1,
+    "pixel_spacing_mm": [
+      0.3125,
+      0.3125
+    ],
+    "spacing_source": "PixelSpacing",
+    "calibration": {
+      "plane": "patient",
+      "type": null,
+      "magnification_factor": null,
+      "confidence": "high"
+    },
+    "physical_extent_mm": [
+      20.0,
+      20.0
+    ],
+    "orientation": {
+      "row_direction": null,
+      "column_direction": null,
+      "edge_labels": {
+        "left": null,
+        "right": null,
+        "top": null,
+        "bottom": null
+      },
+      "assertion_level": "unknown",
+      "note": "Orientation unknown; do not assume laterality."
+    }
+  },
+  "intensity": {
+    "bits_allocated": 16,
+    "bits_stored": 16,
+    "signed": true,
+    "photometric": "MONOCHROME2",
+    "presentation_lut": null,
+    "units": "relative",
+    "rescale": {
+      "slope": 1.0,
+      "intercept": 0.0
+    },
+    "value_range": {
+      "min": 127.0,
+      "max": 2145.0,
+      "p0_5": 148.0,
+      "p99_5": 1840.6750000000006
+    },
+    "voi": {
+      "source": "WindowCenterWidth",
+      "center": 600.0,
+      "width": 1600.0,
+      "function": null,
+      "lower": null,
+      "upper": null
+    },
+    "canonical_polarity": "high_is_bright",
+    "source_inverted_for_render": false
+  },
+  "frames": [],
+  "renders": [
+    {
+      "path": "renders/canonical.png",
+      "purpose": "canonical",
+      "frame": 0,
+      "width": 64,
+      "height": 64,
+      "transform": "apply Modality LUT / RescaleSlope+Intercept; apply VOI (WindowCenterWidth); scaled to 8-bit; no rotation/flip/crop/resample."
+    },
+    {
+      "path": "renders/annotated.png",
+      "purpose": "annotated",
+      "frame": null,
+      "width": 144,
+      "height": 144,
+      "transform": "canonical render pasted into a dark margin; image content unchanged and pixel-aligned at the stated offset.",
+      "annotations": [
+        "margin_offset_px: 40 (subtract from annotated coords to get frame coords)",
+        "edge labels: ",
+        "scale bar: 50 mm = 160 px, bottom-left"
+      ]
+    },
+    {
+      "path": "renders/thumbnail.png",
+      "purpose": "thumbnail",
+      "frame": null,
+      "width": 64,
+      "height": 64,
+      "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
+    }
+  ],
+  "pixels": {
+    "format": "png16",
+    "paths": [
+      "pixels/frame-0000.png"
+    ],
+    "lossless": true,
+    "stored_dtype": "int16"
+  },
+  "derived": {
+    "regions": [],
+    "measurements": [],
+    "measurements_file": "derived/measurements.json"
+  },
+  "quality": {
+    "flags": [
+      "derived_image"
+    ],
+    "notes": []
+  },
+  "deid": {
+    "status": "deidentified",
+    "method": "oip.deid basic profile: PHI keywords removed, UIDs sha256-hashed, private tags dropped, age banded, dates removed",
+    "removed_tag_count": 20,
+    "burned_in_text_checked": false
+  },
+  "context": {
+    "path": "context.md",
+    "template_version": "0.1"
+  },
+  "source": {
+    "dicom_headers": "source/dicom-headers.json",
+    "original": null
+  }
+}

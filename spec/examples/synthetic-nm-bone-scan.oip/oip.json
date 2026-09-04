@@ -1,0 +1,309 @@
+{
+  "oip": {
+    "version": "0.1.0",
+    "profile": "core",
+    "layers": [
+      "L0",
+      "L1",
+      "L2"
+    ],
+    "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
+  },
+  "identity": {
+    "package_id": "74514453-f7f4-44de-b88d-f8fa64203c48",
+    "created": "2026-09-04T09:25:24+00:00",
+    "title": "Synthetic whole-body bone scintigraphy phantom (anterior + posterior)",
+    "source_uids": {
+      "study": "3f193c4ee8b16ba4",
+      "series": "e980b5892c6fc85e",
+      "instance": "ef7a9395c4c6580b"
+    },
+    "source_hash": "4c79cd00d57dce227604481fe3633a2e506cfab42d6b1817a37373a78127b265"
+  },
+  "provenance": {
+    "producer": "oip-python",
+    "producer_version": "0.1.0",
+    "source_format": "dicom",
+    "source_filename": "synthetic_nm_wholebody.dcm",
+    "image_type": [
+      "ORIGINAL",
+      "PRIMARY",
+      "WHOLE BODY",
+      "EMISSION"
+    ],
+    "sop_class": "Nuclear Medicine Image Storage",
+    "pipeline": [
+      "read DICOM with pydicom",
+      "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
+      "apply Modality LUT / RescaleSlope+Intercept",
+      "no VOI in source; sqrt scaling, clipped at 99.5th percentile",
+      "write lossless 16-bit PNG per frame",
+      "write canonical/annotated/thumbnail renders",
+      "generate context.md",
+      "validate against JSON Schema"
+    ]
+  },
+  "subject": {
+    "age_band": "45-49",
+    "sex": "O",
+    "species": "human"
+  },
+  "acquisition": {
+    "modality": {
+      "value": "NM",
+      "assertion_level": "measured"
+    },
+    "modality_family": "scintigraphy",
+    "body_part": {
+      "value": "WHOLEBODY",
+      "assertion_level": "measured"
+    },
+    "view": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "laterality": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "patient_position": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "device": {
+      "manufacturer": "OIP synthetic",
+      "model": "phantom-v1"
+    },
+    "acquisition_datetime_relative": null,
+    "nm": {
+      "image_type": "WHOLE BODY",
+      "radiopharmaceutical": "Tc-99m MDP",
+      "radionuclide": "Technetium Tc-99m",
+      "administered_activity_MBq": {
+        "value": 740.0,
+        "unit": "MBq",
+        "assertion_level": "measured"
+      },
+      "uptake_time_min": {
+        "value": 180.0,
+        "unit": "min",
+        "assertion_level": "computed"
+      },
+      "route": "IV",
+      "energy_windows": [
+        {
+          "name": "Tc-99m photopeak",
+          "lower_keV": 126.0,
+          "upper_keV": 154.0
+        }
+      ],
+      "collimator": "PARA",
+      "number_of_detectors": 2,
+      "whole_body": {
+        "technique": "1PS",
+        "scan_length_mm": 2314.0,
+        "scan_velocity_mm_per_s": 12.0
+      },
+      "corrections": [
+        "UNIF",
+        "DECY"
+      ],
+      "termination_condition": "TIME"
+    }
+  },
+  "geometry": {
+    "rows": 1024,
+    "columns": 256,
+    "number_of_frames": 2,
+    "pixel_spacing_mm": [
+      2.26,
+      2.26
+    ],
+    "spacing_source": "PixelSpacing",
+    "calibration": {
+      "plane": "detector",
+      "type": null,
+      "magnification_factor": null,
+      "confidence": "medium"
+    },
+    "physical_extent_mm": [
+      2314.24,
+      578.56
+    ],
+    "orientation": {
+      "row_direction": null,
+      "column_direction": null,
+      "edge_labels": {
+        "left": null,
+        "right": null,
+        "top": null,
+        "bottom": null
+      },
+      "assertion_level": "unknown",
+      "note": "Orientation unknown; do not assume laterality."
+    }
+  },
+  "intensity": {
+    "bits_allocated": 16,
+    "bits_stored": 16,
+    "signed": false,
+    "photometric": "MONOCHROME2",
+    "presentation_lut": null,
+    "units": "counts",
+    "rescale": {
+      "slope": 1.0,
+      "intercept": 0.0
+    },
+    "value_range": {
+      "min": 0.0,
+      "max": 89.0,
+      "p0_5": 0.0,
+      "p99_5": 21.0
+    },
+    "voi": {
+      "source": "sqrt",
+      "center": null,
+      "width": null,
+      "function": null,
+      "lower": 0.0,
+      "upper": 22.0
+    },
+    "canonical_polarity": "high_is_bright",
+    "source_inverted_for_render": false
+  },
+  "frames": [
+    {
+      "index": 0,
+      "view": "ANTERIOR",
+      "detector": 1,
+      "edge_labels": {
+        "left": "R",
+        "right": "L",
+        "top": "H",
+        "bottom": "F"
+      },
+      "edge_labels_assertion": "measured",
+      "duration_ms": 900000.0,
+      "counts_total": 626229.0,
+      "counts_accumulated_tag": 1189480.0,
+      "energy_window": 1,
+      "orientation_note": "",
+      "pixels": "pixels/frame-0000.png",
+      "render": "renders/frame-0000.png"
+    },
+    {
+      "index": 1,
+      "view": "POSTERIOR",
+      "detector": 2,
+      "edge_labels": {
+        "left": "L",
+        "right": "R",
+        "top": "H",
+        "bottom": "F"
+      },
+      "edge_labels_assertion": "measured",
+      "duration_ms": 900000.0,
+      "counts_total": 563251.0,
+      "counts_accumulated_tag": 1189480.0,
+      "energy_window": 1,
+      "orientation_note": "Posterior view: patient's LEFT appears on the image LEFT (mirrored relative to anterior).",
+      "pixels": "pixels/frame-0001.png",
+      "render": "renders/frame-0001.png"
+    }
+  ],
+  "renders": [
+    {
+      "path": "renders/frame-0000.png",
+      "purpose": "frame",
+      "frame": 0,
+      "width": 256,
+      "height": 1024,
+      "transform": "apply Modality LUT / RescaleSlope+Intercept; no VOI in source; sqrt scaling, clipped at 99.5th percentile; scaled to 8-bit; no rotation/flip/crop/resample."
+    },
+    {
+      "path": "renders/frame-0001.png",
+      "purpose": "frame",
+      "frame": 1,
+      "width": 256,
+      "height": 1024,
+      "transform": "apply Modality LUT / RescaleSlope+Intercept; no VOI in source; sqrt scaling, clipped at 99.5th percentile; scaled to 8-bit; no rotation/flip/crop/resample."
+    },
+    {
+      "path": "renders/canonical.png",
+      "purpose": "composite",
+      "frame": null,
+      "width": 512,
+      "height": 1024,
+      "transform": "2 frame renders placed side by side left-to-right in frame order (frame 0 leftmost); each frame keeps its own geometry."
+    },
+    {
+      "path": "renders/inverted.png",
+      "purpose": "inverted",
+      "frame": null,
+      "width": 512,
+      "height": 1024,
+      "transform": "canonical render inverted (hot = dark), the conventional nuclear-medicine display."
+    },
+    {
+      "path": "renders/annotated.png",
+      "purpose": "annotated",
+      "frame": null,
+      "width": 634,
+      "height": 1146,
+      "transform": "canonical render pasted into a dark margin; image content unchanged and pixel-aligned at the stated offset.",
+      "annotations": [
+        "margin_offset_px: 61 (subtract from annotated coords to get frame coords)",
+        "edge labels: top=H, bottom=F",
+        "frame 0 (ANTERIOR): x-offset 0 px, left edge=R, right edge=L",
+        "frame 1 (POSTERIOR): x-offset 256 px, left edge=L, right edge=R",
+        "scale bar: 50 mm = 22 px, bottom-left",
+        "frames left-to-right: 0=ANTERIOR, 1=POSTERIOR"
+      ]
+    },
+    {
+      "path": "renders/thumbnail.png",
+      "purpose": "thumbnail",
+      "frame": null,
+      "width": 128,
+      "height": 256,
+      "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
+    }
+  ],
+  "pixels": {
+    "format": "png16",
+    "paths": [
+      "pixels/frame-0000.png",
+      "pixels/frame-0001.png"
+    ],
+    "lossless": true,
+    "stored_dtype": "uint16"
+  },
+  "derived": {
+    "regions": [],
+    "measurements": [],
+    "measurements_file": "derived/measurements.json"
+  },
+  "quality": {
+    "flags": [
+      "counts_not_comparable",
+      "multi_frame",
+      "no_voi_in_source",
+      "spacing_uncalibrated"
+    ],
+    "notes": []
+  },
+  "deid": {
+    "status": "synthetic",
+    "method": "oip.deid basic profile: PHI keywords removed, UIDs sha256-hashed, private tags dropped, age banded, dates removed",
+    "removed_tag_count": 4,
+    "burned_in_text_checked": false
+  },
+  "context": {
+    "path": "context.md",
+    "template_version": "0.1"
+  },
+  "source": {
+    "dicom_headers": "source/dicom-headers.json",
+    "original": null
+  }
+}

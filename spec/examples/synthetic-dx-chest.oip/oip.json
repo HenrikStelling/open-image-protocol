@@ -1,0 +1,331 @@
+{
+  "oip": {
+    "version": "0.1.0",
+    "profile": "measured",
+    "layers": [
+      "L0",
+      "L1",
+      "L2",
+      "L3",
+      "L4"
+    ],
+    "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
+  },
+  "identity": {
+    "package_id": "9abff595-fd30-4e5a-af75-6d81fc47b3d3",
+    "created": "2026-09-04T09:25:23+00:00",
+    "title": "Synthetic chest radiograph phantom, PA (MONOCHROME1 source)",
+    "source_uids": {
+      "study": "185f016704699d7e",
+      "series": "de0e668562a0605e",
+      "instance": "48288fce61447944"
+    },
+    "source_hash": "380e3769620f552396e3723c20d3e2c53c57cf746aa7a0fd86b08f51a27be513"
+  },
+  "provenance": {
+    "producer": "oip-python",
+    "producer_version": "0.1.0",
+    "source_format": "dicom",
+    "source_filename": "synthetic_dx_chest.dcm",
+    "image_type": [
+      "ORIGINAL",
+      "PRIMARY"
+    ],
+    "sop_class": "Digital X-Ray Image Storage - For Presentation",
+    "pipeline": [
+      "read DICOM with pydicom",
+      "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
+      "apply Modality LUT / RescaleSlope+Intercept",
+      "apply VOI (WindowCenterWidth)",
+      "invert (source was MONOCHROME1/INVERSE) so high attenuation is bright",
+      "write lossless 16-bit PNG per frame",
+      "write canonical/annotated/thumbnail renders",
+      "generate context.md",
+      "validate against JSON Schema"
+    ]
+  },
+  "subject": {
+    "age_band": "45-49",
+    "sex": "O",
+    "species": "human"
+  },
+  "acquisition": {
+    "modality": {
+      "value": "DX",
+      "assertion_level": "measured"
+    },
+    "modality_family": "projection_radiography",
+    "body_part": {
+      "value": "CHEST",
+      "assertion_level": "measured"
+    },
+    "view": {
+      "value": "PA",
+      "assertion_level": "measured"
+    },
+    "laterality": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "patient_position": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "device": {
+      "manufacturer": "OIP synthetic",
+      "model": "phantom-v1"
+    },
+    "acquisition_datetime_relative": null,
+    "dx": {
+      "kvp": {
+        "value": 120.0,
+        "unit": "kV",
+        "assertion_level": "measured"
+      },
+      "exposure_mAs": {
+        "value": 2.0,
+        "unit": "mA.s",
+        "assertion_level": "measured"
+      },
+      "exposure_time_ms": {
+        "value": 10.0,
+        "unit": "ms",
+        "assertion_level": "measured"
+      },
+      "exposure_index": {
+        "value": null,
+        "unit": "1",
+        "assertion_level": "unknown"
+      },
+      "distance_source_to_detector_mm": {
+        "value": 1800.0,
+        "unit": "mm",
+        "assertion_level": "measured"
+      },
+      "distance_source_to_patient_mm": {
+        "value": 1636.0,
+        "unit": "mm",
+        "assertion_level": "measured"
+      },
+      "grid": null,
+      "detector_type": null
+    }
+  },
+  "geometry": {
+    "rows": 1800,
+    "columns": 1500,
+    "number_of_frames": 1,
+    "pixel_spacing_mm": [
+      0.2,
+      0.2
+    ],
+    "spacing_source": "PixelSpacing_calibrated",
+    "calibration": {
+      "plane": "patient",
+      "type": "GEOMETRY",
+      "magnification_factor": 1.1,
+      "confidence": "high"
+    },
+    "physical_extent_mm": [
+      360.0,
+      300.0
+    ],
+    "orientation": {
+      "row_direction": "L",
+      "column_direction": "F",
+      "edge_labels": {
+        "left": "R",
+        "right": "L",
+        "top": "H",
+        "bottom": "F"
+      },
+      "assertion_level": "measured",
+      "note": "From DICOM PatientOrientation."
+    }
+  },
+  "intensity": {
+    "bits_allocated": 16,
+    "bits_stored": 12,
+    "signed": false,
+    "photometric": "MONOCHROME1",
+    "presentation_lut": "INVERSE",
+    "units": "relative",
+    "rescale": {
+      "slope": 1.0,
+      "intercept": 0.0
+    },
+    "value_range": {
+      "min": 1781.0,
+      "max": 3912.0,
+      "p0_5": 1853.0,
+      "p99_5": 3849.0
+    },
+    "voi": {
+      "source": "WindowCenterWidth",
+      "center": 2895.0,
+      "width": 2600.0,
+      "function": null,
+      "lower": null,
+      "upper": null
+    },
+    "canonical_polarity": "high_is_bright",
+    "source_inverted_for_render": true
+  },
+  "frames": [],
+  "renders": [
+    {
+      "path": "renders/canonical.png",
+      "purpose": "canonical",
+      "frame": 0,
+      "width": 1500,
+      "height": 1800,
+      "transform": "apply Modality LUT / RescaleSlope+Intercept; apply VOI (WindowCenterWidth); invert (source was MONOCHROME1/INVERSE) so high attenuation is bright; scaled to 8-bit; no rotation/flip/crop/resample."
+    },
+    {
+      "path": "renders/annotated.png",
+      "purpose": "annotated",
+      "frame": null,
+      "width": 1716,
+      "height": 2016,
+      "transform": "canonical render pasted into a dark margin; image content unchanged and pixel-aligned at the stated offset.",
+      "annotations": [
+        "margin_offset_px: 108 (subtract from annotated coords to get frame coords)",
+        "edge labels: left=R, right=L, top=H, bottom=F",
+        "scale bar: 50 mm = 250 px, bottom-left",
+        "mark 1 = heart (phantom ellipse)",
+        "mark 2 = thorax (phantom ellipse)"
+      ]
+    },
+    {
+      "path": "renders/thumbnail.png",
+      "purpose": "thumbnail",
+      "frame": null,
+      "width": 213,
+      "height": 256,
+      "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
+    }
+  ],
+  "pixels": {
+    "format": "png16",
+    "paths": [
+      "pixels/frame-0000.png"
+    ],
+    "lossless": true,
+    "stored_dtype": "uint16"
+  },
+  "derived": {
+    "regions": [
+      {
+        "id": "heart",
+        "label": "heart (phantom ellipse)",
+        "mask": "derived/masks/heart.png",
+        "bbox_px": [
+          716,
+          455,
+          1265,
+          1105
+        ],
+        "mark": "1",
+        "assertion_level": "computed",
+        "tool": "phantom-generator",
+        "confidence": 1.0
+      },
+      {
+        "id": "thorax",
+        "label": "thorax (phantom ellipse)",
+        "mask": "derived/masks/thorax.png",
+        "bbox_px": [
+          100,
+          50,
+          1700,
+          1450
+        ],
+        "mark": "2",
+        "assertion_level": "computed",
+        "tool": "phantom-generator",
+        "confidence": 1.0
+      }
+    ],
+    "measurements": [
+      {
+        "id": "ctr",
+        "name": "Cardiothoracic ratio",
+        "value": 0.4647,
+        "unit": "1",
+        "method": "max horizontal heart-mask width / max horizontal thorax-mask width (pixels, spacing independent)",
+        "tool": "oip-measure",
+        "assertion_level": "computed",
+        "geometry": {
+          "heart_bbox_px": [
+            716,
+            455,
+            1265,
+            1105
+          ],
+          "thorax_bbox_px": [
+            100,
+            50,
+            1700,
+            1450
+          ]
+        },
+        "validation_status": "phantom_validated",
+        "tool_version": "0.1.0",
+        "confidence": 0.99,
+        "inputs": [
+          "derived/masks/heart.png",
+          "derived/masks/thorax.png"
+        ]
+      },
+      {
+        "id": "heart_width",
+        "name": "Transverse cardiac diameter",
+        "value": 130.2,
+        "unit": "mm",
+        "method": "max horizontal width of heart mask \u00d7 column spacing",
+        "tool": "oip-measure",
+        "tool_version": "0.1.0",
+        "assertion_level": "computed",
+        "confidence": 0.95,
+        "validation_status": "phantom_validated",
+        "inputs": [
+          "derived/masks/heart.png"
+        ]
+      },
+      {
+        "id": "thorax_width",
+        "name": "Internal thoracic width",
+        "value": 280.2,
+        "unit": "mm",
+        "method": "max horizontal width of thorax mask \u00d7 column spacing",
+        "tool": "oip-measure",
+        "tool_version": "0.1.0",
+        "assertion_level": "computed",
+        "confidence": 0.95,
+        "validation_status": "phantom_validated",
+        "inputs": [
+          "derived/masks/thorax.png"
+        ]
+      }
+    ],
+    "measurements_file": "derived/measurements.json"
+  },
+  "quality": {
+    "flags": [],
+    "notes": []
+  },
+  "deid": {
+    "status": "synthetic",
+    "method": "oip.deid basic profile: PHI keywords removed, UIDs sha256-hashed, private tags dropped, age banded, dates removed",
+    "removed_tag_count": 3,
+    "burned_in_text_checked": false
+  },
+  "context": {
+    "path": "context.md",
+    "template_version": "0.1"
+  },
+  "source": {
+    "dicom_headers": "source/dicom-headers.json",
+    "original": null
+  }
+}

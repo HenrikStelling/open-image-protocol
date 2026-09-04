@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ctr",
+    "name": "Cardiothoracic ratio",
+    "value": 0.4647,
+    "unit": "1",
+    "method": "max horizontal heart-mask width / max horizontal thorax-mask width (pixels, spacing independent)",
+    "tool": "oip-measure",
+    "assertion_level": "computed",
+    "geometry": {
+      "heart_bbox_px": [
+        716,
+        455,
+        1265,
+        1105
+      ],
+      "thorax_bbox_px": [
+        100,
+        50,
+        1700,
+        1450
+      ]
+    },
+    "validation_status": "phantom_validated",
+    "tool_version": "0.1.0",
+    "confidence": 0.99,
+    "inputs": [
+      "derived/masks/heart.png",
+      "derived/masks/thorax.png"
+    ]
+  },
+  {
+    "id": "heart_width",
+    "name": "Transverse cardiac diameter",
+    "value": 130.2,
+    "unit": "mm",
+    "method": "max horizontal width of heart mask \u00d7 column spacing",
+    "tool": "oip-measure",
+    "tool_version": "0.1.0",
+    "assertion_level": "computed",
+    "confidence": 0.95,
+    "validation_status": "phantom_validated",
+    "inputs": [
+      "derived/masks/heart.png"
+    ]
+  },
+  {
+    "id": "thorax_width",
+    "name": "Internal thoracic width",
+    "value": 280.2,
+    "unit": "mm",
+    "method": "max horizontal width of thorax mask \u00d7 column spacing",
+    "tool": "oip-measure",
+    "tool_version": "0.1.0",
+    "assertion_level": "computed",
+    "confidence": 0.95,
+    "validation_status": "phantom_validated",
+    "inputs": [
+      "derived/masks/thorax.png"
+    ]
+  }
+]

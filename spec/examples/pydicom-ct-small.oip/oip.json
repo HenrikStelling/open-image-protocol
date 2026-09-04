@@ -1,0 +1,204 @@
+{
+  "oip": {
+    "version": "0.1.0",
+    "profile": "core",
+    "layers": [
+      "L0",
+      "L1",
+      "L2"
+    ],
+    "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
+  },
+  "identity": {
+    "package_id": "615bbe39-8e99-44fc-899b-39fab009aa54",
+    "created": "2026-09-04T09:25:24+00:00",
+    "title": "CT slice",
+    "source_uids": {
+      "study": "2966c9f9fbae278d",
+      "series": "5713db53730f30bd",
+      "instance": "0c2c7bdafb39176a"
+    },
+    "source_hash": "3dd31e5cc835b3f2cdd46c9da1982f59251e78518fefa8163d914631c66437d6"
+  },
+  "provenance": {
+    "producer": "oip-python",
+    "producer_version": "0.1.0",
+    "source_format": "dicom",
+    "source_filename": "CT_small.dcm",
+    "image_type": [
+      "ORIGINAL",
+      "PRIMARY",
+      "AXIAL"
+    ],
+    "sop_class": "CT Image Storage",
+    "pipeline": [
+      "read DICOM with pydicom",
+      "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
+      "apply Modality LUT / RescaleSlope+Intercept",
+      "no VOI in source; linear window between 0.5th and 99.5th percentile",
+      "write lossless 16-bit PNG per frame",
+      "write canonical/annotated/thumbnail renders",
+      "generate context.md",
+      "validate against JSON Schema"
+    ]
+  },
+  "subject": {
+    "age_band": "0-4",
+    "sex": "O",
+    "species": "human"
+  },
+  "acquisition": {
+    "modality": {
+      "value": "CT",
+      "assertion_level": "measured"
+    },
+    "modality_family": "tomography",
+    "body_part": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "view": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "laterality": {
+      "value": null,
+      "assertion_level": "unknown"
+    },
+    "patient_position": {
+      "value": "FFS",
+      "assertion_level": "measured"
+    },
+    "device": {
+      "manufacturer": "GE MEDICAL SYSTEMS",
+      "model": "RHAPSODE",
+      "software": "05"
+    },
+    "acquisition_datetime_relative": null
+  },
+  "geometry": {
+    "rows": 128,
+    "columns": 128,
+    "number_of_frames": 1,
+    "pixel_spacing_mm": [
+      0.661468,
+      0.661468
+    ],
+    "spacing_source": "PixelSpacing",
+    "calibration": {
+      "plane": "patient",
+      "type": null,
+      "magnification_factor": null,
+      "confidence": "high"
+    },
+    "physical_extent_mm": [
+      84.667904,
+      84.667904
+    ],
+    "orientation": {
+      "row_direction": null,
+      "column_direction": null,
+      "edge_labels": {
+        "left": null,
+        "right": null,
+        "top": null,
+        "bottom": null
+      },
+      "assertion_level": "unknown",
+      "note": "Orientation unknown; do not assume laterality."
+    }
+  },
+  "intensity": {
+    "bits_allocated": 16,
+    "bits_stored": 16,
+    "signed": true,
+    "photometric": "MONOCHROME2",
+    "presentation_lut": null,
+    "units": "HU",
+    "rescale": {
+      "slope": 1.0,
+      "intercept": -1024.0
+    },
+    "value_range": {
+      "min": 128.0,
+      "max": 2191.0,
+      "p0_5": 163.0,
+      "p99_5": 1809.0
+    },
+    "voi": {
+      "source": "auto_percentile",
+      "center": null,
+      "width": null,
+      "function": null,
+      "lower": -861.0,
+      "upper": 785.0
+    },
+    "canonical_polarity": "high_is_bright",
+    "source_inverted_for_render": false
+  },
+  "frames": [],
+  "renders": [
+    {
+      "path": "renders/canonical.png",
+      "purpose": "canonical",
+      "frame": 0,
+      "width": 128,
+      "height": 128,
+      "transform": "apply Modality LUT / RescaleSlope+Intercept; no VOI in source; linear window between 0.5th and 99.5th percentile; scaled to 8-bit; no rotation/flip/crop/resample."
+    },
+    {
+      "path": "renders/annotated.png",
+      "purpose": "annotated",
+      "frame": null,
+      "width": 208,
+      "height": 208,
+      "transform": "canonical render pasted into a dark margin; image content unchanged and pixel-aligned at the stated offset.",
+      "annotations": [
+        "margin_offset_px: 40 (subtract from annotated coords to get frame coords)",
+        "edge labels: ",
+        "scale bar: 50 mm = 76 px, bottom-left"
+      ]
+    },
+    {
+      "path": "renders/thumbnail.png",
+      "purpose": "thumbnail",
+      "frame": null,
+      "width": 128,
+      "height": 128,
+      "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
+    }
+  ],
+  "pixels": {
+    "format": "png16",
+    "paths": [
+      "pixels/frame-0000.png"
+    ],
+    "lossless": true,
+    "stored_dtype": "int16"
+  },
+  "derived": {
+    "regions": [],
+    "measurements": [],
+    "measurements_file": "derived/measurements.json"
+  },
+  "quality": {
+    "flags": [
+      "no_voi_in_source"
+    ],
+    "notes": []
+  },
+  "deid": {
+    "status": "deidentified",
+    "method": "oip.deid basic profile: PHI keywords removed, UIDs sha256-hashed, private tags dropped, age banded, dates removed",
+    "removed_tag_count": 200,
+    "burned_in_text_checked": false
+  },
+  "context": {
+    "path": "context.md",
+    "template_version": "0.1"
+  },
+  "source": {
+    "dicom_headers": "source/dicom-headers.json",
+    "original": null
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json",
+  "title": "OIP manifest (oip.json)",
+  "description": "Self-describing manifest for one medical image or multi-frame acquisition packaged under the Open Image Protocol. Every field carries a description written so that a language model can interpret it without external documentation.",
+  "type": "object",
+  "required": ["oip", "identity", "provenance", "acquisition", "geometry", "intensity", "renders", "quality", "deid", "context"],
+  "additionalProperties": false,
+  "$defs": {
+    "assertion_level": {
+      "type": "string",
+      "enum": ["measured", "computed", "inferred", "external", "unknown"],
+      "description": "Trust label. measured = read from source metadata; computed = deterministic algorithm on the pixels/metadata; inferred = machine-learning or heuristic guess; external = text or labels from outside the image (reports, dataset CSVs) that must be verified against the pixels; unknown = not available."
+    },
+    "asserted_string": {
+      "type": "object",
+      "required": ["value", "assertion_level"],
+      "properties": {
+        "value": {"type": ["string", "null"]},
+        "assertion_level": {"$ref": "#/$defs/assertion_level"},
+        "note": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "asserted_number": {
+      "type": "object",
+      "required": ["value", "assertion_level"],
+      "properties": {
+        "value": {"type": ["number", "null"]},
+        "unit": {"type": "string", "description": "UCUM unit, e.g. mm, MBq, keV, ms, 1 (dimensionless)."},
+        "assertion_level": {"$ref": "#/$defs/assertion_level"},
+        "note": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "code": {
+      "type": "object",
+      "required": ["system", "value"],
+      "properties": {
+        "system": {"type": "string", "description": "Coding system: SCT (SNOMED CT), RADLEX, RadElement, DCM, LOINC, UCUM, or a URL."},
+        "value": {"type": "string"},
+        "display": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "measurement": {
+      "type": "object",
+      "required": ["id", "name", "value", "unit", "method", "assertion_level", "validation_status"],
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "code": {"$ref": "#/$defs/code"},
+        "value": {"type": ["number", "null"]},
+        "unit": {"type": "string", "description": "UCUM unit. '1' means dimensionless ratio. 'px' means pixels (no physical calibration)."},
+        "method": {"type": "string", "description": "Human-readable description of how the value was obtained."},
+        "tool": {"type": "string"},
+        "tool_version": {"type": "string"},
+        "inputs": {"type": "array", "items": {"type": "string"}},
+        "assertion_level": {"$ref": "#/$defs/assertion_level"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "validation_status": {"type": "string", "enum": ["unvalidated", "phantom_validated", "reference_validated", "expert_validated"]},
+        "geometry": {"type": "object", "description": "Pixel-space geometry supporting the measurement (points, lines, boxes) in frame pixel coordinates (row, col)."},
+        "frame": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "oip": {
+      "type": "object",
+      "required": ["version", "profile", "layers"],
+      "properties": {
+        "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "description": "OIP spec version (semver)."},
+        "profile": {"type": "string", "enum": ["core", "measured", "full"], "description": "core = layers L0-L2 (identity, geometry/intensity, renders). measured = adds L3 semantic and L4 measurements. full = adds L5 narrative with external context."},
+        "layers": {"type": "array", "items": {"type": "string", "enum": ["L0", "L1", "L2", "L3", "L4", "L5"]}, "uniqueItems": true},
+        "schema": {"type": "string", "description": "URI of the JSON Schema this manifest validates against."}
+      },
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "required": ["package_id", "created"],
+      "properties": {
+        "package_id": {"type": "string", "description": "Stable opaque identifier (UUID or hash)."},
+        "created": {"type": "string", "format": "date-time"},
+        "title": {"type": "string", "description": "Short human/model-readable title, e.g. 'Chest radiograph, PA, adult'."},
+        "source_uids": {
+          "type": "object",
+          "description": "Hashed (SHA-256, truncated) DICOM UIDs so packages from the same study can be related without exposing the original UIDs.",
+          "properties": {"study": {"type": "string"}, "series": {"type": "string"}, "instance": {"type": "string"}},
+          "additionalProperties": false
+        },
+        "source_hash": {"type": "string", "description": "SHA-256 of the source file bytes."}
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["producer", "producer_version", "source_format"],
+      "properties": {
+        "producer": {"type": "string"},
+        "producer_version": {"type": "string"},
+        "source_format": {"type": "string", "enum": ["dicom", "png", "jpeg", "tiff", "nifti", "other"]},
+        "source_filename": {"type": "string", "description": "Basename only; never a path with identifiers."},
+        "image_type": {"type": "array", "items": {"type": "string"}, "description": "DICOM ImageType values, e.g. ORIGINAL, PRIMARY, WHOLE BODY."},
+        "sop_class": {"type": "string", "description": "DICOM SOP Class name/UID identifying the information object definition."},
+        "pipeline": {"type": "array", "items": {"type": "string"}, "description": "Ordered list of processing steps applied by the converter."}
+      },
+      "additionalProperties": false
+    },
+    "subject": {
+      "type": "object",
+      "description": "De-identified subject information only.",
+      "properties": {
+        "age_band": {"type": ["string", "null"], "description": "5-year band such as '45-49', or 'unknown'."},
+        "sex": {"type": ["string", "null"], "enum": ["F", "M", "O", null]},
+        "species": {"type": "string", "default": "human"}
+      },
+      "additionalProperties": false
+    },
+    "acquisition": {
+      "type": "object",
+      "required": ["modality", "body_part", "view", "laterality"],
+      "properties": {
+        "modality": {"$ref": "#/$defs/asserted_string", "description": "DICOM modality code: DX or CR (projection radiography), NM (planar scintigraphy), CT, MR, PT, US, OT."},
+        "modality_family": {"type": "string", "enum": ["projection_radiography", "scintigraphy", "tomography", "other"], "description": "Neutral grouping so a model knows what kind of physics produced the pixels."},
+        "body_part": {"$ref": "#/$defs/asserted_string"},
+        "view": {"$ref": "#/$defs/asserted_string", "description": "PA, AP, LATERAL, ANTERIOR, POSTERIOR, etc. For NM multi-frame see frames[].view."},
+        "laterality": {"$ref": "#/$defs/asserted_string", "description": "L, R, B (both), U (unpaired) or null."},
+        "patient_position": {"$ref": "#/$defs/asserted_string"},
+        "device": {"type": "object", "properties": {"manufacturer": {"type": "string"}, "model": {"type": "string"}, "software": {"type": "string"}}, "additionalProperties": false},
+        "acquisition_datetime_relative": {"type": ["string", "null"], "description": "Never an absolute date. Optional relative timing such as uptake time; absolute timestamps are removed for de-identification."},
+        "dx": {
+          "type": "object",
+          "description": "Projection radiography technique factors.",
+          "properties": {
+            "kvp": {"$ref": "#/$defs/asserted_number"},
+            "exposure_mAs": {"$ref": "#/$defs/asserted_number"},
+            "exposure_time_ms": {"$ref": "#/$defs/asserted_number"},
+            "exposure_index": {"$ref": "#/$defs/asserted_number"},
+            "distance_source_to_detector_mm": {"$ref": "#/$defs/asserted_number"},
+            "distance_source_to_patient_mm": {"$ref": "#/$defs/asserted_number"},
+            "grid": {"type": ["string", "null"]},
+            "detector_type": {"type": ["string", "null"]}
+          },
+          "additionalProperties": false
+        },
+        "nm": {
+          "type": "object",
+          "description": "Nuclear medicine acquisition parameters. Pixel values are photon counts and are only comparable within the same study and energy window.",
+          "properties": {
+            "image_type": {"type": ["string", "null"], "description": "STATIC, DYNAMIC, GATED, WHOLE BODY, TOMO, RECON TOMO."},
+            "radiopharmaceutical": {"type": ["string", "null"]},
+            "radionuclide": {"type": ["string", "null"]},
+            "administered_activity_MBq": {"$ref": "#/$defs/asserted_number"},
+            "uptake_time_min": {"$ref": "#/$defs/asserted_number", "description": "Minutes between administration and acquisition start, if both times were available in the source (times themselves are not retained)."},
+            "route": {"type": ["string", "null"]},
+            "energy_windows": {"type": "array", "items": {"type": "object", "properties": {"name": {"type": "string"}, "lower_keV": {"type": "number"}, "upper_keV": {"type": "number"}}, "additionalProperties": false}},
+            "collimator": {"type": ["string", "null"]},
+            "number_of_detectors": {"type": ["integer", "null"]},
+            "whole_body": {"type": "object", "properties": {"technique": {"type": ["string", "null"]}, "scan_length_mm": {"type": ["number", "null"]}, "scan_velocity_mm_per_s": {"type": ["number", "null"]}}, "additionalProperties": false},
+            "corrections": {"type": "array", "items": {"type": "string"}, "description": "DICOM CorrectedImage values: UNIF, DECY, ATTN, SCAT, DTIM, MOTN, PMOT, CLN, FLEN, RADL, DCAL, NRGY."},
+            "termination_condition": {"type": ["string", "null"]}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["rows", "columns", "pixel_spacing_mm", "spacing_source", "calibration", "orientation"],
+      "properties": {
+        "rows": {"type": "integer", "minimum": 1},
+        "columns": {"type": "integer", "minimum": 1},
+        "number_of_frames": {"type": "integer", "minimum": 1, "default": 1},
+        "pixel_spacing_mm": {
+          "type": ["array", "null"],
+          "items": {"type": "number", "exclusiveMinimum": 0},
+          "minItems": 2, "maxItems": 2,
+          "description": "[row_spacing, column_spacing] in millimetres between pixel centres. null means NO physical scale is known: do not estimate sizes in mm."
+        },
+        "spacing_source": {
+          "type": "string",
+          "enum": ["PixelSpacing_calibrated", "PixelSpacing", "ImagerPixelSpacing", "ImagerPixelSpacing_magnification_corrected", "dataset_metadata", "none"],
+          "description": "Where the spacing came from, in decreasing order of trust."
+        },
+        "calibration": {
+          "type": "object",
+          "required": ["plane", "confidence"],
+          "properties": {
+            "plane": {"type": "string", "enum": ["patient", "detector", "unknown"], "description": "patient = spacing is valid at the anatomy (magnification corrected); detector = spacing valid at the detector, anatomy is magnified by ~SID/SOD."},
+            "type": {"type": ["string", "null"], "description": "DICOM PixelSpacingCalibrationType: GEOMETRY or FIDUCIAL."},
+            "magnification_factor": {"type": ["number", "null"]},
+            "confidence": {"type": "string", "enum": ["high", "medium", "low", "none"]}
+          },
+          "additionalProperties": false
+        },
+        "physical_extent_mm": {"type": ["array", "null"], "items": {"type": "number"}, "minItems": 2, "maxItems": 2, "description": "[height, width] of the whole image in mm, if spacing is known."},
+        "orientation": {
+          "type": "object",
+          "required": ["row_direction", "column_direction", "assertion_level"],
+          "properties": {
+            "row_direction": {"type": ["string", "null"], "description": "Anatomical direction that increasing column index points to (DICOM PatientOrientation first value), e.g. L = towards patient LEFT, so the RIGHT edge of the image is the patient's left."},
+            "column_direction": {"type": ["string", "null"], "description": "Anatomical direction that increasing row index points to, e.g. F = towards feet."},
+            "edge_labels": {"type": "object", "description": "Ready-to-use labels: which anatomical side each image edge corresponds to.", "properties": {"left": {"type": ["string", "null"]}, "right": {"type": ["string", "null"]}, "top": {"type": ["string", "null"]}, "bottom": {"type": ["string", "null"]}}, "additionalProperties": false},
+            "assertion_level": {"$ref": "#/$defs/assertion_level"},
+            "note": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "intensity": {
+      "type": "object",
+      "required": ["bits_stored", "photometric", "units", "canonical_polarity"],
+      "properties": {
+        "bits_allocated": {"type": "integer"},
+        "bits_stored": {"type": "integer"},
+        "signed": {"type": "boolean"},
+        "photometric": {"type": "string", "description": "Source PhotometricInterpretation. MONOCHROME1 means low stored values are displayed WHITE in the source."},
+        "presentation_lut": {"type": ["string", "null"], "description": "IDENTITY or INVERSE."},
+        "units": {"type": "string", "enum": ["relative", "counts", "HU", "Bq/ml", "SUV", "unknown"], "description": "Physical meaning of rescaled pixel values. relative = arbitrary attenuation-related scale (radiography). counts = detected photons (scintigraphy)."},
+        "rescale": {"type": "object", "properties": {"slope": {"type": "number"}, "intercept": {"type": "number"}}, "additionalProperties": false},
+        "value_range": {"type": "object", "properties": {"min": {"type": "number"}, "max": {"type": "number"}, "p0_5": {"type": "number"}, "p99_5": {"type": "number"}}, "additionalProperties": false},
+        "voi": {
+          "type": "object",
+          "description": "Window used to build the canonical render.",
+          "properties": {
+            "source": {"type": "string", "enum": ["WindowCenterWidth", "VOILUTSequence", "auto_percentile", "full_range", "sqrt", "log"]},
+            "center": {"type": ["number", "null"]},
+            "width": {"type": ["number", "null"]},
+            "function": {"type": ["string", "null"]},
+            "lower": {"type": ["number", "null"]},
+            "upper": {"type": ["number", "null"]}
+          },
+          "additionalProperties": false
+        },
+        "canonical_polarity": {"type": "string", "enum": ["high_is_bright"], "description": "Guarantee for renders/canonical.png: higher attenuation (radiography) or higher counts (scintigraphy) is BRIGHTER."},
+        "source_inverted_for_render": {"type": "boolean", "description": "True if the converter had to invert the source to reach canonical polarity."}
+      },
+      "additionalProperties": false
+    },
+    "frames": {
+      "type": "array",
+      "description": "One entry per frame for multi-frame acquisitions (e.g. anterior and posterior whole-body scintigraphy).",
+      "items": {
+        "type": "object",
+        "required": ["index"],
+        "properties": {
+          "index": {"type": "integer", "minimum": 0},
+          "view": {"type": ["string", "null"]},
+          "detector": {"type": ["integer", "null"]},
+          "duration_ms": {"type": ["number", "null"]},
+          "counts_total": {"type": ["number", "null"], "description": "Sum of pixel values (counts) in this frame, computed by the converter."},
+          "counts_accumulated_tag": {"type": ["number", "null"], "description": "CountsAccumulated from the source header, if present."},
+          "energy_window": {"type": ["integer", "null"]},
+          "orientation_note": {"type": "string"},
+          "edge_labels": {"type": "object", "description": "Anatomical side at each edge of THIS frame (posterior views are mirrored).", "properties": {"left": {"type": ["string", "null"]}, "right": {"type": ["string", "null"]}, "top": {"type": ["string", "null"]}, "bottom": {"type": ["string", "null"]}}, "additionalProperties": false},
+          "edge_labels_assertion": {"$ref": "#/$defs/assertion_level"},
+          "pixels": {"type": "string", "description": "Relative path to the lossless frame."},
+          "render": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "renders": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "purpose", "transform"],
+        "properties": {
+          "path": {"type": "string"},
+          "purpose": {"type": "string", "enum": ["canonical", "annotated", "inverted", "thumbnail", "frame", "composite", "overlay"]},
+          "frame": {"type": ["integer", "null"]},
+          "width": {"type": "integer"},
+          "height": {"type": "integer"},
+          "transform": {"type": "string", "description": "Plain-language description of every step from stored pixels to this PNG."},
+          "annotations": {"type": "array", "items": {"type": "string"}, "description": "What was drawn on top (scale bar, edge labels, region marks)."}
+        },
+        "additionalProperties": false
+      }
+    },
+    "pixels": {
+      "type": "object",
+      "properties": {
+        "format": {"type": "string", "enum": ["png16", "npy", "zarr"]},
+        "paths": {"type": "array", "items": {"type": "string"}},
+        "lossless": {"type": "boolean"},
+        "stored_dtype": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "derived": {
+      "type": "object",
+      "properties": {
+        "regions": {"type": "array", "items": {"type": "object", "required": ["id", "label", "assertion_level"], "properties": {"id": {"type": "string"}, "label": {"type": "string"}, "code": {"$ref": "#/$defs/code"}, "mask": {"type": "string"}, "bbox_px": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4, "description": "[row_min, col_min, row_max, col_max]"}, "mark": {"type": "string", "description": "Label drawn on the annotated render (set-of-mark)."}, "frame": {"type": "integer"}, "assertion_level": {"$ref": "#/$defs/assertion_level"}, "tool": {"type": "string"}, "confidence": {"type": "number"}}, "additionalProperties": false}},
+        "measurements": {"type": "array", "items": {"$ref": "#/$defs/measurement"}},
+        "measurements_file": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "quality": {
+      "type": "object",
+      "required": ["flags"],
+      "properties": {
+        "flags": {"type": "array", "items": {"type": "string", "enum": ["missing_pixel_spacing", "spacing_uncalibrated", "implausible_extent", "burned_in_annotation", "lossy_compression", "orientation_inferred", "no_voi_in_source", "derived_image", "multi_frame", "low_resolution", "non_dicom_source", "counts_not_comparable", "unknown_modality"]}},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "deid": {
+      "type": "object",
+      "required": ["status", "method"],
+      "properties": {
+        "status": {"type": "string", "enum": ["deidentified", "synthetic", "not_applicable", "unverified"]},
+        "method": {"type": "string"},
+        "removed_tag_count": {"type": "integer"},
+        "burned_in_text_checked": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "external": {
+      "type": "object",
+      "description": "Context from outside the pixels. Always assertion_level external.",
+      "properties": {
+        "dataset": {"type": "string"},
+        "labels": {"type": "array", "items": {"type": "string"}},
+        "report_text": {"type": "string"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {"type": "string", "description": "Relative path to the natural-language reference file (context.md)."},
+        "template_version": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "dicom_headers": {"type": "string", "description": "Relative path to the de-identified DICOM JSON model (PS3.18 Annex F)."},
+        "original": {"type": ["string", "null"], "description": "Relative path to the original file if included (usually omitted)."}
+      },
+      "additionalProperties": false
+    },
+    "extensions": {"type": "object", "description": "Namespaced vendor/experimental fields, e.g. {\"org.example.foo\": {...}}."}
+  }
+}
