@@ -13,7 +13,7 @@
 | Dataset (Kaggle) | Size | Format | Metadata | Annotations | Use in OIP |
 |---|---|---|---|---|---|
 | RSNA Pneumonia Detection Challenge (`rsna-pneumonia-detection-challenge`) | 26,684 frontal CXR | **DICOM**, 1024×1024 (derived from NIH) | age, sex, ViewPosition, PixelSpacing (verify: images were resampled, so spacing may be recomputed) | pneumonia bounding boxes | converter tests, box-size in mm |
-| VinDr-CXR (`vinbigdata-chest-xray-abnormalities-detection`) | 18,000 PA CXR (15k train / 3k test) | **original DICOM** from many vendors (Philips, GE, Fujifilm, Siemens, Toshiba, Canon, Samsung) | full headers | 14 findings, boxes by 3 radiologists each (up to 58 annotations/img) | primary validation set: vendor diversity, spacing, findings F1 |
+| VinDr-CXR (`vinbigdata-chest-xray-abnormalities-detection`) | 18,000 PA CXR (15k train / 3k test); **~142 GB total, ~13 MB per DICOM** → we download a stratified 1,000-image sample (~13 GB) via per-file kagglehub downloads | **original DICOM** from many vendors (Philips, GE, Fujifilm, Siemens, Toshiba, Canon, Samsung) | full headers | 14 findings, boxes by 3 radiologists each (up to 58 annotations/img) | primary validation set: vendor diversity, spacing, findings F1 |
 | SIIM-ACR Pneumothorax (`siim-acr-pneumothorax-segmentation`) | ~12k | **DICOM** 1024×1024 | headers | pneumothorax masks (RLE) | mask-based measurement tests |
 | NIH ChestX-ray14 (`nih-chest-xrays/data`) | 112,120 | PNG 1024×1024 | CSV: age, sex, ViewPosition, **OriginalImagePixelSpacing**, original size | 14 labels (NLP) | non-DICOM path: spacing from CSV, `external` |
 | CheXpert (mirrors, e.g. `ashery/chexpert`) | 224k | JPG | frontal/lateral, AP/PA | 14 labels | label diversity; no spacing |
@@ -36,7 +36,10 @@ Spine Degenerative (MRI). These make Kaggle sufficient for CT/MRI too.
 | TCIA PET/CT collections (e.g. FDG-PET-CT-Lesions) | large | **DICOM NM/PT** with radiopharmaceutical module | TCIA licence | closest public source of real NM-family DICOM headers |
 | Synthetic NM DICOM (ours, pydicom) | unlimited | DICOM NM IOD | Apache-2.0 | exact ground truth for converter/tools |
 
+## Storage budget (measured 2026-09-05)
+VinDr full = ~142 GB (too large for a laptop); RSNA ≈ 3.7 GB; SIIM-ACR ≈ 5 GB; NIH full ≈ 42 GB. Phase 2 plan uses ≈ 25 GB: VinDr 1,000-image stratified sample (500 with findings, 500 normal, seed 0, ids in `data/vindr-cxr/sample_ids.txt`), RSNA + SIIM full, NIH CSV + `images_001` only. `scripts/fetch_data.py --phase 2 --dry-run` prints the plan without downloading.
+
 ## What OIP does about it
-1. Phase 2 validation on VinDr + RSNA (DICOM), NIH (PNG + CSV) for the non-DICOM path.
+1. Phase 2 validation on VinDr sample + RSNA (DICOM), NIH (PNG + CSV) for the non-DICOM path.
 2. Scintigraphy: Zenodo Paraguay set + synthetic NM DICOM in Phase 4; request BS-80K terms; consider TCIA PET/CT to test the NM radiopharmaceutical module on real headers.
 3. Action for the user: create Kaggle API token; re-run the Kaggle scintigraphy search via CLI (Q9 script).
