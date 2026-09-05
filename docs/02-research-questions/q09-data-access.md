@@ -1,8 +1,11 @@
 # Q9 — How do we access our reference data?
 
 ## Kaggle
-- Token: kaggle.com → Settings → API → *Create New Token* → `~/.kaggle/kaggle.json`
-  (or env `KAGGLE_USERNAME` / `KAGGLE_KEY`). Never commit it (`.gitignore` covers it).
+- Token: kaggle.com → Settings → API → *Create New Token*. Current Kaggle tokens are
+  stored at `~/.kaggle/access_token` (or exported as `KAGGLE_API_TOKEN`); the older
+  `~/.kaggle/kaggle.json` (`KAGGLE_USERNAME`/`KAGGLE_KEY`) still works. Status: configured
+  on this machine (2026-09-05, user `palpalio`). Never commit tokens (`.gitignore` covers both).
+- Check: `.venv/bin/python -c "import kagglehub; print(kagglehub.whoami())"` (run from the repo root).
 - Library: `kagglehub` (official). Example:
   ```python
   import kagglehub

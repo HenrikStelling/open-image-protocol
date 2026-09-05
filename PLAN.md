@@ -17,7 +17,7 @@ also `docs/03-brainstorm/open-questions.md`.
 | Synthetic phantoms (DX MONOCHROME1, NM whole-body) + Tier-0 tests | working |
 | Example packages | generated in `spec/examples/` |
 | GitHub remote | done — https://github.com/HenrikStelling/open-image-protocol (private) |
-| Kaggle credentials | **[needs you]** |
+| Kaggle credentials | done (2026-09-05) |
 
 ## 1. Principles (do not re-litigate without an OEP)
 R1 neutral core (mm, orientation, units, provenance for every modality) · R2 self-describing twice (schema + prose) ·
@@ -39,7 +39,7 @@ Goal: a package any developer can generate and any model can read.
 Exit criteria: `make test` + `make validate` green; five example packages; spec text reviewed.
 
 ### Phase 2 — Real X-ray data and measurements (weeks 3–6)
-- [ ] **[needs you]** Kaggle token → download VinDr-CXR, RSNA Pneumonia, SIIM-ACR, NIH (`scripts/fetch_data.py --phase 2`)
+- [ ] **[needs you]** accept competition rules on Kaggle for VinDr-CXR, RSNA Pneumonia, SIIM-ACR (one click each) → download VinDr-CXR, RSNA Pneumonia, SIIM-ACR, NIH (`scripts/fetch_data.py --phase 2`)
 - [ ] Convert 1,000 VinDr + 1,000 RSNA DICOMs; report completeness score, flag statistics per vendor
 - [ ] Anatomy adapter: CheXmask-style heart/lung segmentation (HybridGNet) and/or CXAS → `derived/regions`
 - [ ] Measurements: CTR, transverse cardiac diameter, lung areas, VinDr lesion long axis (mm)
@@ -101,5 +101,5 @@ Exit criteria: a model in an MCP host answers the self-check questions correctly
 
 ## 5. Immediate next actions
 1. **[needs you]** Review `docs/03-brainstorm/open-questions.md` (12 items) and the decisions log; say which defaults to change.
-2. **[needs you]** Kaggle API token in `~/.kaggle/kaggle.json`.
+2. **[needs you]** Accept the competition rules once on Kaggle (VinDr-CXR, RSNA Pneumonia, SIIM-ACR) so `scripts/fetch_data.py --phase 2` can download.
 3. Me: non-DICOM adapter, OCR burned-in check, remaining verbs, then Phase 2 conversions as soon as data is available.
