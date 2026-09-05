@@ -14,6 +14,21 @@ ROOT = Path(__file__).resolve().parents[1]; DATA = ROOT / "data"
 DATASETS = json.loads((ROOT / "scripts" / "datasets.json").read_text())
 
 
+def _retry(fn, *args, attempts=6, **kwargs):
+    """Kaggle downloads over flaky links drop with BrokenPipe/ChunkedEncoding; retry with exponential backoff.
+    kagglehub keeps completed files, so a retry resumes rather than restarts."""
+    import time
+    for i in range(attempts):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:  # noqa: BLE001
+            if i == attempts - 1:
+                raise
+            wait = min(300, 10 * 2 ** i)
+            print(f"  retry {i + 1}/{attempts - 1} after error: {type(e).__name__}: {str(e)[:120]} (waiting {wait}s)")
+            time.sleep(wait)
+
+
 def _kagglehub():
     try:
         import kagglehub
@@ -45,7 +60,7 @@ def vindr_sample(entry, kind, ident, dry):
     if dry:
         return
     for k, iid in enumerate(chosen, 1):
-        p = kh.competition_download(ident, path=f"train/{iid}.dicom")
+        p = _retry(kh.competition_download, ident, path=f"train/{iid}.dicom")
         if k % 50 == 0 or k == len(chosen):
             print(f"  {k}/{len(chosen)} -> {Path(p).parent}")
     _source_md(entry, DATA / entry["name"], f"- subset: {n} train images listed in sample_ids.txt (seed {seed}); files live in ~/.cache/kagglehub/competitions/{ident}/train/\n")
@@ -63,11 +78,11 @@ def fetch(entry, dry=False):
             print(f"{entry['name']}: {len(entry['files'])} file(s) ≈ {entry.get('approx_gb','?')} GB")
             if dry: return
             for fpath in entry["files"]:
-                print("  ", fpath, "->", fn(ident, path=fpath))
+                print("  ", fpath, "->", _retry(fn, ident, path=fpath))
         else:
             print(f"{entry['name']}: full download ≈ {entry.get('approx_gb','?')} GB")
             if dry: return
-            print("  ->", fn(ident))
+            print("  ->", _retry(fn, ident))
         _source_md(entry, dest, f"- files cached under ~/.cache/kagglehub/\n")
     elif kind == "zenodo":
         rec = json.load(urllib.request.urlopen(f"https://zenodo.org/api/records/{ident}"))
@@ -78,7 +93,7 @@ def fetch(entry, dry=False):
         for f in rec["files"]:
             out = dest / f["key"]
             if not out.exists():
-                print("  downloading", f["key"]); urllib.request.urlretrieve(f["links"]["self"], out)
+                print("  downloading", f["key"]); _retry(urllib.request.urlretrieve, f["links"]["self"], out)
     else:
         print(f"{entry['name']}: manual download required: {entry['url']}")
 
