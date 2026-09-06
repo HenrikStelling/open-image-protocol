@@ -58,7 +58,13 @@ make test           # phantom tests
 .venv/bin/python -m oip.cli convert path/to/image.dcm out/study   # -> out/study.oip/
 .venv/bin/python -m oip.cli describe spec/examples/synthetic-dx-chest.oip
 .venv/bin/python -m oip.cli validate spec/examples/synthetic-dx-chest.oip
+.venv/bin/oip measure  path/to/study.oip                       # chest anatomy regions + CTR (TorchXRayVision)
+.venv/bin/oip crop     path/to/study.oip 700 400 1200 1100 --upscale 2
+.venv/bin/oip overlay  path/to/study.oip --regions 1 2 --grid-mm 50
+.venv/bin/oip window   path/to/ct.oip --preset lung             # HU presets refuse non-HU images
 ```
+
+Real-data results so far: [docs/reports/](docs/reports/) (2,100 converted images across VinDr, RSNA, SIIM, NIH; anatomy and measurement reports).
 
 To hand an image to a model today: send `renders/annotated.png` (or
 `canonical.png`) plus `context.md`. Nothing else is required.
