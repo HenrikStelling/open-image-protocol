@@ -49,7 +49,7 @@ Overall: **only VinDr provides trustworthy absolute scale**, and only for 82 % o
 
 | Dataset | Size | Format | License | Notes |
 |---|---|---|---|---|
-| Bone scan images, IICS-UNA Paraguay (Zenodo 10.5281/zenodo.13900966) | 582 images / 291 patients, anterior + posterior, 256×1024 | image files (format to verify on download; ~80 MB zip) | CC-BY-4.0 | metastases yes/no; Tc-99m MDP ~20 mCi; best immediate NM reference |
+| Bone scan images, IICS-UNA Paraguay (Zenodo 10.5281/zenodo.13900966) | 582 images / 291 patients (60 with metastases, 231 without), anterior + posterior, 256×1024 | **downloaded 2026-09-06**: 16-bit greyscale PNG (`I;16`), dark background (hot = bright), folders by class and view; no DICOM headers, no spacing, no dose/time per image (paper: Tc-99m MDP ~20 mCi, ~740 MBq) | CC-BY-4.0 | best immediate real NM reference; needs the non-DICOM NM adapter with dataset-level hints (tracer, typical whole-body pixel size ~2.2–2.4 mm marked `external`, low confidence) |
 | BS-80K (West China Hospital) | 82,544 bone scan images / 3,247 patients | images (Google Drive) | not stated — **verify before use** | largest; region/lesion annotations per paper |
 | Thyroid scintigraphy multicentre (2,954 pts, 9 centres; PMC10453808 / arXiv 2503.00366) | 3k | — | not public | code only |
 | TCIA PET/CT collections (e.g. FDG-PET-CT-Lesions) | large | **DICOM NM/PT** with radiopharmaceutical module | TCIA licence | closest public source of real NM-family DICOM headers |

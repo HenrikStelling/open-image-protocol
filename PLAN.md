@@ -59,7 +59,8 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 Exit criteria (understanding tasks gate the release, D-015): statistically significant uplift on understanding tasks for every model; finding-level F1 reported but not gating; lower switch rate with labelled `external` text. Publish benchmark report → v0.2.
 
 ### Phase 4 — Scintigraphy (weeks 8–12)
-- [ ] Download Zenodo Paraguay bone scans; inspect format; build the non-DICOM NM adapter if they are PNG
+- [x] Download Zenodo Paraguay bone scans (582 × 16-bit PNG, 256×1024, ant/post pairs)
+- [ ] Non-DICOM NM adapter (PNG + hints: tracer, view from folder, approximate pixel size `external`)
 - [ ] Skeletal region template (atlas or model trained on BS-80K if licence allows **[needs you]** to confirm terms)
 - [ ] NM metrics: region counts, cps, anterior/posterior geometric mean, lesion/normal ratio, hot-spot count; BSI later
 - [ ] NM rendering study: sqrt vs log vs percentile windows, inverted vs canonical — which do models read best (extend OIP-Bench with NM tasks)
