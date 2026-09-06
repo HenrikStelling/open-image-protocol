@@ -52,7 +52,9 @@ Exit criteria: `make test` + `make validate` green; five example packages; spec 
 Exit criteria: measurement report with ICC/LoA per spacing source; converter handles ≥ 5 vendors without manual fixes.
 
 ### Phase 3 — OIP-Bench: does it help models? (weeks 5–9)
-- [ ] Benchmark harness: conditions {raw PNG, PNG + context.md, annotated + context.md}; tasks: modality, view, laterality, scale (mm estimate), CTR read/estimate, finding F1 (VinDr), misleading-context switch rate (MC-CXR recipe), cross-model variance, token cost
+- [x] Benchmark harness v0 (`bench/`): conditions {raw, ctx, annot}; tasks modality, view, left-edge side, scale availability, CTR, heart mm, findings F1 (VinDr); dry-run mode; results in `bench/results/` (ignored)
+- [ ] Misleading-context (MC-CXR recipe) and cross-model-variance tasks
+- [ ] **[needs you]** export `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` in the shell that runs `bench/run.py` (not in the repo); confirm model ids in `bench/run.py` MODELS
 - [ ] API keys available (D-024); decide open-model hosting (MedGemma or CXR-LLaVA) **[needs you]**
 - [ ] Self-check block failures fed back as protocol bugs
 - [ ] Ablation: which `context.md` sections carry the uplift → trim default profile

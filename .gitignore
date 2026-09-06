@@ -11,3 +11,4 @@ access_token
 *.egg-info/
 build/
 dist/
+bench/results/
