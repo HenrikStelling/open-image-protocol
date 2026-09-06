@@ -8,10 +8,10 @@ limit = int(sys.argv[1]) if len(sys.argv) > 1 else 4; out = Path(sys.argv[2]) if
 files = sorted(SRC.glob("*/*/*.png"))[:limit]
 for f in files:
     cls, view = f.parts[-3], f.parts[-2]
-    meta = dict(modality="NM", body_part="WHOLEBODY", view=view.upper(), original_spacing_mm=[2.3, 2.3], original_size=[256, 1024],
+    meta = dict(modality="NM", body_part="WHOLEBODY", view=view.upper(),   # no pixel size is asserted: it is not in the data (see notes)
                 dataset="Bone scan images, IICS-UNA Paraguay (Zenodo 10.5281/zenodo.13900966, CC-BY-4.0)",
                 labels=[cls], notes=["Label is the patient-level final diagnosis by a nuclear physician (bone metastases vs none), not a per-lesion annotation.",
-                                     "Pixel size is NOT in the data; 2.3 mm/px is the typical whole-body planar pixel size for a 256x1024 matrix (paper reports ~20 mCi Tc-99m MDP, planar whole-body).",
+                                     "Pixel size is NOT in the data. Whole-body planar 256x1024 matrices typically have 2.2-3.0 mm pixels; the adult body height in these frames suggests roughly 2.9 mm/px. Do not report sizes in mm.",
                                      "Whole-body scans: the anterior and posterior views of the same patient share the file number (A<n>/P<n>)."],
                 nm=dict(image_type="WHOLE BODY", radiopharmaceutical="Tc-99m MDP", radionuclide="Technetium Tc-99m", administered_activity_MBq=740.0, route="IV"))
     pkg = convert_image(f, out / f"{cls.replace(' ', '_').lower()}-{f.stem}", meta, title=f"Whole-body bone scintigraphy, {view.lower()} view (from PNG)")
