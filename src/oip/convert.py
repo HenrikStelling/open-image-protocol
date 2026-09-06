@@ -119,7 +119,7 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
             pipeline += steps
             if voi["source"] in ("auto_percentile", "sqrt", "log", "full_range"):
                 flags.append("no_voi_in_source")
-        ppath = f"pixels/frame-{i:04d}.png"; save_png16(arr[i], pkg / ppath); pix_paths.append(ppath)
+        ppath = f"pixels/frame-{i:04d}.png"; pix_fmt = save_png16(arr[i], pkg / ppath, int(ds.get("BitsStored", 16))); pix_paths.append(ppath)
         if n_frames == 1:
             rpath = "renders/canonical.png"; canon0 = u8
         else:
@@ -162,7 +162,7 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
     thumb = Image.fromarray(canon_for_annot); thumb.thumbnail((256, 256)); thumb.save(pkg / "renders/thumbnail.png")
     renders.append({"path": "renders/thumbnail.png", "purpose": "thumbnail", "frame": None, "width": thumb.width, "height": thumb.height,
                     "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."})
-    pipeline += ["write lossless 16-bit PNG per frame", "write canonical/annotated/thumbnail renders", "generate context.md", "validate against JSON Schema"]
+    pipeline += [f"write lossless {pix_fmt} PNG per frame", "write canonical/annotated/thumbnail renders", "generate context.md", "validate against JSON Schema"]
 
     # --- intensity
     vals = arr.astype(np.float64)
@@ -210,7 +210,7 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
         "intensity": intensity,
         "frames": frames,
         "renders": renders,
-        "pixels": {"format": "png16", "paths": pix_paths, "lossless": True, "stored_dtype": str(arr.dtype)},
+        "pixels": {"format": pix_fmt, "paths": pix_paths, "lossless": True, "stored_dtype": str(arr.dtype)},
         "derived": {"regions": [], "measurements": [], "measurements_file": "derived/measurements.json"},
         "quality": {"flags": sorted(set(flags)), "notes": notes},
         "deid": {"status": "synthetic" if synthetic else "deidentified", "method": "oip.deid basic profile: PHI keywords removed, UIDs sha256-hashed, private tags dropped, age banded, dates removed",

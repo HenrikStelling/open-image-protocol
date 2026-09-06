@@ -50,6 +50,12 @@ sub-object `dx` or `nm`), `geometry`, `intensity`, `frames`, `renders`,
    list what is missing.
 8. Validate against the JSON Schema before writing; a package that fails is not written.
 
+## Learnings from the first 2,100 real conversions (2026-09-06)
+- Headers lie in predictable ways: stale spacing after resampling (RSNA, SIIM), stripped identity/orientation (VinDr), anisotropic resizing (NIH). The converter now (a) checks physical extent against body-part ranges and downgrades confidence, (b) accepts dataset-level `hints` recorded as `external`, (c) recomputes per-axis spacing for resized PNGs.
+- Lossless storage should match the source bit depth: 8-bit sources go to 8-bit PNG (`pixels.format = png8`). Packages of JPEG-compressed 8-bit DICOMs are still ~9× the source because PNG is lossless while the source was lossy; an OEP could allow keeping the original JPEG bitstream as the pixel layer.
+- `context.md` costs ~850–900 tokens for the `core` profile, under the 1,500 target.
+- Throughput: 0.85 s/image for 12–16-bit JPEG-2000 DICOMs, <0.1 s for 8-bit sources, single core.
+
 ## What OIP does about it
 Implemented in v0: `src/oip/convert.py` (DICOM path for DX/CR/CT-single-frame and
 NM multi-frame), `render.py`, `context.py`, `validate.py`, CLI `oip convert`.

@@ -95,7 +95,7 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
                       "rescale": {"slope": 1.0, "intercept": 0.0}, "value_range": {"min": float(arr.min()), "max": float(arr.max()), "p0_5": float(np.percentile(arr, 0.5)), "p99_5": float(np.percentile(arr, 99.5))},
                       "voi": voi, "canonical_polarity": "high_is_bright", "source_inverted_for_render": False},
         "frames": [], "renders": renders,
-        "pixels": {"format": "png16" if bits == 16 else "png16", "paths": ["pixels/frame-0000.png"], "lossless": True, "stored_dtype": str(arr.dtype)},
+        "pixels": {"format": "png16" if bits == 16 else "png8", "paths": ["pixels/frame-0000.png"], "lossless": True, "stored_dtype": str(arr.dtype)},
         "derived": {"regions": [], "measurements": [], "measurements_file": "derived/measurements.json"},
         "quality": {"flags": sorted(set(flags)), "notes": notes},
         "deid": {"status": "deidentified", "method": "source dataset is public and de-identified; no DICOM headers present", "removed_tag_count": 0, "burned_in_text_checked": False},

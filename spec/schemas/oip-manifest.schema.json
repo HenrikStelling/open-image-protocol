@@ -286,7 +286,7 @@
     "pixels": {
       "type": "object",
       "properties": {
-        "format": {"type": "string", "enum": ["png16", "npy", "zarr"]},
+        "format": {"type": "string", "enum": ["png8", "png16", "npy", "zarr"], "description": "png8 for sources with <= 8 bits stored (lossless), png16 otherwise."},
         "paths": {"type": "array", "items": {"type": "string"}},
         "lossless": {"type": "boolean"},
         "stored_dtype": {"type": "string"}

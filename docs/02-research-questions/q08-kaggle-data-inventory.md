@@ -22,6 +22,18 @@ Later phases (already on Kaggle, DICOM): RSNA Intracranial Hemorrhage (CT),
 RSNA 2022 Cervical Spine (CT), RSNA 2023 Abdominal Trauma (CT), RSNA 2024 Lumbar
 Spine Degenerative (MRI). These make Kaggle sufficient for CT/MRI too.
 
+
+## Confirmed by conversion (2026-09-06, 2,100 images, 0 failures; see `docs/reports/phase2-conversion-report.md`)
+
+| Dataset | What the headers really contain | Consequence for OIP |
+|---|---|---|
+| VinDr-CXR (1,000 sample) | Modality, ViewPosition, BodyPart, Manufacturer, UIDs and PatientOrientation are all stripped. PixelSpacing present in 82 %; 18 % have none; 0.6 % have implausible values (image width 180 mm or 2,688 mm). 22 % MONOCHROME1; 96 % carry a VOI window; bit depth 10–16; 38 % JPEG 2000 lossless. Width median 348 mm where spacing exists. | Dataset-level hints supply modality/body part/view as `external`; orientation is always inferred; 18 % of packages carry `missing_pixel_spacing` and refuse mm. Best multi-vendor bit-depth/polarity test set. |
+| RSNA Pneumonia | 8-bit JPEG-baseline DICOM, 1024×1024, but PixelSpacing still 0.139 mm from the original ~3,000-px NIH images → computed chest width 142–199 mm. No VOI, no vendor, no PatientOrientation. | `implausible_extent` fires on 100 %; calibration confidence downgraded to `low`. RSNA is unusable for absolute mm without an external correction; fine for ratios (CTR) and for findings/boxes. |
+| SIIM-ACR (mirror) | Identical pattern to RSNA (same NIH-derived preprocessing): 8-bit, 1024², stale 0.139 mm spacing. | Same handling; masks make it useful for area *ratios*, not mm. |
+| NIH ChestX-ray14 sample | 8-bit PNG 1024×1024 resized from 3056×2544 (and other sizes) → anisotropic pixels (e.g. 0.345 × 0.415 mm). CSV gives view, age, sex, original size and spacing. | Non-DICOM adapter recomputes per-axis spacing (`dataset_metadata`, confidence `low`) and records the aspect distortion; median width 420 mm is plausible. |
+
+Overall: **only VinDr provides trustworthy absolute scale**, and only for 82 % of images. Every other Kaggle CXR source is ratio-only. This is the strongest argument for the `spacing_source`/confidence model and the mm refusal rule.
+
 ## Scintigraphy on Kaggle (found 2026-09-06)
 
 | Dataset (Kaggle) | Size | Licence | Notes |

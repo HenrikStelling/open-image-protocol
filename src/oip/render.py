@@ -54,11 +54,15 @@ def canonical_8bit(ds: Dataset, frame: np.ndarray) -> tuple[np.ndarray, dict, li
     return u8, voi, steps
 
 
-def save_png16(arr: np.ndarray, path) -> None:
+def save_png16(arr: np.ndarray, path, bits_stored: int = 16) -> str:
+    """Lossless PNG of stored pixel values. 8-bit PNG when the source has <= 8 bits stored (keeps packages small);
+    16-bit otherwise. Signed data is shifted to unsigned (offset recorded by the caller). Returns the format name."""
     a = np.asarray(arr)
-    if a.dtype.kind == "i":  # signed -> store as int32 PNG not supported; shift to uint16 with note in manifest
+    if a.dtype.kind == "i":
         a = (a.astype(np.int64) - int(a.min())).astype(np.uint16)
-    Image.fromarray(a.astype(np.uint16)).save(path)
+    if bits_stored <= 8 and a.max() <= 255:
+        Image.fromarray(a.astype(np.uint8)).save(path); return "png8"
+    Image.fromarray(a.astype(np.uint16)).save(path); return "png16"
 
 
 def _font(size: int):
