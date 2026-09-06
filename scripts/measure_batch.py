@@ -15,7 +15,7 @@ for i, p in enumerate(pkgs, 1):
 ctrs = [r["ctr"] for r in res if r.get("ctr")]
 out = {"dataset": name, "n": len(res), "with_ctr": len(ctrs), "errors": sum(1 for r in res if "error" in r),
        "ctr_median": statistics.median(ctrs) if ctrs else None, "ctr_p10": sorted(ctrs)[len(ctrs)//10] if ctrs else None, "ctr_p90": sorted(ctrs)[9*len(ctrs)//10] if ctrs else None,
-       "ctr_gt_0_5": sum(c > 0.5 for c in ctrs), "laterality_notes": sum(1 for r in res if r.get("notes")), "seconds_per_image": round((time.time()-t0)/max(len(res),1), 2), "results": res}
+       "ctr_gt_0_5": sum(c > 0.5 for c in ctrs), "laterality_notes": sum(1 for r in res if any("check orientation" in n for n in r.get("notes", []))), "no_spacing": sum(1 for r in res if any("No calibrated spacing" in n for n in r.get("notes", []))), "seconds_per_image": round((time.time()-t0)/max(len(res),1), 2), "results": res}
 (ROOT / "data/oip" / name / "_measure.json").write_text(json.dumps(out, indent=1))
 print(json.dumps({k: v for k, v in out.items() if k != "results"}, indent=1))
 for r in [r for r in res if "error" in r][:3]: print("ERR", r)
