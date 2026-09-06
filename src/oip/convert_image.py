@@ -67,7 +67,8 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
         units = "counts"; flags.append("counts_not_comparable")
         nz = np.unique(arr[arr > 0])
         if nz.size > 1:
-            k = np.round(nz / float(nz.min()))         # integer count for each distinct value if the image was linearly stretched
+            step0 = float(np.diff(np.concatenate([[0], nz])).min())   # smallest gap between distinct values ≈ one count
+            k = np.round(nz / step0)                   # integer count for each distinct value if the image was linearly stretched
             step = float((nz * k).sum() / (k * k).sum())  # least-squares step (the smallest value is rounded, this is not)
             q = nz / step
             if step > 1.5 and np.abs(q - np.round(q)).max() < 0.15 and 20 < arr.max() / step < 65535:
