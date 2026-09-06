@@ -32,8 +32,19 @@
   "source": "kaggle-competition:siim-acr-pneumothorax-segmentation",
   "url": "https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation",
   "licence": "competition rules",
-  "use": "DICOM + masks; mask-based measurement tests",
-  "approx_gb": 5,
+  "use": "Kaggle package holds only 3,205 stage-2 TEST DICOMs (no masks); training DICOMs + masks were on a Google Cloud DICOM store. Use for header diversity only.",
+  "approx_gb": 0.5,
+  "phases": [
+   2
+  ]
+ },
+ {
+  "name": "siim-acr-train-mirror",
+  "source": "kaggle-dataset:jesperdramsch/siim-acr-pneumothorax-segmentation-data",
+  "url": "https://www.kaggle.com/datasets/jesperdramsch/siim-acr-pneumothorax-segmentation-data",
+  "licence": "competition data re-hosted by a community member; SIIM-ACR competition rules apply (research use)",
+  "use": "stage-1 training DICOMs + train-rle.csv pneumothorax masks -> mask-based measurement tests",
+  "approx_gb": 3.3,
   "phases": [
    2
   ]
