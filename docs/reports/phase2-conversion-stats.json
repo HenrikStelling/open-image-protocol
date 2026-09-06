@@ -1,0 +1,38 @@
+{
+ "vindr": {
+  "n": 1000,
+  "ok": 1000,
+  "fail": 0,
+  "seconds": 851.3,
+  "failures": [],
+  "summary_md": "### vindr\n- converted 1000/1000 (0 failures) in 851.3 s (0.85 s/image)\n- package/source size ratio: 1.23; context.md mean 3331 chars (~833 tokens)\n- spacing_source: PixelSpacing (815), none (185)\n- confidence: medium (809), none (185), low (6)\n- photometric: MONOCHROME2 (784), MONOCHROME1 (216)\n- bits: 12 (702), 14 (253), 16 (44), 10 (1)\n- voi: WindowCenterWidth (964), auto_percentile (36)\n- orientation: inferred (1000)\n- modality_level: external (1000)\n- view: PA (1000)\n- vendor: None (1000)\n- ts: Implicit VR Little Endian (550), JPEG 2000 Image Compression (Lossless Only) (378), Explicit VR Little Endian (72)\n- computed image width from header spacing: min 180 / median 348 / max 2688 mm (n=815)\n- flags: orientation_inferred (1000, 100%), spacing_uncalibrated (815, 82%), missing_pixel_spacing (185, 18%), no_voi_in_source (36, 4%), implausible_extent (6, 1%)\n",
+  "generated": "2026-09-06 08:53"
+ },
+ "rsna": {
+  "n": 500,
+  "ok": 500,
+  "fail": 0,
+  "seconds": 34.3,
+  "failures": [],
+  "summary_md": "### rsna\n- converted 500/500 (0 failures) in 34.3 s (0.07 s/image)\n- package/source size ratio: 9.41; context.md mean 3568 chars (~892 tokens)\n- spacing_source: PixelSpacing (500)\n- confidence: low (500)\n- photometric: MONOCHROME2 (500)\n- bits: 8 (500)\n- voi: auto_percentile (500)\n- orientation: inferred (500)\n- modality_level: measured (500)\n- view: PA (274), AP (226)\n- vendor: None (500)\n- ts: JPEG Baseline (Process 1) (500)\n- computed image width from header spacing: min 142 / median 146 / max 199 mm (n=500)\n- flags: implausible_extent (500, 100%), lossy_compression (500, 100%), no_voi_in_source (500, 100%), orientation_inferred (500, 100%), spacing_uncalibrated (500, 100%)\n",
+  "generated": "2026-09-06 08:53"
+ },
+ "siim": {
+  "n": 300,
+  "ok": 300,
+  "fail": 0,
+  "seconds": 20.6,
+  "failures": [],
+  "summary_md": "### siim\n- converted 300/300 (0 failures) in 20.6 s (0.07 s/image)\n- package/source size ratio: 9.40; context.md mean 3569 chars (~892 tokens)\n- spacing_source: PixelSpacing (300)\n- confidence: low (300)\n- photometric: MONOCHROME2 (300)\n- bits: 8 (300)\n- voi: auto_percentile (300)\n- orientation: inferred (300)\n- modality_level: measured (300)\n- view: PA (176), AP (124)\n- vendor: None (300)\n- ts: JPEG Baseline (Process 1) (300)\n- computed image width from header spacing: min 142 / median 146 / max 199 mm (n=300)\n- flags: implausible_extent (300, 100%), lossy_compression (300, 100%), no_voi_in_source (300, 100%), orientation_inferred (300, 100%), spacing_uncalibrated (300, 100%)\n",
+  "generated": "2026-09-06 08:53"
+ },
+ "nih": {
+  "n": 300,
+  "ok": 300,
+  "fail": 0,
+  "seconds": 17.4,
+  "failures": [],
+  "summary_md": "### nih\n- converted 300/300 (0 failures) in 17.4 s (0.06 s/image)\n- package/source size ratio: 3.39; context.md mean 3512 chars (~878 tokens)\n- spacing_source: dataset_metadata (300)\n- confidence: low (300)\n- photometric: MONOCHROME2 (300)\n- bits: 8 (300)\n- voi: full_range (300)\n- orientation: inferred (300)\n- modality_level: external (300)\n- view: PA (186), AP (114)\n- vendor: None (300)\n- ts: png (300)\n- computed image width from header spacing: min 316 / median 420 / max 428 mm (n=300)\n- flags: no_voi_in_source (300, 100%), non_dicom_source (300, 100%), orientation_inferred (300, 100%), spacing_uncalibrated (300, 100%)\n",
+  "generated": "2026-09-06 08:53"
+ }
+}
