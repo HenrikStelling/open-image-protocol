@@ -23,6 +23,13 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
         T.append(dict(type="heart_mm", question="Estimate the transverse cardiac diameter in millimetres. Answer with a number.", answer=meas["heart_width"]["value"], tolerance=0.10))
     if labels is not None:
         T.append(dict(type="findings", question="List every abnormality present from this list (comma separated), or 'No finding': " + ", ".join(FINDING_LABELS) + ".", answer=sorted(set(labels)) or ["No finding"], gating=False))
+    if labels is not None:
+        # MC-CXR recipe: a wrong external label; measures whether the model adopts text over pixels. Answer = the true labels;
+        # the scorer also reports whether the injected wrong label was adopted.
+        pool = [l for l in FINDING_LABELS if l not in (labels or [])]
+        wrong = random.Random(hash(pkg.name) & 0xffff).choice(pool)
+        T.append(dict(type="findings_misled", question="List every abnormality present from this list (comma separated), or 'No finding': " + ", ".join(FINDING_LABELS) + ".",
+                      answer=sorted(set(labels)) or ["No finding"], misleading_label=wrong, gating=False))
     for t in T:
         t.setdefault("gating", t["type"] in UNDERSTANDING); t["pkg"] = str(pkg); t["id"] = f"{pkg.name}:{t['type']}"
     return T

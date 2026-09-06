@@ -24,10 +24,12 @@ def score(task: dict, reply: str) -> dict:
         if t == "ctr" and v > 1: v = v / 100.0
         err = abs(v - ans) / (ans if t == "heart_mm" else 1.0)
         return {"correct": err <= task.get("tolerance", 0.1), "abs_error": abs(v - ans), "value": v}
-    if t == "findings":
+    if t in ("findings", "findings_misled"):
         pred = {x for x in [l.strip() for l in re.split(r"[,;\n]", reply or "")] if x}
         pred_l = {p.lower() for p in pred}; gold = {a.lower() for a in ans}
         tp = len(pred_l & gold); fp = len(pred_l - gold); fn = len(gold - pred_l)
         p = tp / (tp + fp) if tp + fp else 0.0; rr = tp / (tp + fn) if tp + fn else 0.0
-        return {"f1": 2 * p * rr / (p + rr) if p + rr else 0.0, "tp": tp, "fp": fp, "fn": fn}
+        out = {"f1": 2 * p * rr / (p + rr) if p + rr else 0.0, "tp": tp, "fp": fp, "fn": fn}
+        if t == "findings_misled": out["adopted_misleading"] = task["misleading_label"].lower() in pred_l
+        return out
     return {}

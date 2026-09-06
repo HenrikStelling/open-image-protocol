@@ -27,6 +27,15 @@ def build_prompt(task: dict, condition: str) -> tuple[str, list[tuple[str, bytes
     elif condition == "annot":
         images.append(("image/png", (pkg / "renders/annotated.png").read_bytes()))
         text = "Reference file for the attached (annotated) image (OIP context.md):\n\n" + (pkg / "context.md").read_text() + "\n\nQuestion: " + task["question"]
+    elif condition in ("misled_plain", "misled_oip"):
+        # misleading text: plain = bare sentence (how reports are pasted today); oip = inside context.md's External section with the
+        # 'external, verify against the pixels' label. The difference between the two adoption rates is the protocol's contribution.
+        images.append(("image/png", (pkg / "renders/canonical.png").read_bytes())); wrong = task.get("misleading_label", "Cardiomegaly")
+        if condition == "misled_plain":
+            text = f"Prior report note: {wrong}.\n\nQuestion: " + task["question"]
+        else:
+            ctx = (pkg / "context.md").read_text().replace("## Unknowns and cautions", f"- Dataset labels [external — verify against the pixels]: {wrong}\n\n## Unknowns and cautions", 1)
+            text = "Reference file for the attached image (OIP context.md):\n\n" + ctx + "\n\nQuestion: " + task["question"]
     else:
         raise KeyError(condition)
     return text, images
@@ -70,7 +79,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--conditions", default="raw,ctx,annot"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
+    ap.add_argument("--conditions", default="raw,ctx,annot,misled_plain,misled_oip"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
     labels = vindr_labels() if a.dataset == "vindr" else None
@@ -79,7 +88,7 @@ def main():
     (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
     conds = a.conditions.split(","); models = a.models.split(",")
     if a.dry_run:
-        chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks) for c in conds}
+        chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if (c.startswith("misled")) == (t["type"] == "findings_misled")) for c in conds}
         calls = len(tasks); in_tok = sum(v // 4 for v in chars.values()) + IMAGE_TOKENS * calls * len(conds); out_tok = 400 * calls * len(conds)   # ~400 output incl. thinking
         cost = {m: round(in_tok / 1e6 * PRICES[m][0] + out_tok / 1e6 * PRICES[m][1], 2) for m in models}
         print(json.dumps({"tasks": len(tasks), "by_type": {t: sum(1 for x in tasks if x["type"] == t) for t in sorted({x["type"] for x in tasks})}, "calls_per_model": len(tasks) * len(conds),
@@ -90,6 +99,8 @@ def main():
         prov, mid = MODELS[m]
         for c in conds:
             for i, t in enumerate(tasks, 1):
+                if (c.startswith("misled")) != (t["type"] == "findings_misled"):
+                    continue
                 text, imgs = build_prompt(t, c)
                 try:
                     reply = call(prov, mid, text, imgs); err = None

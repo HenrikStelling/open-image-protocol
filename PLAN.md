@@ -53,7 +53,9 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 
 ### Phase 3 — OIP-Bench: does it help models? (weeks 5–9)
 - [x] Benchmark harness v0 (`bench/`): conditions {raw, ctx, annot}; tasks modality, view, left-edge side, scale availability, CTR, heart mm, findings F1 (VinDr); dry-run mode; results in `bench/results/` (ignored)
-- [ ] Misleading-context (MC-CXR recipe) and cross-model-variance tasks
+- [x] Misleading-context conditions (`misled_plain` vs `misled_oip`, adoption rate of a wrong label)
+- [ ] Cross-model-variance aggregation in the report
+- Cost estimate (dry run, 30 images): ≈ $11 Opus 5 + $5 GPT + $1 Gemini per full pass; 100 images ≈ $55 total. Anthropic id verified (`claude-opus-5`); GPT/Gemini ids must be confirmed before a paid run.
 - [ ] **[needs you]** export `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` in the shell that runs `bench/run.py` (not in the repo); confirm model ids in `bench/run.py` MODELS
 - [ ] API keys available (D-024); decide open-model hosting (MedGemma or CXR-LLaVA) **[needs you]**
 - [ ] Self-check block failures fed back as protocol bugs
