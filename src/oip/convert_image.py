@@ -51,8 +51,10 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
         lo, hi = PLAUSIBLE_WIDTH_MM[str(body).upper()]
         if not (lo <= extent[1] <= hi):
             flags.append("implausible_extent"); cal["confidence"] = "low"; notes.append(f"Expected {body} width {lo}-{hi} mm, computed {extent[1]:.0f} mm.")
-    if view and str(view).upper() in ("PA", "AP"):
+    if view and str(view).upper() in ("PA", "AP", "ANTERIOR"):
         row, col, lvl, onote = "L", "F", "inferred", f"No orientation metadata; assumed conventional display for view {view} (patient's right on image left)."
+    elif view and str(view).upper() == "POSTERIOR":
+        row, col, lvl, onote = "R", "F", "inferred", "No orientation metadata; assumed conventional posterior display (mirrored: patient's left on image left)."
     else:
         row = col = None; lvl, onote = "unknown", "Orientation unknown; do not assume laterality."
     orient = dict(row_direction=row, column_direction=col, edge_labels=dict(left=OPPOSITE.get(row) if row else None, right=row, top=OPPOSITE.get(col) if col else None, bottom=col), assertion_level=lvl, note=onote)
@@ -60,13 +62,31 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
     # pixels + renders (8-bit sources: canonical == stored; assume already MONOCHROME2-like display)
     bits = 16 if arr.dtype == np.uint16 else 8
     Image.fromarray(arr).save(pkg / "pixels/frame-0000.png")
-    if bits == 8:
+    units = "relative"; counts_note = None; count_step = None
+    if fam == "scintigraphy":
+        units = "counts"; flags.append("counts_not_comparable")
+        nz = np.unique(arr[arr > 0])
+        if nz.size > 1:
+            k = np.round(nz / float(nz.min()))         # integer count for each distinct value if the image was linearly stretched
+            step = float((nz * k).sum() / (k * k).sum())  # least-squares step (the smallest value is rounded, this is not)
+            q = nz / step
+            if step > 1.5 and np.abs(q - np.round(q)).max() < 0.15 and 20 < arr.max() / step < 65535:
+                count_step = round(step, 3)
+                counts_note = (f"Stored values are quantised in steps of {step:.1f} (image stretched to full 16-bit range); "
+                               f"original photon counts ≈ stored value / {step:.1f} (max ≈ {arr.max()/step:.0f} counts). This recovery is inferred, not measured.")
+    if fam == "scintigraphy":
+        hi = float(np.percentile(arr[arr > 0], 99.5)) if (arr > 0).any() else float(arr.max())
+        u8 = np.clip(np.sqrt(np.clip(arr.astype(np.float64), 0, hi)) / np.sqrt(hi) * 255, 0, 255).astype(np.uint8)
+        voi = dict(source="sqrt", center=None, width=None, function=None, lower=0.0, upper=hi); tr = "square-root scaling of counts, clipped at the 99.5th percentile of non-zero pixels, to 8-bit (hot = bright)."
+        Image.fromarray(255 - u8).save(pkg / "renders/inverted.png")
+    elif bits == 8:
         u8 = arr.astype(np.uint8); voi = dict(source="full_range", center=None, width=None, function=None, lower=0.0, upper=255.0)
         tr = "source is already 8-bit; no window applied; assumed display polarity (bone bright) from the dataset."
     else:
         lo, hi = np.percentile(arr, [0.5, 99.5]); u8 = np.clip((arr - lo) / max(hi - lo, 1) * 255, 0, 255).astype(np.uint8)
         voi = dict(source="auto_percentile", center=None, width=None, function=None, lower=float(lo), upper=float(hi)); tr = "linear window 0.5-99.5 percentile to 8-bit."
     flags.append("no_voi_in_source")
+    if counts_note: notes.append(counts_note)
     if rows < 1024 and cols < 1024: flags.append("low_resolution")
     Image.fromarray(u8).save(pkg / "renders/canonical.png")
     title = title or f"{ {'DX':'Radiograph','CR':'Radiograph'}.get(modality, modality)}" + (f", {str(body).lower()}" if body else "") + (f", {view}" if view else "") + " (from PNG)"
@@ -74,6 +94,7 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
     ann.save(pkg / "renders/annotated.png")
     th = Image.fromarray(u8); th.thumbnail((256, 256)); th.save(pkg / "renders/thumbnail.png")
     renders = [dict(path="renders/canonical.png", purpose="canonical", frame=0, width=cols, height=rows, transform=tr + " No rotation/flip/crop/resample."),
+               *([dict(path="renders/inverted.png", purpose="inverted", frame=0, width=cols, height=rows, transform="canonical render inverted (hot = dark), the conventional nuclear-medicine display.")] if fam == "scintigraphy" else []),
                dict(path="renders/annotated.png", purpose="annotated", frame=None, width=ann.width, height=ann.height, transform="canonical render pasted into a dark margin; image content unchanged and pixel-aligned at the stated offset.", annotations=ann_notes),
                dict(path="renders/thumbnail.png", purpose="thumbnail", frame=None, width=th.width, height=th.height, transform="canonical render downsampled to fit 256 px; preview only.")]
     ext = {k: v for k, v in dict(dataset=meta.get("dataset"), labels=meta.get("labels"), notes=meta.get("notes")).items() if v}
@@ -91,7 +112,7 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
                         "patient_position": {"value": None, "assertion_level": "unknown"},
                         "device": ({"manufacturer": meta["manufacturer"]} if meta.get("manufacturer") else {}), "acquisition_datetime_relative": None},
         "geometry": {"rows": rows, "columns": cols, "number_of_frames": 1, "pixel_spacing_mm": spacing, "spacing_source": source, "calibration": cal, "physical_extent_mm": extent, "orientation": orient},
-        "intensity": {"bits_allocated": bits, "bits_stored": bits, "signed": False, "photometric": "MONOCHROME2", "presentation_lut": None, "units": "relative",
+        "intensity": {"bits_allocated": bits, "bits_stored": bits, "signed": False, "photometric": "MONOCHROME2", "presentation_lut": None, "units": units,
                       "rescale": {"slope": 1.0, "intercept": 0.0}, "value_range": {"min": float(arr.min()), "max": float(arr.max()), "p0_5": float(np.percentile(arr, 0.5)), "p99_5": float(np.percentile(arr, 99.5))},
                       "voi": voi, "canonical_polarity": "high_is_bright", "source_inverted_for_render": False},
         "frames": [], "renders": renders,
@@ -101,6 +122,14 @@ def convert_image(src: str | Path, out_dir: str | Path, meta: dict, *, title: st
         "deid": {"status": "deidentified", "method": "source dataset is public and de-identified; no DICOM headers present", "removed_tag_count": 0, "burned_in_text_checked": False},
         "context": {"path": "context.md", "template_version": TEMPLATE_VERSION},
     }
+    if fam == "scintigraphy":
+        nm = meta.get("nm") or {}
+        m["acquisition"]["nm"] = {"image_type": nm.get("image_type"), "radiopharmaceutical": nm.get("radiopharmaceutical"), "radionuclide": nm.get("radionuclide"),
+                                  "administered_activity_MBq": {"value": nm.get("administered_activity_MBq"), "unit": "MBq", "assertion_level": "external" if nm.get("administered_activity_MBq") else "unknown"},
+                                  "uptake_time_min": {"value": nm.get("uptake_time_min"), "unit": "min", "assertion_level": "external" if nm.get("uptake_time_min") else "unknown"},
+                                  "route": nm.get("route"), "energy_windows": nm.get("energy_windows", []), "collimator": nm.get("collimator"), "number_of_detectors": None,
+                                  "whole_body": {"technique": None, "scan_length_mm": None, "scan_velocity_mm_per_s": None}, "corrections": [], "termination_condition": None}
+        if count_step: m["extensions"] = {"org.openimageprotocol.counts_recovery": {"quantisation_step": count_step, "estimated_max_counts": round(float(arr.max()) / count_step), "assertion_level": "inferred"}}
     if ext: m["external"] = ext
     errs = validate_manifest(m)
     if errs: raise ValueError("\n".join(errs))

@@ -65,7 +65,8 @@ def build_context(m: dict) -> str:
     if geo["pixel_spacing_mm"]:
         sp = geo["pixel_spacing_mm"]; cal = geo["calibration"]
         L.append(f"- Scale [{'measured' if geo['spacing_source']!='dataset_metadata' else 'external'}]: {sp[0]:g} × {sp[1]:g} mm per pixel (row × column), source `{geo['spacing_source']}`, valid in the {cal['plane']} plane, confidence {cal['confidence']}. Image extent ≈ {geo['physical_extent_mm'][0]:.0f} × {geo['physical_extent_mm'][1]:.0f} mm (height × width)."
-                 + (" Anatomy is magnified relative to the detector; absolute sizes may be over-estimated by roughly 5–10 % unless corrected." if cal["plane"] == "detector" else ""))
+                 + (" Anatomy is magnified relative to the detector; absolute sizes may be over-estimated by roughly 5–10 % unless corrected." if cal["plane"] == "detector" and fam == "projection_radiography" else "")
+                 + (" Planar gamma-camera images have no geometric magnification, but resolution is coarse (several mm) and the pixel size here is not from the header." if fam == "scintigraphy" and geo["spacing_source"] in ("dataset_metadata",) else ""))
     else:
         L.append("- Scale [unknown]: NO pixel spacing is available. Do not state sizes in mm or cm; use pixels or ratios only.")
     L.append(f"- Pixel values: {inten['bits_stored']}-bit stored, units `{inten['units']}`; window for the canonical render: {inten['voi'].get('source')}"
