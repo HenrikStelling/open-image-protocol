@@ -46,6 +46,9 @@ NM guardrails (enforced in tools, explained in `context.md`):
   by decay-corrected administered dose and uptake time.
 - Whole-body posterior view is mirrored; ROI templates must be flipped.
 
+## 6.4b Recovering counts from exported scintigraphy images (finding, 2026-09-06)
+Public bone-scan PNGs (Zenodo IICS-UNA set) are 16-bit images linearly stretched so that the per-image maximum is 65535. The stored values therefore sit on a lattice `value = floor(step × counts)`; fitting `step` (smallest value gap, then iterative least squares) recovers the original photon counts up to that per-image factor. On the Zenodo set this succeeds for 414/582 images (recovered maxima 72–1,110 counts). OIP records the result under `extensions["org.openimageprotocol.counts_recovery"]` with `assertion_level = inferred` and states it in `context.md`. Absolute cross-patient comparison still needs dose, time and duration, which such exports lack. To do: the 29 % of images where the lattice fit fails (likely a half-step local minimum).
+
 ## 6.5 How measurements are represented
 `derived/measurements.json` — one record per measurement:
 ```json

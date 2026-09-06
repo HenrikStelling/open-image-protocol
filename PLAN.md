@@ -60,7 +60,8 @@ Exit criteria (understanding tasks gate the release, D-015): statistically signi
 
 ### Phase 4 — Scintigraphy (weeks 8–12)
 - [x] Download Zenodo Paraguay bone scans (582 × 16-bit PNG, 256×1024, ant/post pairs)
-- [ ] Non-DICOM NM adapter (PNG + hints: tracer, view from folder, approximate pixel size `external`)
+- [x] Non-DICOM NM adapter (PNG + hints; counts units; sqrt window; inverted render; count recovery from quantisation, 71 % success) — `scripts/bonescan_to_oip.py`
+- [ ] Count-recovery robustness for the remaining 29 % (multi-start lattice fit)
 - [ ] Skeletal region template (atlas or model trained on BS-80K if licence allows **[needs you]** to confirm terms)
 - [ ] NM metrics: region counts, cps, anterior/posterior geometric mean, lesion/normal ratio, hot-spot count; BSI later
 - [ ] NM rendering study: sqrt vs log vs percentile windows, inverted vs canonical — which do models read best (extend OIP-Bench with NM tasks)
