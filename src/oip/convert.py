@@ -37,9 +37,16 @@ def _dicom_json(ds: pydicom.Dataset) -> dict:
 
 
 def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = None, title: str | None = None,
-            include_original: bool = False, synthetic: bool = False) -> Path:
+            include_original: bool = False, synthetic: bool = False, hints: dict | None = None) -> Path:
+    """hints: dataset-level facts used ONLY when the header lacks them (e.g. {"modality": "DX", "body_part": "CHEST",
+    "view": "PA"}); they are recorded with assertion_level 'external', never 'measured'."""
     src = Path(src)
     ds = pydicom.dcmread(str(src), force=True)
+    hints = hints or {}
+    hinted: set[str] = set()
+    for kw, hk in (("Modality", "modality"), ("BodyPartExamined", "body_part"), ("ViewPosition", "view"), ("ImageLaterality", "laterality")):
+        if hk in hints and not ds.get(kw):
+            ds.add_new(pydicom.datadict.tag_for_keyword(kw), pydicom.datadict.dictionary_VR(pydicom.datadict.tag_for_keyword(kw)), hints[hk]); hinted.add(hk)
     arr = ds.pixel_array
     if arr.ndim == 2:
         arr = arr[None, ...]
@@ -71,6 +78,8 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
     rows, cols = int(ds.Rows), int(ds.Columns)
     extent = [rows * sp["spacing"][0], cols * sp["spacing"][1]] if sp["spacing"] else None
     orient = derive_orientation(ds, view)
+    if "view" in hinted and orient["assertion_level"] == "inferred":
+        orient["note"] += " The view itself came from dataset metadata (external), not from the header."
     flags: list[str] = []
     notes: list[str] = []
     if sp["spacing"] is None:
@@ -80,7 +89,9 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
     if extent and body and body.upper() in PLAUSIBLE_WIDTH_MM:
         lo, hi = PLAUSIBLE_WIDTH_MM[body.upper()]
         if not (lo <= extent[1] <= hi):
-            flags.append("implausible_extent"); notes.append(f"Expected {body} width {lo}-{hi} mm, computed {extent[1]:.0f} mm.")
+            flags.append("implausible_extent")
+            notes.append(f"Expected {body} width {lo}-{hi} mm, computed {extent[1]:.0f} mm from the header spacing; the image was probably resampled after acquisition. Treat mm values as unreliable.")
+            sp["calibration"]["confidence"] = "low"
     if orient["assertion_level"] == "inferred":
         flags.append("orientation_inferred")
     if str(ds.get("BurnedInAnnotation", "")).upper() == "YES":
@@ -169,11 +180,12 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
         "voi": voi_rec, "canonical_polarity": "high_is_bright", "source_inverted_for_render": inverted,
     }
 
+    lvl = lambda k: "external" if k in hinted else "measured"
     acquisition = {
-        "modality": {"value": modality, "assertion_level": "measured"}, "modality_family": fam,
-        "body_part": _str(ds, "BodyPartExamined"),
-        "view": {"value": view, "assertion_level": "measured" if view else "unknown"},
-        "laterality": _str(ds, "ImageLaterality") if ds.get("ImageLaterality") else _str(ds, "Laterality"),
+        "modality": {"value": modality, "assertion_level": lvl("modality")}, "modality_family": fam,
+        "body_part": _str(ds, "BodyPartExamined", lvl("body_part")),
+        "view": {"value": view, "assertion_level": (lvl("view") if view else "unknown")},
+        "laterality": _str(ds, "ImageLaterality", lvl("laterality")) if ds.get("ImageLaterality") else _str(ds, "Laterality"),
         "patient_position": _str(ds, "PatientPosition"),
         "device": {k: v for k, v in {"manufacturer": str(ds.get("Manufacturer", "")) or None, "model": str(ds.get("ManufacturerModelName", "")) or None,
                                      "software": str(ds.get("SoftwareVersions", "")) or None}.items() if v},

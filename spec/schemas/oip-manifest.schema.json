@@ -87,7 +87,7 @@
         "source_uids": {
           "type": "object",
           "description": "Hashed (SHA-256, truncated) DICOM UIDs so packages from the same study can be related without exposing the original UIDs.",
-          "properties": {"study": {"type": "string"}, "series": {"type": "string"}, "instance": {"type": "string"}},
+          "properties": {"study": {"type": ["string", "null"]}, "series": {"type": ["string", "null"]}, "instance": {"type": ["string", "null"]}},
           "additionalProperties": false
         },
         "source_hash": {"type": "string", "description": "SHA-256 of the source file bytes."}
