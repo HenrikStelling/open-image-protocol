@@ -203,6 +203,37 @@
       "width": 213,
       "height": 256,
       "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
+    },
+    {
+      "path": "renders/crop_700_400_1200_1100_x2.png",
+      "purpose": "overlay",
+      "frame": 0,
+      "width": 1402,
+      "height": 1002,
+      "transform": "crop of canonical render rows 700-1200, cols 400-1100, nearest-neighbour upscale x2. frame_coord = crop_coord/2 + (700, 400). Effective spacing 0.1 x 0.1 mm/px."
+    },
+    {
+      "path": "renders/overlay.png",
+      "purpose": "overlay",
+      "frame": null,
+      "width": 1716,
+      "height": 2016,
+      "transform": "canonical render in a dark margin with selected region marks and a 50 mm grid; content pixel-aligned at the stated offset.",
+      "annotations": [
+        "margin_offset_px: 108 (subtract from annotated coords to get frame coords)",
+        "edge labels: left=R, right=L, top=H, bottom=F",
+        "scale bar: 50 mm = 250 px, bottom-left",
+        "mark 1 = heart (phantom ellipse)",
+        "grid: 50 mm spacing (250.0 px horizontally, 250.0 px vertically)"
+      ]
+    },
+    {
+      "path": "renders/window_c2000_w1500.png",
+      "purpose": "overlay",
+      "frame": 0,
+      "width": 1500,
+      "height": 1800,
+      "transform": "linear window center 2000 width 1500 in units 'relative' applied to rescaled stored pixels; high = bright; no resample."
     }
   ],
   "pixels": {

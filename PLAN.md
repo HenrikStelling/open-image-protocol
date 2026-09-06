@@ -37,7 +37,7 @@ Goal: a package any developer can generate and any model can read.
 - [x] Guardrails: no mm without spacing; schema validation before write
 - [x] Non-DICOM adapter (PNG/JPG + CSV → `external` metadata) for NIH ChestX-ray14 (`src/oip/convert_image.py`)
 - [ ] Burned-in text detector (OCR pass) to set `burned_in_text_checked = true`
-- [ ] `oip window/crop/overlay` verbs in CLI + SDK
+- [x] `oip window/crop/overlay/measure` verbs in CLI + SDK (`src/oip/tools.py`, `anatomy.py`)
 - [ ] Spec review pass with you; freeze v0.1.0 tag
 Exit criteria: `make test` + `make validate` green; five example packages; spec text reviewed.
 
@@ -45,7 +45,8 @@ Exit criteria: `make test` + `make validate` green; five example packages; spec 
 - [ ] **[needs you]** accept competition rules on Kaggle for VinDr-CXR, RSNA Pneumonia, SIIM-ACR (one click each) → download VinDr-CXR, RSNA Pneumonia, SIIM-ACR, NIH (`scripts/fetch_data.py --phase 2`)
 - [x] Convert 1,000 VinDr + 500 RSNA + 300 SIIM + 300 NIH; completeness/flag report (`docs/reports/phase2-conversion-report.md`). Finding: only VinDr has trustworthy absolute scale (82 %); RSNA/SIIM spacing is stale after resampling.
 - [ ] Anatomy adapter: TorchXRayVision PSPNet (heart, lungs, 14 structures) first, CheXmask/CXAS for cross-checking → `derived/regions` (in progress)
-- [ ] Measurements: CTR, transverse cardiac diameter, lung areas, VinDr lesion long axis (mm)
+- [x] Measurements: CTR, transverse cardiac diameter, thoracic width (VinDr, 1,000 images running); SIIM pneumothorax area / lung fraction from radiologist masks (`scripts/siim_measure.py`)
+- [ ] VinDr lesion long axis (mm) from radiologist boxes
 - [ ] Tier-1 plausibility rules in `quality.flags`; Tier-2 validation vs CheXmask (**[needs you]** PhysioNet access): ICC ≥ 0.95, Bland–Altman
 - [x] Re-checked Kaggle for scintigraphy (D-022): small image-only sets only
 Exit criteria: measurement report with ICC/LoA per spacing source; converter handles ≥ 5 vendors without manual fixes.

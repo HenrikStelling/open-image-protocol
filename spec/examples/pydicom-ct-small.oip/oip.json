@@ -166,6 +166,14 @@
       "width": 128,
       "height": 128,
       "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
+    },
+    {
+      "path": "renders/window_c-600_w1500.png",
+      "purpose": "overlay",
+      "frame": 0,
+      "width": 128,
+      "height": 128,
+      "transform": "linear window center -600 width 1500 in units 'HU' applied to rescaled stored pixels; high = bright; no resample."
     }
   ],
   "pixels": {
