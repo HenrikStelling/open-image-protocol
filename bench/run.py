@@ -8,7 +8,12 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "bench
 from tasks import build, vindr_labels
 from score import score
 
-MODELS = {"claude": ("anthropic", "claude-sonnet-5"), "gpt": ("openai", "gpt-5.2"), "gemini": ("google", "gemini-3.1-flash")}
+# Anthropic id verified against current docs (2026-09). OpenAI/Google ids are placeholders: confirm against each provider's
+# model list before a paid run (override with --gpt-model / --gemini-model).
+MODELS = {"claude": ("anthropic", "claude-opus-5"), "gpt": ("openai", "gpt-5.2"), "gemini": ("google", "gemini-3.1-flash")}
+# $ per 1M tokens (input, output) for the cost estimate; Anthropic from the current price table, others approximate.
+PRICES = {"claude": (5.0, 25.0), "gpt": (2.5, 10.0), "gemini": (0.5, 3.0)}
+IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 SYSTEM = "You are assisting with medical image understanding for a benchmark. Answer the question only, briefly, with no disclaimers. This is not clinical use."
 
 
@@ -37,10 +42,16 @@ def _downscale(png: bytes, max_side: int = 1568) -> bytes:
 def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) -> str:
     if provider == "anthropic":
         import anthropic
-        c = anthropic.Anthropic()
-        content = [{"type": "image", "source": {"type": "base64", "media_type": mt, "data": base64.b64encode(_downscale(b)).decode()}} for mt, b in images] + [{"type": "text", "text": text}]
-        r = c.messages.create(model=model, max_tokens=300, system=SYSTEM, messages=[{"role": "user", "content": content}])
-        return "".join(x.text for x in r.content if getattr(x, "type", "") == "text")
+        c = anthropic.Anthropic()   # credentials: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile
+        content = [{"type": "image", "source": {"type": "base64", "media_type": mt, "data": base64.standard_b64encode(_downscale(b)).decode("utf-8")}} for mt, b in images] + [{"type": "text", "text": text}]
+        # Adaptive thinking is on by default on claude-opus-5; low effort suits short factual answers. max_tokens must leave
+        # room for thinking tokens. No server-side fallbacks on purpose: a benchmark must not silently swap models.
+        r = c.messages.create(model=model, max_tokens=4000, system=SYSTEM, output_config={"effort": "low"},
+                              messages=[{"role": "user", "content": content}])
+        if r.stop_reason == "refusal":
+            cat = r.stop_details.category if r.stop_details else None
+            return f"[refusal:{cat}]"
+        return "".join(x.text for x in r.content if x.type == "text")
     if provider == "openai":
         from openai import OpenAI
         c = OpenAI()
@@ -59,7 +70,9 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--conditions", default="raw,ctx,annot"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
+    ap.add_argument("--conditions", default="raw,ctx,annot"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
+    if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
+    if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
     labels = vindr_labels() if a.dataset == "vindr" else None
     tasks = build(ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
     run = ROOT / "bench/results" / time.strftime("%Y%m%d-%H%M%S"); run.mkdir(parents=True, exist_ok=True)
@@ -67,8 +80,11 @@ def main():
     conds = a.conditions.split(","); models = a.models.split(",")
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks) for c in conds}
+        calls = len(tasks); in_tok = sum(v // 4 for v in chars.values()) + IMAGE_TOKENS * calls * len(conds); out_tok = 400 * calls * len(conds)   # ~400 output incl. thinking
+        cost = {m: round(in_tok / 1e6 * PRICES[m][0] + out_tok / 1e6 * PRICES[m][1], 2) for m in models}
         print(json.dumps({"tasks": len(tasks), "by_type": {t: sum(1 for x in tasks if x["type"] == t) for t in sorted({x["type"] for x in tasks})}, "calls_per_model": len(tasks) * len(conds),
-                          "approx_text_tokens_per_condition": {c: v // 4 for c, v in chars.items()}, "models": {m: MODELS[m] for m in models}, "run_dir": str(run)}, indent=1)); return
+                          "approx_text_tokens_per_condition": {c: v // 4 for c, v in chars.items()}, "approx_input_tokens_per_model": in_tok, "approx_output_tokens_per_model": out_tok,
+                          "approx_cost_usd_per_model": cost, "models": {m: MODELS[m] for m in models}, "run_dir": str(run)}, indent=1)); return
     rows = []
     for m in models:
         prov, mid = MODELS[m]
