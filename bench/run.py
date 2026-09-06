@@ -89,9 +89,11 @@ def main():
     conds = a.conditions.split(","); models = a.models.split(",")
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if (c.startswith("misled")) == (t["type"] == "findings_misled")) for c in conds}
-        calls = len(tasks); in_tok = sum(v // 4 for v in chars.values()) + IMAGE_TOKENS * calls * len(conds); out_tok = 400 * calls * len(conds)   # ~400 output incl. thinking
+        applies = lambda t, c: (c.startswith("misled")) == (t["type"] == "findings_misled")
+        n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
+        in_tok = sum(v // 4 for v in chars.values()) + IMAGE_TOKENS * n_calls; out_tok = 400 * n_calls   # ~400 output incl. thinking
         cost = {m: round(in_tok / 1e6 * PRICES[m][0] + out_tok / 1e6 * PRICES[m][1], 2) for m in models}
-        print(json.dumps({"tasks": len(tasks), "by_type": {t: sum(1 for x in tasks if x["type"] == t) for t in sorted({x["type"] for x in tasks})}, "calls_per_model": len(tasks) * len(conds),
+        print(json.dumps({"tasks": len(tasks), "by_type": {t: sum(1 for x in tasks if x["type"] == t) for t in sorted({x["type"] for x in tasks})}, "calls_per_model": n_calls,
                           "approx_text_tokens_per_condition": {c: v // 4 for c, v in chars.items()}, "approx_input_tokens_per_model": in_tok, "approx_output_tokens_per_model": out_tok,
                           "approx_cost_usd_per_model": cost, "models": {m: MODELS[m] for m in models}, "run_dir": str(run)}, indent=1)); return
     rows = []
