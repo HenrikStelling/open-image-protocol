@@ -2,11 +2,7 @@
 
 ## Verdict
 - **X-ray: yes**, comfortably, including DICOM with pixel spacing and radiologist annotations.
-- **Scintigraphy: no.** Searches (web + site:kaggle.com) found no planar
-  scintigraphy / bone scan / thyroid / DaTscan image dataset on Kaggle. The
-  Kaggle search page is JavaScript-rendered and could not be scraped here; this
-  must be re-checked with the Kaggle CLI (`kaggle datasets list -s scintigraphy`)
-  once credentials are configured (see Q9). Mitigation below.
+- **Scintigraphy: not enough.** Re-checked via the Kaggle API on 2026-09-06 (11 queries, 80 hits): only a handful of small, image-only sets exist and none carries DICOM headers (no counts, energy windows, tracer, spacing). Useful for render/benchmark diversity, not for converter validation. Mitigation below.
 
 ## X-ray inventory (Kaggle)
 
@@ -25,6 +21,17 @@
 Later phases (already on Kaggle, DICOM): RSNA Intracranial Hemorrhage (CT),
 RSNA 2022 Cervical Spine (CT), RSNA 2023 Abdominal Trauma (CT), RSNA 2024 Lumbar
 Spine Degenerative (MRI). These make Kaggle sufficient for CT/MRI too.
+
+## Scintigraphy on Kaggle (found 2026-09-06)
+
+| Dataset (Kaggle) | Size | Licence | Notes |
+|---|---|---|---|
+| `alshahriyarshrabon/thyroid-scan-image-dataset` | 34 MB | CDLA-Permissive-1.0 | thyroid scintigrams, class folders; best-licensed find |
+| `shawcholghosh/bone-scan` | 80 MB | unknown | planar bone scans; licence must be clarified before use |
+| `drjaveriaamin/datscan` | 36 MB | CC BY-NC-SA 4.0 | DaT-SPECT slices as images |
+| `integer15maxval/datscanonly-ntua-dataset` | 32 MB | unknown | DaT-SPECT images |
+| `rishikjha/parkinsons-disease-dat-and-mri-scans` | 1 GB | CC BY-NC-SA 4.0 | DaT + MRI, image files |
+| `selcankaplan/spect-mpi` | 23 MB | see description | myocardial perfusion SPECT polar maps/slices |
 
 ## Scintigraphy inventory (outside Kaggle)
 

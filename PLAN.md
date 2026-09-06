@@ -1,6 +1,6 @@
 # OIP — living plan
 
-Last updated: 2026-09-04 (end of autonomous research session). Owner: Henrik.
+Last updated: 2026-09-06 (owner answered all open questions; Phase 2 data downloading). Owner: Henrik.
 Everything marked **[needs you]** is blocked on a decision or credential; see
 also `docs/03-brainstorm/open-questions.md`.
 
@@ -18,6 +18,8 @@ also `docs/03-brainstorm/open-questions.md`.
 | Example packages | generated in `spec/examples/` |
 | GitHub remote | done — https://github.com/HenrikStelling/open-image-protocol (private) |
 | Kaggle credentials | done (2026-09-05) |
+| Open questions | all 12 answered (D-014 to D-024) |
+| Phase 2 data | VinDr 1,000-sample + RSNA + SIIM downloaded; NIH sample pending |
 
 ## 1. Principles (do not re-litigate without an OEP)
 R1 neutral core (mm, orientation, units, provenance for every modality) · R2 self-describing twice (schema + prose) ·
@@ -44,16 +46,16 @@ Exit criteria: `make test` + `make validate` green; five example packages; spec 
 - [ ] Anatomy adapter: CheXmask-style heart/lung segmentation (HybridGNet) and/or CXAS → `derived/regions`
 - [ ] Measurements: CTR, transverse cardiac diameter, lung areas, VinDr lesion long axis (mm)
 - [ ] Tier-1 plausibility rules in `quality.flags`; Tier-2 validation vs CheXmask (**[needs you]** PhysioNet access): ICC ≥ 0.95, Bland–Altman
-- [ ] Re-check Kaggle for scintigraphy via CLI (`kaggle datasets list -s scintigraphy`)
+- [x] Re-checked Kaggle for scintigraphy (D-022): small image-only sets only
 Exit criteria: measurement report with ICC/LoA per spacing source; converter handles ≥ 5 vendors without manual fixes.
 
 ### Phase 3 — OIP-Bench: does it help models? (weeks 5–9)
 - [ ] Benchmark harness: conditions {raw PNG, PNG + context.md, annotated + context.md}; tasks: modality, view, laterality, scale (mm estimate), CTR read/estimate, finding F1 (VinDr), misleading-context switch rate (MC-CXR recipe), cross-model variance, token cost
-- [ ] **[needs you]** API keys: Claude, GPT, Gemini; one open model (MedGemma or CXR-LLaVA) on a GPU/hosted endpoint
+- [ ] API keys available (D-024); decide open-model hosting (MedGemma or CXR-LLaVA) **[needs you]**
 - [ ] Self-check block failures fed back as protocol bugs
 - [ ] Ablation: which `context.md` sections carry the uplift → trim default profile
-- [ ] Tier-3 expert subset (~200 CXR) **[needs you]** reader access
-Exit criteria: statistically significant uplift on understanding tasks for every model; no F1 regression; lower switch rate with labelled `external` text. Publish benchmark report → v0.2.
+- [ ] Tier-3 expert subset (~200 CXR): readers available (D-023); I prepare the reading set + instructions, you schedule the readers
+Exit criteria (understanding tasks gate the release, D-015): statistically significant uplift on understanding tasks for every model; finding-level F1 reported but not gating; lower switch rate with labelled `external` text. Publish benchmark report → v0.2.
 
 ### Phase 4 — Scintigraphy (weeks 8–12)
 - [ ] Download Zenodo Paraguay bone scans; inspect format; build the non-DICOM NM adapter if they are PNG
@@ -71,6 +73,7 @@ Exit criteria: NM packages from real data validate; NM benchmark tasks added; co
 Exit criteria: a model in an MCP host answers the self-check questions correctly on all examples.
 
 ### Phase 6 — Governance, interop, release (weeks 12–16)
+Order per D-014: clinical-integration exports (SR/FHIR) before research-pipeline tooling; first outside contributors are validating experts (D-021).
 - [ ] OEP process opened to outside contributors; CHANGELOG; deprecation policy text
 - [ ] Conformance suite published; `oip validate --conformance`
 - [ ] Exports: DICOM SR TID 1500 (via highdicom), FHIR ImagingStudy/Observation stub
@@ -100,6 +103,6 @@ Exit criteria: a model in an MCP host answers the self-check questions correctly
 | PHI leakage via burned-in text | OCR check in Phase 1; `burned_in_text_checked` flag; synthetic examples only in repo |
 
 ## 5. Immediate next actions
-1. **[needs you]** Review `docs/03-brainstorm/open-questions.md` (12 items) and the decisions log; say which defaults to change.
+1. **[needs you]** PhysioNet credentialing for CheXmask (start now, takes days).
 2. **[needs you]** Accept the competition rules once on Kaggle (VinDr-CXR, RSNA Pneumonia, SIIM-ACR) so `scripts/fetch_data.py --phase 2` can download.
 3. Me: non-DICOM adapter, OCR burned-in check, remaining verbs, then Phase 2 conversions as soon as data is available.

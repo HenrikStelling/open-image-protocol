@@ -1,5 +1,7 @@
 # Open questions for the user (brainstorm backlog)
 
+**Status 2026-09-06: all 12 answered; see decisions D-014 to D-024 in `decisions-log.md`. Kept for history.**
+
 Each item: why it matters, my current default, what I need from you.
 
 1. **Target consumer.** Are we optimising first for (a) general assistants

@@ -49,3 +49,34 @@ Resources: `oip://<package>/manifest`, `/context`, `/renders/canonical`;
 tools mirror the verb set. Remote (HTTP + OAuth) later.
 
 ## D-013 — 3D extension deferred; will align with NIfTI affine + OME-Zarr multiscale · proposed
+
+---
+## Decisions from the owner's review of the open questions (2026-09-06)
+
+## D-014 — Target consumers, in order: general assistants (a) → clinical integrators (c) → research pipelines (b) · accepted
+Consequence: MCP server and `context.md` quality come first; SR/FHIR export (clinical integration) is pulled forward ahead of research-pipeline conveniences (bulk conversion, dataset tooling).
+
+## D-015 — OIP is an understanding protocol, not a diagnostic one · accepted
+OIP lets a model understand and analyse an image. It never produces a diagnosis. The benchmark measures both understanding tasks and finding-level tasks, but **only understanding tasks gate releases**.
+
+## D-016 — Scintigraphy priority: bone scans → thyroid → renal → cardiac · accepted
+
+## D-017 — Human free-text notes allowed in `context.md`, marked `external` · accepted
+
+## D-018 — Full-resolution lossless pixels are included in every package · accepted
+
+## D-019 — Subject keeps 5-year age band and sex; finer detail opt-in · accepted
+
+## D-020 — Layers inside the manifest, profiles as named layer sets · accepted (default confirmed)
+
+## D-021 — Governance: first outside contributors are domain experts who validate · accepted
+Open the OEP process to outside contributors after v0.2, or earlier if the first benchmark fails its gate. Expert readers are available (D-023).
+
+## D-022 — Kaggle re-checked for scintigraphy (2026-09-06) · accepted
+Small image-only sets exist (thyroid scan set under CDLA-Permissive-1.0; two DaTscan sets; one bone-scan set with unknown licence; one SPECT MPI set). None ship DICOM headers. Strategy unchanged: Zenodo Paraguay + synthetic NM DICOM for the converter; Kaggle sets added to Phase 4 for render/benchmark diversity.
+
+## D-023 — Expert readers are available · accepted
+Tier-3 validation (~200 CXR, ~50 bone scans, two readers) is scheduled in Phase 3 rather than deferred.
+
+## D-024 — Model API keys are available · accepted
+Phase 3 benchmark is unblocked; cost estimate to be confirmed before the first full run.

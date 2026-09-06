@@ -1,9 +1,115 @@
 [
- {"name": "vindr-cxr", "source": "kaggle-competition:vinbigdata-chest-xray-abnormalities-detection", "url": "https://www.kaggle.com/competitions/vinbigdata-chest-xray-abnormalities-detection", "licence": "competition rules (non-commercial research)", "use": "primary DX validation: original DICOM, multi-vendor, 14 findings with boxes. FULL SET IS ~142 GB (18k DICOM at ~8-13 MB); we use a stratified 1,000-image sample.", "sample": {"n": 1000, "seed": 0}, "approx_gb": 13, "phases": [2, 3]},
- {"name": "rsna-pneumonia", "source": "kaggle-competition:rsna-pneumonia-detection-challenge", "url": "https://www.kaggle.com/competitions/rsna-pneumonia-detection-challenge", "licence": "competition rules", "use": "DICOM CXR with boxes; converter tests", "approx_gb": 3.7, "phases": [2, 3]},
- {"name": "siim-acr-pneumothorax", "source": "kaggle-competition:siim-acr-pneumothorax-segmentation", "url": "https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation", "licence": "competition rules", "use": "DICOM + masks; mask-based measurement tests", "approx_gb": 5, "phases": [2]},
- {"name": "nih-chestxray14", "source": "kaggle-dataset:nih-chest-xrays/data", "url": "https://www.kaggle.com/datasets/nih-chest-xrays/data", "licence": "CC0 (NIH)", "use": "non-DICOM path: PNG + CSV with OriginalImagePixelSpacing. Full set is ~42 GB; we take the CSV + first image archive (~5k images).", "files": ["Data_Entry_2017.csv", "images_001/images"], "approx_gb": 2, "phases": [2]},
- {"name": "bone-scans-paraguay", "source": "zenodo:13900966", "url": "https://zenodo.org/records/13900966", "licence": "CC-BY-4.0", "use": "real planar bone scintigraphy, anterior/posterior, metastasis labels", "phases": [4]},
- {"name": "chexmask", "source": "manual:physionet", "url": "https://physionet.org/content/chexmask-cxr-segmentation-data/1.0.0/", "licence": "PhysioNet credentialed", "use": "heart/lung masks -> CTR reference", "phases": [2, 3]},
- {"name": "bs-80k", "source": "manual:gdrive", "url": "https://pubmed.ncbi.nlm.nih.gov/36334360/", "licence": "verify", "use": "large bone scan set; region models", "phases": [4]}
+ {
+  "name": "vindr-cxr",
+  "source": "kaggle-competition:vinbigdata-chest-xray-abnormalities-detection",
+  "url": "https://www.kaggle.com/competitions/vinbigdata-chest-xray-abnormalities-detection",
+  "licence": "competition rules (non-commercial research)",
+  "use": "primary DX validation: original DICOM, multi-vendor, 14 findings with boxes. FULL SET IS ~142 GB (18k DICOM at ~8-13 MB); we use a stratified 1,000-image sample.",
+  "sample": {
+   "n": 1000,
+   "seed": 0
+  },
+  "approx_gb": 13,
+  "phases": [
+   2,
+   3
+  ]
+ },
+ {
+  "name": "rsna-pneumonia",
+  "source": "kaggle-competition:rsna-pneumonia-detection-challenge",
+  "url": "https://www.kaggle.com/competitions/rsna-pneumonia-detection-challenge",
+  "licence": "competition rules",
+  "use": "DICOM CXR with boxes; converter tests",
+  "approx_gb": 3.7,
+  "phases": [
+   2,
+   3
+  ]
+ },
+ {
+  "name": "siim-acr-pneumothorax",
+  "source": "kaggle-competition:siim-acr-pneumothorax-segmentation",
+  "url": "https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation",
+  "licence": "competition rules",
+  "use": "DICOM + masks; mask-based measurement tests",
+  "approx_gb": 5,
+  "phases": [
+   2
+  ]
+ },
+ {
+  "name": "nih-chestxray14",
+  "source": "kaggle-dataset:nih-chest-xrays/sample",
+  "url": "https://www.kaggle.com/datasets/nih-chest-xrays/sample",
+  "licence": "CC0 (NIH)",
+  "use": "non-DICOM path: official 5,606-image PNG sample of ChestX-ray14 with sample_labels.csv (view position, age, OriginalImagePixelSpacing). Full set (~42 GB) not needed.",
+  "approx_gb": 4,
+  "phases": [
+   2
+  ]
+ },
+ {
+  "name": "bone-scans-paraguay",
+  "source": "zenodo:13900966",
+  "url": "https://zenodo.org/records/13900966",
+  "licence": "CC-BY-4.0",
+  "use": "real planar bone scintigraphy, anterior/posterior, metastasis labels",
+  "phases": [
+   4
+  ]
+ },
+ {
+  "name": "chexmask",
+  "source": "manual:physionet",
+  "url": "https://physionet.org/content/chexmask-cxr-segmentation-data/1.0.0/",
+  "licence": "PhysioNet credentialed",
+  "use": "heart/lung masks -> CTR reference",
+  "phases": [
+   2,
+   3
+  ]
+ },
+ {
+  "name": "bs-80k",
+  "source": "manual:gdrive",
+  "url": "https://pubmed.ncbi.nlm.nih.gov/36334360/",
+  "licence": "verify",
+  "use": "large bone scan set; region models",
+  "phases": [
+   4
+  ]
+ },
+ {
+  "name": "kaggle-thyroid-scan",
+  "source": "kaggle-dataset:alshahriyarshrabon/thyroid-scan-image-dataset",
+  "url": "https://www.kaggle.com/datasets/alshahriyarshrabon/thyroid-scan-image-dataset",
+  "licence": "CDLA-Permissive-1.0",
+  "use": "thyroid scintigrams (image-only) for render/benchmark diversity",
+  "approx_gb": 0.04,
+  "phases": [
+   4
+  ]
+ },
+ {
+  "name": "kaggle-datscan",
+  "source": "kaggle-dataset:drjaveriaamin/datscan",
+  "url": "https://www.kaggle.com/datasets/drjaveriaamin/datscan",
+  "licence": "CC BY-NC-SA 4.0",
+  "use": "DaT-SPECT images (image-only)",
+  "approx_gb": 0.04,
+  "phases": [
+   4
+  ]
+ },
+ {
+  "name": "kaggle-bone-scan",
+  "source": "manual:kaggle",
+  "url": "https://www.kaggle.com/datasets/shawcholghosh/bone-scan",
+  "licence": "unknown - clarify before use",
+  "use": "planar bone scans (image-only); do not download until licence is known",
+  "phases": [
+   4
+  ]
+ }
 ]
