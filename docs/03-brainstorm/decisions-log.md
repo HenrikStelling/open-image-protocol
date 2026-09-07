@@ -80,3 +80,10 @@ Tier-3 validation (~200 CXR, ~50 bone scans, two readers) is scheduled in Phase 
 
 ## D-024 — Model API keys are available · accepted
 Phase 3 benchmark is unblocked; cost estimate to be confirmed before the first full run.
+
+## D-025 — Diagnosis is emergent, not preconfigured; OIP carries observations, optionally reference ranges, never interpretations · accepted · 2026-09-06
+Owner's question: does a format that lets a model understand an image (entity, anatomy, sizes, intensity values such as HU or uptake) need built-in diagnostic logic, or can diagnosis follow from better understanding? Decision: the latter, with a three-tier boundary.
+1. **Observations (in scope, mandatory):** what the image is, geometry, intensity semantics, regions, and measurements with provenance and assertion level. This includes *value* measurements per region (mean/min/max HU, count density, relative attenuation) — added as `derived.regions[].stats`.
+2. **Reference ranges (in scope, optional, `external`):** cited normal ranges next to a measurement (e.g. "adult CTR normal < 0.50", "liver 40–60 HU"). Knowledge, not judgement; lets a model compare without OIP deciding anything.
+3. **Interpretation (out of scope):** findings, impressions, diagnoses. Produced by the consuming model or a downstream tool, never by the package. Detector outputs (boxes, "nodule") may be carried as `inferred` observations with the producing tool named, but OIP defines no diagnostic vocabulary and no rules.
+Rationale: (a) frontier models already hold the clinical reasoning (CTR threshold, HU ranges, uptake patterns); what they lack is trustworthy inputs — MedVision, MC-CXR and our own runs show the failure is measurement and grounding, not reasoning. (b) Diagnostic logic inside a format freezes today's medicine into a spec and turns a data standard into a regulated device. (c) It keeps the benchmark honest: OIP-Bench measures whether findings-level accuracy rises *as a consequence* of understanding tasks improving, with zero diagnostic code in the package — that is the test of the hypothesis. Consistent with D-015.

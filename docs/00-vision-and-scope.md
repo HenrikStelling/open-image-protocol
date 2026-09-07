@@ -35,7 +35,7 @@ big things are, and which statements are measured facts versus guesses.
 5. An MCP server, CLI and Python SDK exposing the same small verb set.
 6. A benchmark that measures model understanding *with vs without* OIP.
 
-**Out of scope for now:** diagnosis, clinical decision support, regulatory
+**Out of scope, by design (D-025):** diagnosis and interpretation — OIP carries observations and optional cited reference ranges; conclusions are the consuming model's. Also out of scope for now: clinical decision support, regulatory
 clearance, PACS integration, DICOM write-back, 3D volumes (CT/MRI arrive in a
 later phase with an explicit 3D extension, aligned with NIfTI/OME-Zarr).
 
