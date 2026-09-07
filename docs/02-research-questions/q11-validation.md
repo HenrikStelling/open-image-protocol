@@ -30,6 +30,12 @@
   inter-reader agreement first; the tool must fall inside the inter-reader
   limits of agreement. This is the only tier that costs money/time; schedule in Phase 3.
 
+## Status (2026-09-06)
+- Tier 0: passing (phantom tests in CI).
+- Tier 1: extent/spacing plausibility live; caught RSNA/SIIM stale spacing (100 %) and 6 VinDr outliers.
+- Tier 2: **blocked on CheXmask (PhysioNet)**. The Phase 2 run already shows the need: CTR from lung-mask union is biased high (see Q6 §6.4b); the CheXmask comparison will quantify the bias and calibrate the thoracic-width definition.
+- Tier 3: readers available (D-023); reading set to be prepared after Tier 2.
+
 ## Statistical protocol (fixed in advance)
 - Primary: ICC(2,1) and Bland–Altman 95 % LoA per metric.
 - Secondary: MAE in mm and in %, error stratified by vendor, view (PA/AP),

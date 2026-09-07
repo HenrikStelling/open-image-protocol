@@ -21,6 +21,7 @@ also `docs/03-brainstorm/open-questions.md`.
 | Open questions | all 12 answered (D-014 to D-024) |
 | Phase 2 data | VinDr 1,000-sample, RSNA, SIIM mirror (train + masks), NIH sample: all downloaded (~26 GB) |
 | Phase 2 conversion | 2,100 real images converted, 0 failures; report in `docs/reports/` |
+| Phase 2 measurements | 1,000 VinDr (regions, CTR, mm), 299 SIIM (pneumothorax ratios); CTR bias identified, Tier-2 pending CheXmask |
 
 ## 1. Principles (do not re-litigate without an OEP)
 R1 neutral core (mm, orientation, units, provenance for every modality) · R2 self-describing twice (schema + prose) ·

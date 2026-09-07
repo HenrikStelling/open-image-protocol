@@ -28,5 +28,15 @@ for name in names:
         by = {}
         for x in mm: by.setdefault(x["conf"], []).append(x["thorax_mm"])
         md.append("- thoracic width by spacing confidence: " + "; ".join(f"{k}: n={len(v)}, median {sorted(v)[len(v)//2]:.0f} mm" for k, v in by.items()))
+    bx = d / "_boxes.json"
+    if bx.exists():
+        b = json.load(open(bx))
+        md.append(f"- radiologist boxes (VinDr train.csv, `external`): {b.get('images_with_boxes',0)} of {b.get('images',0)} images carry boxes; long axis in mm for {b.get('mm',0)} boxes, px-only for {b.get('px_only',0)}; long axis median {b.get('lesion_mm_median')} mm (p10 {b.get('lesion_mm_p10')}, p90 {b.get('lesion_mm_p90')})")
     md.append("")
+# SIIM: external masks + spacing-free ratios
+sm = ROOT / "data/oip/siim/_measure.json"
+if sm.exists():
+    s = json.load(open(sm))
+    md += ["### siim (radiologist pneumothorax masks as `external` regions)", f"- images: {s['n']} · with pneumothorax: {s['with_pneumothorax']}",
+           f"- pneumothorax / ipsilateral lung-field area ratio (spacing-free): median {s['fraction_median']}, p90 {s['fraction_p90']}; mask area median {s['area_px_median']} px (no mm2: spacing is stale on this dataset)", ""]
 (ROOT / "docs/reports/phase2-measurement-report.md").write_text("\n".join(md)); print("\n".join(md))
