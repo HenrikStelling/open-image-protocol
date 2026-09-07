@@ -19,7 +19,7 @@ for name in names:
     ctrs = sorted(x["ctr"] for x in rows); q = lambda p: ctrs[int(p * (len(ctrs) - 1))] if ctrs else None
     md += [f"### {name}", f"- images measured: {mres['n']} · with CTR: {len(rows)} · errors: {mres['errors']} · {mres['seconds_per_image']} s/image (CPU)",
            f"- regions per image: {statistics.mean(x['regions'] for x in rows):.1f} (heart, lungs, spine, aorta, mediastinum, clavicles, diaphragm when detected)",
-           f"- CTR: median {q(0.5):.3f}, p10 {q(0.1):.3f}, p90 {q(0.9):.3f}, min {ctrs[0]:.3f}, max {ctrs[-1]:.3f}; CTR > 0.50 in {sum(c > 0.5 for c in ctrs)} ({100*sum(c > 0.5 for c in ctrs)/len(ctrs):.0f} %) — VinDr has ~18 % cardiomegaly labels, so this order of magnitude is expected",
+           f"- CTR: median {q(0.5):.3f}, p10 {q(0.1):.3f}, p90 {q(0.9):.3f}, min {ctrs[0]:.3f}, max {ctrs[-1]:.3f}; CTR > 0.50 in {sum(c > 0.5 for c in ctrs)} ({100*sum(c > 0.5 for c in ctrs)/len(ctrs):.0f} %) — about twice VinDr's ~18 % cardiomegaly prevalence: the lung-mask union underestimates internal thoracic width, so this CTR is biased high (see docs/02-research-questions/q06 §6.4b); unvalidated until CheXmask Tier-2",
            f"- laterality sanity check flagged: {sum(x['lat'] for x in rows)} images (left/right structure found on the wrong image side)"]
     mm = [x for x in rows if x["heart_mm"]]
     if mm:
