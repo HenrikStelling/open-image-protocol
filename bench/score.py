@@ -13,6 +13,10 @@ def score(task: dict, reply: str) -> dict:
     if t in ("modality", "view", "left_edge", "scale_available"):
         ok = str(ans).lower() in r
         if t == "modality" and ans == "radiograph": ok = ok or "x-ray" in r or "xray" in r or "radiography" in r
+        if t == "view":
+            frontal = bool(re.search(r"\b(frontal|pa|ap|posteroanterior|anteroposterior|postero-anterior|antero-posterior)\b", r))
+            lateral = bool(re.search(r"\b(lateral|ll|rl)\b", r))
+            ok = (ans == "frontal" and frontal and not lateral) or (ans == "lateral" and lateral and not frontal)
         if t == "left_edge":  # accept 'right'/'left' alone when unambiguous
             other = "patient left" if ans == "patient right" else "patient right"
             ok = (ans in r) and (other not in r)
