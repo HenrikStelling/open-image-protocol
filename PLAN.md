@@ -60,6 +60,8 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 - Cost estimate (dry run, 30 images): ≈ $11 Opus 5 + $5 GPT + $1 Gemini per full pass; 100 images ≈ $55 total. Anthropic id verified (`claude-opus-5`); GPT/Gemini ids must be confirmed before a paid run.
 - [x] Ollama provider in the harness (D-026): pilot on Ollama cloud/local multimodal models, no keys needed
 - [ ] Pilot runs on Ollama: fix harness/prompt issues, first protocol-effect numbers
+  - Model roster (Ollama directory checked 2026-09-08). Cloud runs on Ollama's servers, so size is not limited by the Mac. Cloud vision-capable: kimi-k3 (most capable), mistral-large-3 (675b), qwen3.5 (cloud build), minimax-m3, gemma4 (12b/26b/31b), glm-5.3-flash (18b), kimi-k2.6. Retired: qwen3-vl:235b-cloud (410). Local medical (limited by 16 GB RAM / 14 GB disk): medgemma:4b only; the Gemma-3-based domain model and the privacy-preserving clinical arm.
+  - Wave 1 (running): minimax-m3, glm-5.3-flash, gemma4:31b. Wave 2 (queued): kimi-k3, mistral-large-3:675b, qwen3.5. Wave 3: medgemma:4b local. Cloud concurrency limit: 3 models at a time.
 - [ ] Later: export `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` in the shell (not in the repo) and confirm GPT/Gemini model ids before paid runs
 - [ ] API keys available (D-024); decide open-model hosting (MedGemma or CXR-LLaVA) **[needs you]**
 - [ ] Self-check block failures fed back as protocol bugs
