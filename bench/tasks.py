@@ -36,7 +36,7 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
 
 
 def build(pkg_dir: Path, n: int = 100, seed: int = 0, labels_by_id: dict | None = None) -> list[dict]:
-    pkgs = sorted(pkg_dir.glob("*.oip")); random.Random(seed).shuffle(pkgs); out = []
+    pkgs = sorted(p for p in pkg_dir.glob("*.oip") if (p / "oip.json").exists()); random.Random(seed).shuffle(pkgs); out = []
     for p in pkgs[:n]:
         m = json.loads((p / "oip.json").read_text()); iid = m["provenance"]["source_filename"].split(".")[0]
         out += tasks_for_package(p, (labels_by_id or {}).get(iid))
