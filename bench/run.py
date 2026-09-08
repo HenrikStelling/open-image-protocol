@@ -92,16 +92,19 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--conditions", default="raw,ctx,annot,misled_plain,misled_oip"); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
+    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default="raw,ctx,annot,misled_plain,misled_oip"); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
     global OLLAMA_THINK; OLLAMA_THINK = a.ollama_think
     labels = vindr_labels() if a.dataset == "vindr" else None
     if a.resume:
         run = Path(a.resume); tasks = json.loads((run / "tasks.json").read_text())
+        if a.pkg_dir:
+            for t in tasks: t["pkg"] = str(Path(a.pkg_dir) / Path(t["pkg"]).name)
     else:
-        tasks = build(ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
-        run = ROOT / "bench/results" / time.strftime("%Y%m%d-%H%M%S"); run.mkdir(parents=True, exist_ok=True)
+        tasks = build(Path(a.pkg_dir) if a.pkg_dir else ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
+        tag = "+".join(m.replace("/", "_").replace(":", "_") for m in a.models.split(","))[:60]
+        run = ROOT / "bench/results" / f"{time.strftime('%Y%m%d-%H%M%S')}-{tag}-{os.getpid()}"; run.mkdir(parents=True, exist_ok=True)   # unique per process
         (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
     conds = a.conditions.split(","); models = a.models.split(",")
     if a.dry_run:
