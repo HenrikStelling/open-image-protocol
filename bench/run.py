@@ -92,14 +92,17 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--conditions", default="raw,ctx,annot,misled_plain,misled_oip"); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
+    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--conditions", default="raw,ctx,annot,misled_plain,misled_oip"); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
     global OLLAMA_THINK; OLLAMA_THINK = a.ollama_think
     labels = vindr_labels() if a.dataset == "vindr" else None
-    tasks = build(ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
-    run = ROOT / "bench/results" / time.strftime("%Y%m%d-%H%M%S"); run.mkdir(parents=True, exist_ok=True)
-    (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
+    if a.resume:
+        run = Path(a.resume); tasks = json.loads((run / "tasks.json").read_text())
+    else:
+        tasks = build(ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
+        run = ROOT / "bench/results" / time.strftime("%Y%m%d-%H%M%S"); run.mkdir(parents=True, exist_ok=True)
+        (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
     conds = a.conditions.split(","); models = a.models.split(",")
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if (c.startswith("misled")) == (t["type"] == "findings_misled")) for c in conds}
@@ -110,15 +113,18 @@ def main():
         print(json.dumps({"tasks": len(tasks), "by_type": {t: sum(1 for x in tasks if x["type"] == t) for t in sorted({x["type"] for x in tasks})}, "calls_per_model": n_calls,
                           "approx_text_tokens_per_condition": {c: v // 4 for c, v in chars.items()}, "approx_input_tokens_per_model": in_tok, "approx_output_tokens_per_model": out_tok,
                           "approx_cost_usd_per_model": cost, "models": {m: (MODELS[m] if m in MODELS else ("ollama", m.split("/", 1)[1])) for m in models}, "run_dir": str(run)}, indent=1)); return
-    rows = []
+    rows = [json.loads(l) for l in (run / "results.jsonl").read_text().splitlines() if l.strip()] if (run / "results.jsonl").exists() else []
+    rows = [r for r in rows if not r.get("error")]          # failed rows are retried
+    done = {(r["model"], r["condition"], r["task"]) for r in rows}
+    if done: print(f"resuming {run.name}: {len(done)} rows already done", flush=True)
     for m in models:
         prov, mid = MODELS[m] if m in MODELS else (("ollama", m.split("/", 1)[1]) if m.startswith("ollama/") else (_ for _ in ()).throw(KeyError(f"unknown model {m}; use a key in MODELS or ollama/<tag>")))
         for c in conds:
             for i, t in enumerate(tasks, 1):
-                if (c.startswith("misled")) != (t["type"] == "findings_misled"):
+                if (c.startswith("misled")) != (t["type"] == "findings_misled") or (m, c, t["id"]) in done:
                     continue
-                text, imgs = build_prompt(t, c)
                 try:
+                    text, imgs = build_prompt(t, c)
                     reply = call(prov, mid, text, imgs); err = None
                 except Exception as e:
                     reply, err = "", f"{type(e).__name__}: {str(e)[:200]}"
@@ -128,6 +134,7 @@ def main():
                     (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
                     sys.exit(f"ABORT {m}: 5 consecutive identical errors -> {recent[-1][:160]} (retired tag? auth? see bench/README.md)")
                 if i % 20 == 0: print(f"  {m}/{c}: {i}/{len(tasks)}", flush=True)
+                if len(rows) % 10 == 0: (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
             (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     print("done ->", run)
 
