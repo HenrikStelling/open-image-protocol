@@ -13,3 +13,5 @@ Measures whether an OIP package helps a vision-language model understand an imag
   `ollama/<tag>` through the local daemon (e.g. `ollama/minimax-m3:cloud`, `ollama/gemma4:26b-cloud`, `ollama/glm-5.3-flash:cloud`);
   cloud tags need `ollama signin`, no key. Pilot phase runs on Ollama (D-026); frontier providers afterwards. `--dry-run` builds prompts and estimates tokens only.
 - `score.py` — per task type: exact match (modality, view, side), tolerance (scale/CTR within ±10 %), F1 (findings), switch rate (misleading context).
+
+Failure notes: a retired Ollama cloud tag answers `HTTP Error 410: Gone` on every call (seen with `qwen3-vl:235b-cloud`, 2026-09-08); the runner now aborts a model after 5 consecutive identical errors. Reasoning models need a large `num_predict` or `--ollama-think off`, otherwise the answer is consumed by thinking and `content` comes back empty.

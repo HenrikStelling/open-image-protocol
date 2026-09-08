@@ -123,6 +123,10 @@ def main():
                 except Exception as e:
                     reply, err = "", f"{type(e).__name__}: {str(e)[:200]}"
                 rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "reply": reply, "error": err, "score": score(t, reply) if not err else {}})
+                recent = [r["error"] for r in rows[-5:] if r["model"] == m]
+                if len(recent) == 5 and all(recent) and len({e[:60] for e in recent}) == 1:
+                    (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+                    sys.exit(f"ABORT {m}: 5 consecutive identical errors -> {recent[-1][:160]} (retired tag? auth? see bench/README.md)")
                 if i % 20 == 0: print(f"  {m}/{c}: {i}/{len(tasks)}", flush=True)
             (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     print("done ->", run)
