@@ -57,6 +57,7 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 - [x] Benchmark harness v0 (`bench/`): conditions {raw, ctx, annot}; tasks modality, view, left-edge side, scale availability, CTR, heart mm, findings F1 (VinDr); dry-run mode; results in `bench/results/` (ignored)
 - [x] Misleading-context conditions (`misled_plain` vs `misled_oip`, adoption rate of a wrong label)
 - [ ] Cross-model-variance aggregation in the report
+- [ ] **OEP-001**: External-section wording ablation (`misled_oip` vs `misled_oip_strong` vs omit-by-default), decide by adoption rate across ≥3 models (finding: gemma4 31B adopts a wrong label 100 % inside the External section vs 75 % as a plain note)
 - Cost estimate (dry run, 30 images): ≈ $11 Opus 5 + $5 GPT + $1 Gemini per full pass; 100 images ≈ $55 total. Anthropic id verified (`claude-opus-5`); GPT/Gemini ids must be confirmed before a paid run.
 - [x] Ollama provider in the harness (D-026): pilot on Ollama cloud/local multimodal models, no keys needed
 - [ ] Pilot runs on Ollama: fix harness/prompt issues, first protocol-effect numbers

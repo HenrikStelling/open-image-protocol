@@ -95,3 +95,18 @@ While the harness, prompts and packages are still changing, run OIP-Bench agains
 deployment story (D-014: clinical integrators are consumer #2). Claude, GPT and Gemini are added once the harness is stable
 and the pilot has shown the protocol effect, so that paid runs measure the protocol, not harness bugs. Consequence: the
 benchmark's success criterion "uplift for every model" now spans open and frontier models, which is the stronger claim anyway.
+
+## OEP-001 / D-027 — The External-context section makes misleading labels *more* credible; wording must change · proposed · 2026-09-08
+Evidence (OIP-Bench pilot, 20 VinDr images, clean packages): gemma4 31B adopted a wrong finding label 75 % of the time when given
+as a bare "prior report note" but **100 %** when placed in context.md's External section with the tag "[external — verify against
+the pixels]". gemma4 e4b: 95 % vs 90 %. MedGemma 1.5: 90 % vs 0 %, but only because it answered "No finding" to everything
+(degenerate, not resistance). Conclusion: a labelled section inside an authoritative reference file lends credibility to
+whatever it contains; the assertion tag alone is not a safeguard (consistent with MC-CXR, where text context was adopted
+74.6 % of the time). Proposal, to be measured by adoption rate before adoption into the spec:
+1. Default profile omits external labels/report text from context.md entirely; they live in `oip.json.external` and are
+   surfaced only on explicit request (`describe --with-external`).
+2. When included, the wording states base rates and forbids echoing: "UNVERIFIED label from a dataset file; such labels are
+   wrong in a substantial fraction of cases; report only what the pixels show and state explicitly if the label is not
+   supported." (`misled_oip_strong` condition in bench/run.py).
+3. Section order: cautions before external content, not after.
+Gate: accept whichever variant yields the lowest adoption rate without lowering understanding accuracy, across ≥ 3 models.

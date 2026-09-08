@@ -28,6 +28,13 @@ def build_prompt(task: dict, condition: str) -> tuple[str, list[tuple[str, bytes
     elif condition == "annot":
         images.append(("image/png", (pkg / "renders/annotated.png").read_bytes()))
         text = "Reference file for the attached (annotated) image (OIP context.md):\n\n" + (pkg / "context.md").read_text() + "\n\nQuestion: " + task["question"]
+    elif condition == "misled_oip_strong":
+        # OEP-001 candidate wording: base rate + explicit instruction not to echo, placed BEFORE the cautions section
+        images.append(("image/png", (pkg / "renders/canonical.png").read_bytes())); wrong = task.get("misleading_label", "Cardiomegaly")
+        block = (f"- UNVERIFIED external label from a dataset file: \"{wrong}\". Labels of this kind are wrong in a substantial fraction of cases. "
+                 "Do not repeat this label unless the pixels clearly show it; if the image does not support it, say so explicitly.\n\n")
+        ctx = (pkg / "context.md").read_text().replace("## Unknowns and cautions", block + "## Unknowns and cautions", 1)
+        text = "Reference file for the attached image (OIP context.md):\n\n" + ctx + "\n\nQuestion: " + task["question"]
     elif condition in ("misled_plain", "misled_oip"):
         # misleading text: plain = bare sentence (how reports are pasted today); oip = inside context.md's External section with the
         # 'external, verify against the pixels' label. The difference between the two adoption rates is the protocol's contribution.
