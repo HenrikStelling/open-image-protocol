@@ -4,9 +4,23 @@ import re
 FINDING_LABELS = ["Aortic enlargement", "Atelectasis", "Calcification", "Cardiomegaly", "Consolidation", "ILD", "Infiltration", "Lung Opacity", "Nodule/Mass", "Other lesion", "Pleural effusion", "Pleural thickening", "Pneumothorax", "Pulmonary fibrosis"]
 
 
+NUM = r"-?\d+(?:\.\d+)?"
+
+
 def _num(s: str):
-    """Last number in the reply: models that write visible reasoning put intermediate pixel counts first and the answer last."""
-    m = re.findall(r"-?\d+(?:\.\d+)?", s.replace(",", ""))
+    """Answer extraction for free-text replies, in order of reliability: a number after an explicit answer marker
+    ('Answer:', '**≈116 mm**'), then the first number on the final non-empty line, then the last number anywhere."""
+    s = (s or "").replace(",", "")
+    tail = s.split("</think>")[-1]                      # visible reasoning models close their thinking with this tag
+    m = re.search(r"(?:answer|estimate|ctr|ratio|diameter)\s*(?:is|:|=|≈|~)?\s*\**\s*[~≈]?\s*(" + NUM + ")", tail, re.I)
+    if m: return float(m.group(1))
+    m = re.search(r"\*\*\s*[~≈]?\s*(" + NUM + ")", tail)
+    if m: return float(m.group(1))
+    lines = [l for l in tail.splitlines() if l.strip()]
+    if lines:
+        m = re.search(NUM, lines[-1])
+        if m: return float(m.group(0))
+    m = re.findall(NUM, tail)
     return float(m[-1]) if m else None
 
 

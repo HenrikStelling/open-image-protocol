@@ -21,4 +21,4 @@ exclude the folders with a `.nosync` suffix before they grow. `bench/run.py --pk
   and restart the Ollama app. `num_gpu: 0` (CPU only) also works but is ~10x slower.
 - Ollama Cloud free tier: starter credits and **one concurrent request**; extra requests are queued (then time out /
   502 through the local daemon). Run one model at a time on Free; Pro ($20/mo, $60 credits, 3 concurrent) fits the
-  benchmark's three-parallel-model layout. Retired cloud tags answer HTTP 410.
+  benchmark's three-parallel-model layout. Retired cloud tags answer HTTP 410. Pro also rate-limits bursts: three parallel runs of ~5k-token image prompts hit sustained HTTP 429 after ~30 minutes (2026-09-08); the runner backs off 15/30/60 s and then aborts the model, and runs must be resumed (`--resume <run dir>`) one model at a time.
