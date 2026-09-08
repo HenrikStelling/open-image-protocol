@@ -61,7 +61,8 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 - [x] Ollama provider in the harness (D-026): pilot on Ollama cloud/local multimodal models, no keys needed
 - [ ] Pilot runs on Ollama: fix harness/prompt issues, first protocol-effect numbers
   - Model roster (Ollama directory checked 2026-09-08). Cloud runs on Ollama's servers, so size is not limited by the Mac. Cloud vision-capable: kimi-k3 (most capable), mistral-large-3 (675b), qwen3.5 (cloud build), minimax-m3, gemma4 (12b/26b/31b), glm-5.3-flash (18b), kimi-k2.6. Retired: qwen3-vl:235b-cloud (410). Local medical (limited by 16 GB RAM / 14 GB disk): medgemma:4b only; the Gemma-3-based domain model and the privacy-preserving clinical arm.
-  - Wave 1 (running): minimax-m3, glm-5.3-flash, gemma4:31b. Wave 2 (queued): kimi-k3, mistral-large-3:675b, qwen3.5. Wave 3: medgemma:4b local. Cloud concurrency limit: 3 models at a time.
+  - Wave 1: minimax-m3, glm-5.3-flash, gemma4:31b; wave 2: kimi-k3, mistral-large-3:675b, qwen3.5; wave 3: medgemma:4b + gemma4:e4b local (Metal workaround, see CONTRIBUTING).
+  - 2026-09-08 status: first cloud attempts hit the Free tier's 1-request concurrency and (probably) exhausted the starter credits → every cloud call 502/timeout. **[needs you]** decide: Ollama Pro ($20/mo, 3 concurrent, $60 credits) or run one model at a time on Free once credits reset. Pilot packages live at ~/oip-bench/vindr (outside iCloud); run from ~/oip-work with ~/oip-venv.
 - [ ] Later: export `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` in the shell (not in the repo) and confirm GPT/Gemini model ids before paid runs
 - [ ] API keys available (D-024); decide open-model hosting (MedGemma or CXR-LLaVA) **[needs you]**
 - [ ] Self-check block failures fed back as protocol bugs

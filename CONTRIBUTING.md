@@ -14,3 +14,11 @@ Lesson from 2026-09-08: with "Desktop & Documents" iCloud sync and "Optimize Mac
 for minutes and failed with `[Errno 60] Operation timed out`; renaming the 15 GB store made iCloud re-process the whole tree.
 Keep the clone, the virtual environment and `data/` outside iCloud (e.g. `~/oip-work`, `~/oip-venv`, `~/oip-bench`), or
 exclude the folders with a `.nosync` suffix before they grow. `bench/run.py --pkg-dir` exists for running from such a copy.
+
+## Ollama on Apple M5 / macOS 26 (2026-09-08)
+- Local models fail to load with `ggml_metal_library_init_from_source: error compiling source` (Metal bfloat/half
+  static_assert; ollama/ollama issues #15594, #15862, #15548). Workaround: `launchctl setenv GGML_METAL_TENSOR_DISABLE 1`
+  and restart the Ollama app. `num_gpu: 0` (CPU only) also works but is ~10x slower.
+- Ollama Cloud free tier: starter credits and **one concurrent request**; extra requests are queued (then time out /
+  502 through the local daemon). Run one model at a time on Free; Pro ($20/mo, $60 credits, 3 concurrent) fits the
+  benchmark's three-parallel-model layout. Retired cloud tags answer HTTP 410.
