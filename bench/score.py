@@ -12,11 +12,14 @@ def score(task: dict, reply: str) -> dict:
     r = (reply or "").strip().lower(); t = task["type"]; ans = task["answer"]
     if t in ("modality", "view", "left_edge", "scale_available"):
         ok = str(ans).lower() in r
+        if t == "modality" and ans == "radiograph": ok = ok or "x-ray" in r or "xray" in r or "radiography" in r
         if t == "left_edge":  # accept 'right'/'left' alone when unambiguous
             other = "patient left" if ans == "patient right" else "patient right"
             ok = (ans in r) and (other not in r)
         if t == "scale_available":
-            ok = r.startswith(str(ans)) or f" {ans}" in r[:20]
+            # first standalone yes/no token in the reply decides ('no,' 'yes.' etc.)
+            m = re.search(r"\b(yes|no)\b", r)
+            ok = bool(m) and m.group(1) == str(ans)
         return {"correct": bool(ok)}
     if t in ("ctr", "heart_mm"):
         v = _num(r)

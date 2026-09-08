@@ -60,8 +60,18 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
         body = {"model": model, "stream": False, "think": OLLAMA_THINK, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
                 "options": {"num_predict": 1200 if OLLAMA_THINK else 400}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=300) as r:
-            return json.load(r)["message"]["content"]
+        last = None
+        for attempt in range(4):                       # cloud 502s/timeouts are transient; back off 15/30/60 s
+            try:
+                with urllib.request.urlopen(req, timeout=180) as r:
+                    return json.load(r)["message"]["content"]
+            except Exception as e:                     # noqa: BLE001
+                last = e
+                msg = str(e)
+                if not ("timed out" in msg or "502" in msg or "503" in msg or "504" in msg or "429" in msg):
+                    raise
+                time.sleep(15 * 2 ** attempt)
+        raise last
     if provider == "anthropic":
         import anthropic
         c = anthropic.Anthropic()   # credentials: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile
