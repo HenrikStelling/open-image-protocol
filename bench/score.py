@@ -4,8 +4,9 @@ import re
 
 
 def _num(s: str):
+    """Last number in the reply: models that write visible reasoning put intermediate pixel counts first and the answer last."""
     m = re.findall(r"-?\d+(?:\.\d+)?", s.replace(",", ""))
-    return float(m[0]) if m else None
+    return float(m[-1]) if m else None
 
 
 def score(task: dict, reply: str) -> dict:
