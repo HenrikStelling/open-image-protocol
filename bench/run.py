@@ -58,7 +58,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
         if not base.startswith("http"): base = "http://" + base
         # reasoning models spend the output budget inside 'thinking'; keep it generous and let --ollama-think decide
         body = {"model": model, "stream": False, "think": OLLAMA_THINK, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
-                "options": {"num_predict": 1200 if OLLAMA_THINK else 400}}
+                "options": {"num_predict": 1600 if OLLAMA_THINK else 800}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
         last = None
         for attempt in range(4):                       # cloud 502s/timeouts are transient; back off 15/30/60 s
