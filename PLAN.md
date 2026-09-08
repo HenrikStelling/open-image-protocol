@@ -18,6 +18,7 @@ also `docs/03-brainstorm/open-questions.md`.
 | Example packages | generated in `spec/examples/` |
 | GitHub remote | done — https://github.com/HenrikStelling/open-image-protocol (private) |
 | Kaggle credentials | done (2026-09-05) |
+| PhysioNet | CITI training done 2026-09-08; credentialing application pending |
 | Open questions | all 12 answered (D-014 to D-024) |
 | Phase 2 data | VinDr 1,000-sample, RSNA, SIIM mirror (train + masks), NIH sample: all downloaded (~26 GB) |
 | Phase 2 conversion | 2,100 real images converted, 0 failures; report in `docs/reports/` |
@@ -57,7 +58,9 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 - [x] Misleading-context conditions (`misled_plain` vs `misled_oip`, adoption rate of a wrong label)
 - [ ] Cross-model-variance aggregation in the report
 - Cost estimate (dry run, 30 images): ≈ $11 Opus 5 + $5 GPT + $1 Gemini per full pass; 100 images ≈ $55 total. Anthropic id verified (`claude-opus-5`); GPT/Gemini ids must be confirmed before a paid run.
-- [ ] **[needs you]** export `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` in the shell that runs `bench/run.py` (not in the repo); confirm model ids in `bench/run.py` MODELS
+- [x] Ollama provider in the harness (D-026): pilot on Ollama cloud/local multimodal models, no keys needed
+- [ ] Pilot runs on Ollama: fix harness/prompt issues, first protocol-effect numbers
+- [ ] Later: export `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` in the shell (not in the repo) and confirm GPT/Gemini model ids before paid runs
 - [ ] API keys available (D-024); decide open-model hosting (MedGemma or CXR-LLaVA) **[needs you]**
 - [ ] Self-check block failures fed back as protocol bugs
 - [ ] Ablation: which `context.md` sections carry the uplift → trim default profile
@@ -112,6 +115,6 @@ Order per D-014: clinical-integration exports (SR/FHIR) before research-pipeline
 | PHI leakage via burned-in text | OCR check in Phase 1; `burned_in_text_checked` flag; synthetic examples only in repo |
 
 ## 5. Immediate next actions
-1. **[needs you]** PhysioNet credentialing for CheXmask (start now, takes days).
+1. **[needs you]** PhysioNet credentialing for CheXmask: CITI course done (2026-09-08); upload the certificate in the credentialing application and sign the CheXmask DUA once approved.
 2. **[needs you]** Accept the competition rules once on Kaggle (VinDr-CXR, RSNA Pneumonia, SIIM-ACR) so `scripts/fetch_data.py --phase 2` can download.
 3. Me: non-DICOM adapter, OCR burned-in check, remaining verbs, then Phase 2 conversions as soon as data is available.

@@ -87,3 +87,11 @@ Owner's question: does a format that lets a model understand an image (entity, a
 2. **Reference ranges (in scope, optional, `external`):** cited normal ranges next to a measurement (e.g. "adult CTR normal < 0.50", "liver 40–60 HU"). Knowledge, not judgement; lets a model compare without OIP deciding anything.
 3. **Interpretation (out of scope):** findings, impressions, diagnoses. Produced by the consuming model or a downstream tool, never by the package. Detector outputs (boxes, "nodule") may be carried as `inferred` observations with the producing tool named, but OIP defines no diagnostic vocabulary and no rules.
 Rationale: (a) frontier models already hold the clinical reasoning (CTR threshold, HU ranges, uptake patterns); what they lack is trustworthy inputs — MedVision, MC-CXR and our own runs show the failure is measurement and grounding, not reasoning. (b) Diagnostic logic inside a format freezes today's medicine into a spec and turns a data standard into a regulated device. (c) It keeps the benchmark honest: OIP-Bench measures whether findings-level accuracy rises *as a consequence* of understanding tasks improving, with zero diagnostic code in the package — that is the test of the hypothesis. Consistent with D-015.
+
+## D-026 — Benchmark pilot on Ollama (cloud + local open models); frontier APIs after the harness is stable · accepted · 2026-09-08
+While the harness, prompts and packages are still changing, run OIP-Bench against Ollama models: cloud multimodal tags
+(glm-5.3-flash, gemma4 12b/26b/31b, minimax-m3, kimi-k2.6, kimi-k3, mistral-large-3) through the signed-in local daemon
+(plan allowance instead of per-token billing; no API keys), and local models (gemma4 e4b) for the privacy-preserving clinical
+deployment story (D-014: clinical integrators are consumer #2). Claude, GPT and Gemini are added once the harness is stable
+and the pilot has shown the protocol effect, so that paid runs measure the protocol, not harness bugs. Consequence: the
+benchmark's success criterion "uplift for every model" now spans open and frontier models, which is the stronger claim anyway.
