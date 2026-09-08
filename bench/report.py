@@ -27,10 +27,12 @@ for m in models:
     for t in ("modality", "view", "left_edge", "scale_available", "ctr", "heart_mm", "findings"):
         cells.append(" → ".join(fmt(acc(m, c, t)[0]) for c in conds))
     md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
-md += ["", "## Misleading text: adoption rate of a wrong label (lower is better) and findings F1 under it", "", "| model | plain note: adopted | plain: F1 | OIP external section: adopted | OIP: F1 |", "|---|---|---|---|---|"]
+md += ["", "## Misleading text: adoption rate of a wrong label (lower is better) and findings F1 under it", "", "| model | plain note: adopted / F1 | OIP external section (v0.1 wording): adopted / F1 | OEP-001 strong wording: adopted / F1 |", "|---|---|---|---|"]
 for m in models:
-    ap, n = adopt(m, "misled_plain"); ao, _ = adopt(m, "misled_oip")
-    md.append(f"| {m.replace('ollama/','')} (n={n}) | {fmt(ap)} | {fmt(acc(m, 'misled_plain', 'findings_misled')[0])} | {fmt(ao)} | {fmt(acc(m, 'misled_oip', 'findings_misled')[0])} |")
+    cells = []
+    for c in ("misled_plain", "misled_oip", "misled_oip_strong"):
+        a, n = adopt(m, c); cells.append(f"{fmt(a)} / {fmt(acc(m, c, 'findings_misled')[0])}" + (f" (n={n})" if n else ""))
+    md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
 errs = collections.Counter((x["model"], x["error"][:40]) for x in rows if x.get("error"))
 md += ["", f"Rows: {len(rows)}; errors: {sum(errs.values())}" + ("; " + "; ".join(f"{m.replace('ollama/','')}: {e} ×{c}" for (m, e), c in errs.most_common(5)) if errs else ""), ""]
 out = ROOT / "docs/reports/pilot-ollama-report.md"; out.write_text("\n".join(md)); print("\n".join(md))

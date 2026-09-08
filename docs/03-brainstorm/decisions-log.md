@@ -110,3 +110,5 @@ whatever it contains; the assertion tag alone is not a safeguard (consistent wit
    supported." (`misled_oip_strong` condition in bench/run.py).
 3. Section order: cautions before external content, not after.
 Gate: accept whichever variant yields the lowest adoption rate without lowering understanding accuracy, across ≥ 3 models.
+
+First ablation (2026-09-08, local models): the strong wording cut gemma4 e4b's adoption from 90 % to 10 % and raised F1 under misleading text from 0.10 to 0.67 — but the model now answers "No finding" in 15/20 cases (over-suppression risk to be checked against findings F1 in the non-misled conditions). MedGemma 1.5 stays degenerate ("No finding" always). Cloud models queued for the same condition.
