@@ -56,7 +56,10 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 ### Phase 3 — OIP-Bench: does it help models? (weeks 5–9)
 - [x] Benchmark harness v0 (`bench/`): conditions {raw, ctx, annot}; tasks modality, view, left-edge side, scale availability, CTR, heart mm, findings F1 (VinDr); dry-run mode; results in `bench/results/` (ignored)
 - [x] Misleading-context conditions (`misled_plain` vs `misled_oip`, adoption rate of a wrong label)
-- [ ] Cross-model-variance aggregation in the report
+- [x] Cross-model-variance aggregation in the report (std of gating accuracy across models per condition)
+- [x] Harness v2 (2026-09-09, before the frontier run): layer ablation condition `ctx_l1` (L0–L2 only, no measurements) vs full `ctx`; misleading test routed through the shipped template; token/latency capture and cost table; abstention detection; new gating tasks that the file cannot answer verbatim — heart-mark and mark-side localisation (annotated render only) and a balanced flip-consistency test (mirrored render vs stated orientation); modality/view demoted from the gate. Validated on the two local models before any paid call.
+- [ ] Sample size 60–100 stratified (spacing availability, finding presence, cardiomegaly) — ~80 more packages from the DICOMs on disk (after the storage move)
+- [ ] Second thoracic-width source (CXAS thorax mask) for the CTR caveat; left-edge truth footnoted with the 1,000-image laterality check (0 mismatches)
 - [ ] **OEP-001**: External-section wording ablation (`misled_oip` vs `misled_oip_strong` vs omit-by-default), decide by adoption rate across ≥3 models (finding: gemma4 31B adopts a wrong label 100 % inside the External section vs 75 % as a plain note)
 - Cost estimate (dry run, 30 images): ≈ $11 Opus 5 + $5 GPT + $1 Gemini per full pass; 100 images ≈ $55 total. Anthropic id verified (`claude-opus-5`); GPT/Gemini ids must be confirmed before a paid run.
 - [x] Ollama provider in the harness (D-026): pilot on Ollama cloud/local multimodal models, no keys needed
