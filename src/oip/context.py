@@ -1,7 +1,7 @@
 """Generate context.md, the natural-language reference file, from a manifest (fixed template, section 6 of the spec)."""
 from __future__ import annotations
 
-TEMPLATE_VERSION = "0.1"
+TEMPLATE_VERSION = "0.2"
 
 
 def _fmt(v, unit=""):
@@ -19,7 +19,8 @@ def _a(x: dict, unit_key="unit"):
     return f"[{x.get('assertion_level','unknown')}] {_fmt(x.get('value'), x.get(unit_key, ''))}"
 
 
-def build_context(m: dict) -> str:
+def build_context(m: dict, include_external: bool = False) -> str:
+    """include_external=False (default, OEP-001): external labels/report text stay in oip.json and are not rendered."""
     acq, geo, inten, q = m["acquisition"], m["geometry"], m["intensity"], m["quality"]
     mod = acq["modality"]["value"]; fam = acq.get("modality_family", "other")
     title = m["identity"].get("title", "medical image")
@@ -110,21 +111,6 @@ def build_context(m: dict) -> str:
         L.append("None.")
     L.append("")
 
-    L.append("## External context")
-    ext = m.get("external") or {}
-    if ext:
-        if ext.get("dataset"):
-            L.append(f"- Dataset: {ext['dataset']}")
-        if ext.get("labels"):
-            L.append(f"- Dataset labels [external — verify against the pixels]: {', '.join(ext['labels'])}")
-        if ext.get("report_text"):
-            L.append(f"- Report text [external — verify against the pixels]: {ext['report_text']}")
-        for n in ext.get("notes", []):
-            L.append(f"- Note [external]: {n}")
-    else:
-        L.append("None. Statements in this section, when present, come from outside the image and must be verified against the pixels.")
-    L.append("")
-
     L.append("## Unknowns and cautions")
     caut = []
     flag_txt = {"missing_pixel_spacing": "no pixel spacing: never report sizes in mm",
@@ -147,6 +133,22 @@ def build_context(m: dict) -> str:
     if fam == "projection_radiography":
         caut.append("- A radiograph is a projection: overlapping structures superimpose; depth cannot be measured.")
     L.extend(caut or ["- None recorded."])
+    L.append("")
+
+    L.append("## External context")
+    ext = (m.get("external") or {}) if include_external else {}
+    if ext:
+        L.append("UNVERIFIED information from outside the image (dataset files, prior reports). Such labels are wrong in a substantial fraction of cases. Do not repeat any of it unless the pixels clearly show it; if the image does not support a statement below, say so explicitly.")
+        if ext.get("dataset"):
+            L.append(f"- Dataset: {ext['dataset']}")
+        if ext.get("labels"):
+            L.append(f"- Dataset labels [external, UNVERIFIED]: {', '.join(ext['labels'])}")
+        if ext.get("report_text"):
+            L.append(f"- Report text [external, UNVERIFIED]: {ext['report_text']}")
+        for n in ext.get("notes", []):
+            L.append(f"- Note [external]: {n}")
+    else:
+        L.append("Not rendered by default (OEP-001). External labels or report text, if any, are in `oip.json` under `external`; they are unverified and must not be repeated unless the pixels support them.")
     L.append("")
 
     L.append("## Self-check")

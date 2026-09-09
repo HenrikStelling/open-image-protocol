@@ -10,8 +10,8 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "615bbe39-8e99-44fc-899b-39fab009aa54",
-    "created": "2026-09-04T09:25:24+00:00",
+    "package_id": "d4491a46-71df-4604-836b-72d595b87175",
+    "created": "2026-09-09T06:32:25+00:00",
     "title": "CT slice",
     "source_uids": {
       "study": "2966c9f9fbae278d",
@@ -36,7 +36,7 @@
       "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
       "apply Modality LUT / RescaleSlope+Intercept",
       "no VOI in source; linear window between 0.5th and 99.5th percentile",
-      "write lossless 16-bit PNG per frame",
+      "write lossless png16 PNG per frame",
       "write canonical/annotated/thumbnail renders",
       "generate context.md",
       "validate against JSON Schema"
@@ -166,14 +166,6 @@
       "width": 128,
       "height": 128,
       "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
-    },
-    {
-      "path": "renders/window_c-600_w1500.png",
-      "purpose": "overlay",
-      "frame": 0,
-      "width": 128,
-      "height": 128,
-      "transform": "linear window center -600 width 1500 in units 'HU' applied to rescaled stored pixels; high = bright; no resample."
     }
   ],
   "pixels": {
@@ -203,7 +195,7 @@
   },
   "context": {
     "path": "context.md",
-    "template_version": "0.1"
+    "template_version": "0.2"
   },
   "source": {
     "dicom_headers": "source/dicom-headers.json",

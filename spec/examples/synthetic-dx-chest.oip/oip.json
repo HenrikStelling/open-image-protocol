@@ -12,15 +12,15 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "9abff595-fd30-4e5a-af75-6d81fc47b3d3",
-    "created": "2026-09-04T09:25:23+00:00",
+    "package_id": "13c00193-c877-4276-91ba-ac8938ecd922",
+    "created": "2026-09-09T06:32:25+00:00",
     "title": "Synthetic chest radiograph phantom, PA (MONOCHROME1 source)",
     "source_uids": {
-      "study": "185f016704699d7e",
-      "series": "de0e668562a0605e",
-      "instance": "48288fce61447944"
+      "study": "ed32dd2e4004f040",
+      "series": "901b3ebe52181083",
+      "instance": "5514bcfd04e798a1"
     },
-    "source_hash": "380e3769620f552396e3723c20d3e2c53c57cf746aa7a0fd86b08f51a27be513"
+    "source_hash": "efd7acd9c5e99586af59d41304ba47ce6bcafbc7e25f83c7132d5721f3356170"
   },
   "provenance": {
     "producer": "oip-python",
@@ -38,7 +38,7 @@
       "apply Modality LUT / RescaleSlope+Intercept",
       "apply VOI (WindowCenterWidth)",
       "invert (source was MONOCHROME1/INVERSE) so high attenuation is bright",
-      "write lossless 16-bit PNG per frame",
+      "write lossless png16 PNG per frame",
       "write canonical/annotated/thumbnail renders",
       "generate context.md",
       "validate against JSON Schema"
@@ -203,37 +203,6 @@
       "width": 213,
       "height": 256,
       "transform": "canonical render downsampled to fit 256 px; for preview only, not for measurement."
-    },
-    {
-      "path": "renders/crop_700_400_1200_1100_x2.png",
-      "purpose": "overlay",
-      "frame": 0,
-      "width": 1402,
-      "height": 1002,
-      "transform": "crop of canonical render rows 700-1200, cols 400-1100, nearest-neighbour upscale x2. frame_coord = crop_coord/2 + (700, 400). Effective spacing 0.1 x 0.1 mm/px."
-    },
-    {
-      "path": "renders/overlay.png",
-      "purpose": "overlay",
-      "frame": null,
-      "width": 1716,
-      "height": 2016,
-      "transform": "canonical render in a dark margin with selected region marks and a 50 mm grid; content pixel-aligned at the stated offset.",
-      "annotations": [
-        "margin_offset_px: 108 (subtract from annotated coords to get frame coords)",
-        "edge labels: left=R, right=L, top=H, bottom=F",
-        "scale bar: 50 mm = 250 px, bottom-left",
-        "mark 1 = heart (phantom ellipse)",
-        "grid: 50 mm spacing (250.0 px horizontally, 250.0 px vertically)"
-      ]
-    },
-    {
-      "path": "renders/window_c2000_w1500.png",
-      "purpose": "overlay",
-      "frame": 0,
-      "width": 1500,
-      "height": 1800,
-      "transform": "linear window center 2000 width 1500 in units 'relative' applied to rescaled stored pixels; high = bright; no resample."
     }
   ],
   "pixels": {
@@ -353,7 +322,7 @@
   },
   "context": {
     "path": "context.md",
-    "template_version": "0.1"
+    "template_version": "0.2"
   },
   "source": {
     "dicom_headers": "source/dicom-headers.json",

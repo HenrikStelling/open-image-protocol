@@ -10,15 +10,15 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "74514453-f7f4-44de-b88d-f8fa64203c48",
-    "created": "2026-09-04T09:25:24+00:00",
+    "package_id": "879a44ef-59ee-44af-b055-cb3471e70694",
+    "created": "2026-09-09T06:32:25+00:00",
     "title": "Synthetic whole-body bone scintigraphy phantom (anterior + posterior)",
     "source_uids": {
-      "study": "3f193c4ee8b16ba4",
-      "series": "e980b5892c6fc85e",
-      "instance": "ef7a9395c4c6580b"
+      "study": "eebf5843518cb756",
+      "series": "40b80da01d40a8b6",
+      "instance": "d7c0135a0109d4fb"
     },
-    "source_hash": "4c79cd00d57dce227604481fe3633a2e506cfab42d6b1817a37373a78127b265"
+    "source_hash": "6e0fad83610f52bc15d1f02720543b93d71fd61506c343b255431ce0eb2731bb"
   },
   "provenance": {
     "producer": "oip-python",
@@ -37,7 +37,7 @@
       "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
       "apply Modality LUT / RescaleSlope+Intercept",
       "no VOI in source; sqrt scaling, clipped at 99.5th percentile",
-      "write lossless 16-bit PNG per frame",
+      "write lossless png16 PNG per frame",
       "write canonical/annotated/thumbnail renders",
       "generate context.md",
       "validate against JSON Schema"
@@ -300,7 +300,7 @@
   },
   "context": {
     "path": "context.md",
-    "template_version": "0.1"
+    "template_version": "0.2"
   },
   "source": {
     "dicom_headers": "source/dicom-headers.json",

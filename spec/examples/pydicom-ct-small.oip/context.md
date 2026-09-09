@@ -28,11 +28,11 @@ None. (Measurements, when present, are computed by deterministic tools, not by a
 ## Inferred
 None.
 
-## External context
-None. Statements in this section, when present, come from outside the image and must be verified against the pixels.
-
 ## Unknowns and cautions
 - no display window in the source; the render window is automatic
+
+## External context
+Not rendered by default (OEP-001). External labels or report text, if any, are in `oip.json` under `external`; they are unverified and must not be repeated unless the pixels support them.
 
 ## Self-check
 Before answering questions about this image, confirm you can answer these from the package:

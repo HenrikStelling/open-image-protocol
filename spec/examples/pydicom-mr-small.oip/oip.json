@@ -10,8 +10,8 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "ff6d9356-9d77-4117-b328-f5ef170553e7",
-    "created": "2026-09-04T09:25:24+00:00",
+    "package_id": "64462225-3c67-43dd-8d31-215054c6e396",
+    "created": "2026-09-09T06:32:25+00:00",
     "title": "MR slice",
     "source_uids": {
       "study": "e4c2d72eee037e98",
@@ -36,7 +36,7 @@
       "de-identify (PHI tags removed, UIDs hashed, private tags dropped)",
       "apply Modality LUT / RescaleSlope+Intercept",
       "apply VOI (WindowCenterWidth)",
-      "write lossless 16-bit PNG per frame",
+      "write lossless png16 PNG per frame",
       "write canonical/annotated/thumbnail renders",
       "generate context.md",
       "validate against JSON Schema"
@@ -195,7 +195,7 @@
   },
   "context": {
     "path": "context.md",
-    "template_version": "0.1"
+    "template_version": "0.2"
   },
   "source": {
     "dicom_headers": "source/dicom-headers.json",

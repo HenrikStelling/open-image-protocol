@@ -21,7 +21,7 @@ This package describes a planar scintigraphy image (nuclear medicine): each pixe
 - `renders/thumbnail.png` (thumbnail): canonical render downsampled to fit 256 px; for preview only, not for measurement.
 - Polarity guarantee: in the canonical render, higher counts is BRIGHTER.
 - Orientation [unknown]: do not assume which side is the patient's left or right.
-- Scale [measured]: 2.26 × 2.26 mm per pixel (row × column), source `PixelSpacing`, valid in the detector plane, confidence medium. Image extent ≈ 2314 × 579 mm (height × width). Anatomy is magnified relative to the detector; absolute sizes may be over-estimated by roughly 5–10 % unless corrected.
+- Scale [measured]: 2.26 × 2.26 mm per pixel (row × column), source `PixelSpacing`, valid in the detector plane, confidence medium. Image extent ≈ 2314 × 579 mm (height × width).
 - Pixel values: 16-bit stored, units `counts`; window for the canonical render: sqrt (range 0–22).
 
 ## Measured facts
@@ -38,14 +38,14 @@ Counts caution: pixel values are photon counts; compare them only within this pa
 ## Inferred
 None.
 
-## External context
-None. Statements in this section, when present, come from outside the image and must be verified against the pixels.
-
 ## Unknowns and cautions
 - counts depend on dose, uptake time, duration and window
 - multiple frames; read frames[] before comparing views
 - no display window in the source; the render window is automatic
 - spacing is at the detector plane; anatomy magnified ~5–10 %
+
+## External context
+Not rendered by default (OEP-001). External labels or report text, if any, are in `oip.json` under `external`; they are unverified and must not be repeated unless the pixels support them.
 
 ## Self-check
 Before answering questions about this image, confirm you can answer these from the package:

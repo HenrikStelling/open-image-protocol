@@ -6,6 +6,8 @@ rows = []
 for r in sorted((ROOT / "bench/results").glob("2026*")):
     f = r / "results.jsonl"
     if f.exists(): rows += [json.loads(l) for l in f.read_text().splitlines() if l.strip()]
+for x in rows:  # normalise tag spellings (a resume script once produced 'name:size:cloud' for 'name:size-cloud')
+    x["model"] = x["model"].replace(":675b:cloud", ":675b-cloud")
 models = sorted({x["model"] for x in rows}); conds = ["raw", "ctx", "annot"]
 def acc(m, c, t=None, gating=None):
     sel = [x for x in rows if x["model"] == m and x["condition"] == c and not x.get("error") and (t is None or x["type"] == t) and (gating is None or x["gating"] == gating)]
