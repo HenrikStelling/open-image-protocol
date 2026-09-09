@@ -31,7 +31,10 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
         T.append(dict(type="mark_heart", question="On the annotated image, which numbered mark outlines the heart? Answer with the number only.", answer=str(regs["heart"]["mark"]), conditions=["annot"]))
     side_regs = [r for r in regs.values() if r["id"] in ("lung_left", "lung_right", "clavicle_left", "clavicle_right") and r.get("mark") and r.get("bbox_px")]
     if side_regs and el.get("left") in ("L", "R"):
-        r0 = side_regs[0]; cx = (r0["bbox_px"][1] + r0["bbox_px"][3]) / 2; img_side = "left" if cx < g["columns"] / 2 else "right"
+        # balance the truth: alternate between a left-sided and a right-sided structure by package (seeded on the name)
+        want = "_left" if (int(pkg.name[:6], 16) % 2 == 0) else "_right"
+        pick = [r for r in side_regs if r["id"].endswith(want)] or side_regs
+        r0 = pick[0]; cx = (r0["bbox_px"][1] + r0["bbox_px"][3]) / 2; img_side = "left" if cx < g["columns"] / 2 else "right"
         pat = el[img_side]  # anatomical side at that image edge
         T.append(dict(type="mark_side", question=f"On the annotated image, mark {r0['mark']} lies on which side of the PATIENT? Answer 'patient right' or 'patient left'.", answer="patient right" if pat == "R" else "patient left", conditions=["annot"]))
     # --- flip consistency: the shown image may be mirrored while the reference file states normal orientation.

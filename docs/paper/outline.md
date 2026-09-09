@@ -46,7 +46,7 @@ Converter on 2,100 images from four sources, 0 failures; what the headers really
 ## 8. Results
 Table 1: understanding accuracy per model × condition (pilot: 8 models, +22…+45 pp; final **[pending]**).
 Figure 2: layer ablation — L0–L2 vs full vs annotated, per task (which layer carries the effect) **[pending v2 runs]**.
-Table 2: localisation and flip consistency (does the annotated render earn its place; do models check pixels against text) **[pending]**.
+Table 2: localisation and flip consistency (does the annotated render earn its place; do models check pixels against text). Preliminary (gemma4 e4b): marks readable (100 %), mark-side 0 % (image side ≠ patient side even with edge labels), flip check at chance — models do not verify text against pixels. **[pending full set + frontier]**
 Figure 3: misleading text — adoption rate under plain note / v0.1 wording / revised template, per model (pilot numbers exist; the spec change is the story).
 Table 3: measurement validation vs CheXmask and experts **[pending]**.
 Figure 4: cost — tokens and latency per condition; cross-model spread shrinking with the package.
