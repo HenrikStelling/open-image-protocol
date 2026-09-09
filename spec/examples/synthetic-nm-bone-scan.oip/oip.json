@@ -10,15 +10,15 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "879a44ef-59ee-44af-b055-cb3471e70694",
-    "created": "2026-09-09T06:32:25+00:00",
+    "package_id": "0b9aabb5-5d65-486b-b2ff-9a57b5abddfc",
+    "created": "2026-09-09T08:05:35+00:00",
     "title": "Synthetic whole-body bone scintigraphy phantom (anterior + posterior)",
     "source_uids": {
-      "study": "eebf5843518cb756",
-      "series": "40b80da01d40a8b6",
-      "instance": "d7c0135a0109d4fb"
+      "study": "a4a4856695422545",
+      "series": "43d7694ce7a22e76",
+      "instance": "287f41e7a77f4395"
     },
-    "source_hash": "6e0fad83610f52bc15d1f02720543b93d71fd61506c343b255431ce0eb2731bb"
+    "source_hash": "c9ddd543e1c40eb72bf87d31eac830d9f10155600cbc47215f893747c64e4296"
   },
   "provenance": {
     "producer": "oip-python",

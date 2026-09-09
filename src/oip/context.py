@@ -34,7 +34,10 @@ def build_context(m: dict, include_external: bool = False) -> str:
                "tomography": "a tomographic slice: each pixel is a reconstructed value in a cross-sectional plane.",
                "other": "a medical image of unspecified physics."}[fam]
     L.append(f"This package describes {fam_txt}")
-    L.append(f"- Modality: {_a(acq['modality'])} · body part: {_a(acq['body_part'])} · view: {_a(acq['view'])} · laterality: {_a(acq['laterality'])}")
+    VIEW_WORDS = {"PA": "frontal, posteroanterior (PA)", "AP": "frontal, anteroposterior (AP)", "LL": "lateral, left lateral (LL)", "RL": "lateral, right lateral (RL)",
+                  "LATERAL": "lateral", "ANTERIOR": "anterior (frontal)", "POSTERIOR": "posterior (from the back, mirrored)"}
+    v = acq["view"]; vtxt = f"[{v.get('assertion_level','unknown')}] {VIEW_WORDS.get(str(v.get('value')).upper(), v.get('value')) if v.get('value') else 'unknown'}"
+    L.append(f"- Modality: {_a(acq['modality'])} · body part: {_a(acq['body_part'])} · view: {vtxt} · laterality: {_a(acq['laterality'])}")
     if m.get("subject"):
         L.append(f"- Subject (de-identified): age band {m['subject'].get('age_band') or 'unknown'}, sex {m['subject'].get('sex') or 'unknown'}")
     if fam == "scintigraphy" and acq.get("nm"):

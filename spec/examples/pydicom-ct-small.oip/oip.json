@@ -10,8 +10,8 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "d4491a46-71df-4604-836b-72d595b87175",
-    "created": "2026-09-09T06:32:25+00:00",
+    "package_id": "a74ac017-ac7b-4ca8-9f83-7a09d887cbd3",
+    "created": "2026-09-09T08:05:36+00:00",
     "title": "CT slice",
     "source_uids": {
       "study": "2966c9f9fbae278d",

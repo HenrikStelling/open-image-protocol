@@ -26,8 +26,11 @@ def _num(s: str):
 
 def score(task: dict, reply: str) -> dict:
     r = (reply or "").strip().lower(); t = task["type"]; ans = task["answer"]
+    ABSTAIN = re.compile(r"\b(cannot|can't|unable|not possible|insufficient|no way to|impossible to|not determin|indetermin|unknown from the image)\b")
     if t in ("modality", "view", "left_edge", "scale_available"):
         ok = str(ans).lower() in r
+        if ABSTAIN.search(r) and not ok:
+            return {"correct": False, "abstained": True}
         if t == "modality" and ans == "radiograph": ok = ok or "x-ray" in r or "xray" in r or "radiography" in r
         if t == "view":
             frontal = bool(re.search(r"\b(frontal|pa|ap|posteroanterior|anteroposterior|postero-anterior|antero-posterior)\b", r))

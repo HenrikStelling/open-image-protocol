@@ -3,7 +3,7 @@ OIP 0.1.0 · profile `measured` · layers L0, L1, L2, L3, L4 · de-identificatio
 
 ## What this is
 This package describes a projection radiograph (X-ray): pixel brightness relates to X-ray attenuation along the beam; the image is a 2D shadow, not a slice.
-- Modality: [measured] DX · body part: [measured] CHEST · view: [measured] PA · laterality: [unknown] unknown
+- Modality: [measured] DX · body part: [measured] CHEST · view: [measured] frontal, posteroanterior (PA) · laterality: [unknown] unknown
 - Subject (de-identified): age band 45-49, sex O
 - Technique: [measured] 120 kV, [measured] 2 mA.s, source-to-detector [measured] 1800 mm
 
