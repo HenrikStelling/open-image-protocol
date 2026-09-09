@@ -121,3 +121,9 @@ the true rate (12/20), so no general over-suppression. Because two capable model
 sufficient safeguard: the default reference file now renders no external labels or report text at all (they remain in
 `oip.json.external`; `oip describe --with-external` renders them with the strong wording, cautions first). Template 0.2.
 Consumers that need prior-report text must request it explicitly and inherit the wording.
+
+## D-028 — The Phase 3 deliverable is a paper (arXiv preprint, then a benchmark/resource venue) · accepted · 2026-09-09
+The pilot is preprint-grade evidence for a protocol but not paper-grade evaluation (n = 20, one dataset, open models only,
+partly self-referential ground truth). Remaining Phase 3 work is organised around the paper's figures: layer ablation,
+localisation/flip tasks, misleading-text before/after, measurement validation (CheXmask + experts), cost and cross-model
+spread, frontier models, 150 images across two sources and two modalities. Outline: docs/paper/outline.md.

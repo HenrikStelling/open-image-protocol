@@ -53,7 +53,7 @@ Exit criteria: `make test` + `make validate` green; five example packages; spec 
 - [x] Re-checked Kaggle for scintigraphy (D-022): small image-only sets only
 Exit criteria: measurement report with ICC/LoA per spacing source; converter handles ≥ 5 vendors without manual fixes.
 
-### Phase 3 — OIP-Bench: does it help models? (weeks 5–9)
+### Phase 3 — OIP-Bench: does it help models? (weeks 5–9) — deliverable: the paper (D-028, `docs/paper/outline.md`)
 - [x] Benchmark harness v0 (`bench/`): conditions {raw, ctx, annot}; tasks modality, view, left-edge side, scale availability, CTR, heart mm, findings F1 (VinDr); dry-run mode; results in `bench/results/` (ignored)
 - [x] Misleading-context conditions (`misled_plain` vs `misled_oip`, adoption rate of a wrong label)
 - [x] Cross-model-variance aggregation in the report (std of gating accuracy across models per condition)
@@ -77,7 +77,7 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 - [ ] Self-check block failures fed back as protocol bugs
 - [ ] Ablation: which `context.md` sections carry the uplift → trim default profile
 - [ ] Tier-3 expert subset (~200 CXR): readers available (D-023); I prepare the reading set + instructions, you schedule the readers
-Exit criteria (understanding tasks gate the release, D-015): statistically significant uplift on understanding tasks for every model; finding-level F1 reported but not gating; lower switch rate with labelled `external` text. Publish benchmark report → v0.2.
+Exit criteria (understanding tasks gate the release, D-015; paper experiments E1–E8 in `docs/paper/outline.md` §11): statistically significant uplift on understanding tasks for every model; finding-level F1 reported but not gating; lower switch rate with labelled `external` text. Publish benchmark report → v0.2.
 
 ### Phase 4 — Scintigraphy (weeks 8–12)
 - [x] Download Zenodo Paraguay bone scans (582 × 16-bit PNG, 256×1024, ant/post pairs)
