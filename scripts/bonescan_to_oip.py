@@ -5,7 +5,17 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src")
 from oip.convert_image import convert_image
 SRC = ROOT / "data/bone-scans-paraguay/images"
 limit = int(sys.argv[1]) if len(sys.argv) > 1 else 4; out = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "data/oip/bonescan"
-files = sorted(SRC.glob("*/*/*.png"))[:limit]
+# balanced sample: equal counts per (class, view) cell, same patient numbers for anterior/posterior so pairs stay together
+import random, collections
+cells = collections.defaultdict(list)
+for f in sorted(SRC.glob("*/*/*.png")): cells[f.parts[-3]].append(f.stem[1:])       # patient numbers per class (A<n>/P<n>)
+per_class = max(1, limit // 4); rng = random.Random(0); files = []
+for cls, nums in sorted(cells.items()):
+    chosen = rng.sample(sorted(set(nums)), min(per_class, len(set(nums))))
+    for n in chosen:
+        for view in ("Anterior", "Posterior"):
+            f = SRC / cls / view / f"{view[0]}{n}.png"
+            if f.exists(): files.append(f)
 for f in files:
     cls, view = f.parts[-3], f.parts[-2]
     meta = dict(modality="NM", body_part="WHOLEBODY", view=view.upper(),   # no pixel size is asserted: it is not in the data (see notes)
