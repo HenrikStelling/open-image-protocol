@@ -43,8 +43,24 @@ CONDITIONS = {
 DEFAULT_CONDITIONS = "raw,ctx_l1,ctx,annot,misled_plain,misled_oip"
 
 
+def applies(task: dict, condition: str) -> bool:
+    """Which conditions a task runs in: misled_* only for findings_misled; tasks with an explicit 'conditions' list only there."""
+    if condition.startswith("misled") or task["type"] == "findings_misled":
+        return condition.startswith("misled") and task["type"] == "findings_misled"
+    return condition in task["conditions"] if task.get("conditions") else True
+
+
+def _flipped(pkg: Path) -> bytes:
+    """Horizontally mirrored canonical render (bench artefact, cached next to the package as renders/_flipped.png)."""
+    f = pkg / "renders/_flipped.png"
+    if not f.exists():
+        from PIL import Image, ImageOps
+        ImageOps.mirror(Image.open(pkg / "renders/canonical.png")).save(f)
+    return f.read_bytes()
+
+
 def build_prompt(task: dict, condition: str) -> tuple[str, list[tuple[str, bytes]]]:
-    pkg = Path(task["pkg"]); canon = ("image/png", (pkg / "renders/canonical.png").read_bytes())
+    pkg = Path(task["pkg"]); canon = ("image/png", _flipped(pkg) if task.get("flipped") else (pkg / "renders/canonical.png").read_bytes())
     q = task["question"]; wrong = task.get("misleading_label", "Cardiomegaly")
     if condition == "raw":
         return q, [canon]
@@ -141,8 +157,7 @@ def main():
         (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
     conds = a.conditions.split(","); models = a.models.split(",")
     if a.dry_run:
-        chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if (c.startswith("misled")) == (t["type"] == "findings_misled")) for c in conds}
-        applies = lambda t, c: (c.startswith("misled")) == (t["type"] == "findings_misled")
+        chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
         in_tok = sum(v // 4 for v in chars.values()) + IMAGE_TOKENS * n_calls; out_tok = 400 * n_calls   # ~400 output incl. thinking
         cost = {m: (round(in_tok / 1e6 * PRICES[m][0] + out_tok / 1e6 * PRICES[m][1], 2) if m in PRICES else "ollama plan allowance") for m in models}
@@ -157,7 +172,7 @@ def main():
         prov, mid = MODELS[m] if m in MODELS else (("ollama", m.split("/", 1)[1]) if m.startswith("ollama/") else (_ for _ in ()).throw(KeyError(f"unknown model {m}; use a key in MODELS or ollama/<tag>")))
         for c in conds:
             for i, t in enumerate(tasks, 1):
-                if (c.startswith("misled")) != (t["type"] == "findings_misled") or (m, c, t["id"]) in done:
+                if not applies(t, c) or (m, c, t["id"]) in done:
                     continue
                 try:
                     text, imgs = build_prompt(t, c)

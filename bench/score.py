@@ -44,6 +44,14 @@ def score(task: dict, reply: str) -> dict:
             m = re.search(r"\b(yes|no)\b", r)
             ok = bool(m) and m.group(1) == str(ans)
         return {"correct": bool(ok)}
+    if t == "mark_heart":
+        m = re.search(r"\b(\d{1,2})\b", r); return {"correct": bool(m) and m.group(1) == str(ans), "value": m.group(1) if m else None}
+    if t == "mark_side":
+        other = "patient left" if ans == "patient right" else "patient right"
+        return {"correct": (ans in r) and (other not in r)}
+    if t == "flip_check":
+        mir = bool(re.search(r"\b(mirror|mirrored|flipped|disagree|does not agree|reversed)\b", r)); agr = bool(re.search(r"\bagree", r)) and not mir
+        return {"correct": (ans == "mirrored" and mir) or (ans == "agree" and agr)}
     if t in ("ctr", "heart_mm"):
         v = _num(r)
         if v is None: return {"correct": False, "abstained": True}
