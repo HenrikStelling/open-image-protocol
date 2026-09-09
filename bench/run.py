@@ -151,7 +151,10 @@ def main():
         if a.pkg_dir:
             for t in tasks: t["pkg"] = str(Path(a.pkg_dir) / Path(t["pkg"]).name)
     else:
-        tasks = build(Path(a.pkg_dir) if a.pkg_dir else ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
+        if a.dataset == "bonescan":
+            from tasks_nm import build_nm; tasks = build_nm(Path(a.pkg_dir) if a.pkg_dir else ROOT / "data/oip" / a.dataset, a.n, a.seed)
+        else:
+            tasks = build(Path(a.pkg_dir) if a.pkg_dir else ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
         tag = "+".join(m.replace("/", "_").replace(":", "_") for m in a.models.split(","))[:60]
         run = ROOT / "bench/results" / f"{time.strftime('%Y%m%d-%H%M%S')}-{tag}-{os.getpid()}"; run.mkdir(parents=True, exist_ok=True)   # unique per process
         (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
