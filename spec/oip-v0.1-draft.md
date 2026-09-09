@@ -71,10 +71,12 @@ declare `oip.profile` and `oip.layers` and MUST NOT claim a layer it did not fil
    that is the conventional display.
 
 ## 6. `context.md` (reference file)
-Fixed section order; every section present even if it only says "none":
+Fixed section order (template 0.2); every section present even if it only says "none":
 `What this is` · `How to read the renders` · `Measured facts` ·
-`Computed measurements` · `Inferred` · `External context` · `Unknowns and cautions`
+`Computed measurements` · `Inferred` · `Unknowns and cautions` · `External context`
 · `Self-check` · `Machine-readable`.
+External content (dataset labels, prior report text) is NOT rendered by default (D-027): it stays in `oip.json.external`.
+When a consumer requests it, it is rendered after the cautions with the wording "UNVERIFIED … do not repeat unless the pixels clearly show it".
 The file SHOULD stay below ~1,500 tokens for the `core` profile. Each statement
 in sections 3–6 is prefixed with its assertion level in brackets.
 

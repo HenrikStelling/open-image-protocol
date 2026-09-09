@@ -112,3 +112,12 @@ whatever it contains; the assertion tag alone is not a safeguard (consistent wit
 Gate: accept whichever variant yields the lowest adoption rate without lowering understanding accuracy, across ≥ 3 models.
 
 First ablation (2026-09-08, local models): the strong wording cut gemma4 e4b's adoption from 90 % to 10 % and raised F1 under misleading text from 0.10 to 0.67 — but the model now answers "No finding" in 15/20 cases (over-suppression risk to be checked against findings F1 in the non-misled conditions). MedGemma 1.5 stays degenerate ("No finding" always). Cloud models queued for the same condition.
+
+## D-027 — OEP-001 accepted: external content is omitted from context.md by default; when rendered, cautions precede it and it carries unverified-label wording · accepted · 2026-09-09
+Cloud ablation (6 models, 20 images, wrong label injected): adoption under v0.1 wording → OEP-001 wording: gemma4 31B 100→10 %,
+minimax-m3 90→0 %, qwen3.5 60→0 %, gemma4 e4b 90→10 %, kimi-k3 90→40 %, glm-5.3-flash 95→60 %, mistral-large-3 100→80 %
+(MedGemma degenerate both ways). Findings F1 under misleading text rose for 6/8 models; the "No finding" rate stayed near
+the true rate (12/20), so no general over-suppression. Because two capable models still adopt ≥ 60 %, wording alone is not a
+sufficient safeguard: the default reference file now renders no external labels or report text at all (they remain in
+`oip.json.external`; `oip describe --with-external` renders them with the strong wording, cautions first). Template 0.2.
+Consumers that need prior-report text must request it explicitly and inherit the wording.
