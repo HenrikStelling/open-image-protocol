@@ -17,15 +17,22 @@ def run_cxas(pkg: Path) -> dict[str, np.ndarray]:
     return {k: np.asarray(Image.open(out / f"{k}.png")) > 127 for k in ("ribs", "heart", "lung_left", "lung_right")}
 
 
-def internal_thoracic_width_px(ribs: np.ndarray, spine_col: int | None = None) -> dict:
-    """At each row, the inner margins are the innermost rib pixel on each side of the midline; width = max over rows of the
-    distance between them. Midline = column of the rib mask's centroid unless given."""
-    H, W = ribs.shape; mid = spine_col if spine_col is not None else int(np.round(np.where(ribs.any(axis=0))[0].mean())) if ribs.any() else W // 2
-    best = (0, None)
-    for r in range(H):
-        row = ribs[r]
-        left = np.where(row[:mid])[0]; right = np.where(row[mid:])[0]
-        if left.size and right.size:
-            li, ri = left.max(), mid + right.min()      # innermost rib pixel left of midline, innermost right of midline
-            if ri - li > best[0]: best = (int(ri - li), r)
-    return {"width_px": best[0], "row": best[1], "midline_col": mid}
+def internal_thoracic_width_px(ribs: np.ndarray, lungs: np.ndarray | None = None) -> dict:
+    """Internal thoracic width = distance between the INNER margins of the lateral chest wall at the widest level.
+    Per row: outermost rib pixel on each side, then walk inward to the end of that contiguous rib run (the inner cortex of the
+    lateral rib segment). Rows are restricted to the lung-bearing region when lung masks are given. Width = max over rows."""
+    H, W = ribs.shape
+    rows = range(H)
+    if lungs is not None and lungs.any():
+        rr = np.where(lungs.any(axis=1))[0]; rows = range(int(rr.min()), int(rr.max()) + 1)
+    best = (0, None, None, None)
+    for r in rows:
+        idx = np.where(ribs[r])[0]
+        if idx.size < 2: continue
+        l = int(idx.min()); li = l
+        while li + 1 < W and ribs[r, li + 1]: li += 1          # end of the left rib run -> inner margin
+        rt = int(idx.max()); ri = rt
+        while ri - 1 >= 0 and ribs[r, ri - 1]: ri -= 1          # start of the right rib run -> inner margin
+        if ri - li > best[0] and (rt - l) > 0.5 * W * 0.4:      # ignore rows where only one side is segmented
+            best = (int(ri - li), r, li, ri)
+    return {"width_px": best[0], "row": best[1], "left_inner_col": best[2], "right_inner_col": best[3]}

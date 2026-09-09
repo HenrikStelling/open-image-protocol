@@ -61,7 +61,7 @@ Exit criteria: measurement report with ICC/LoA per spacing source; converter han
 - **Harness v2 validated on local models (2026-09-09):** layer ablation gemma4 e4b raw 61 % → L0–L2 only 78 % → full 100 %; MedGemma 57 → 67 → 87 %. About half of the uplift comes from geometry/orientation/units, the rest from computed measurements. Misleading test via the shipped template: gemma4 e4b 30 % adoption (vs 95 % plain note); MedGemma 0 % (degenerate). Cross-model spread raw 9 → ctx 5 pp. Localisation/flip tasks running (v3).
 - [x] Storage: Kaggle cache (22 GB) and package store (15 GB) moved to /Volumes/Video Storage/oip with checksum verification; symlinks in place; 121 GB free internally
 - [ ] Sample size 60–100 stratified (spacing availability, finding presence, cardiomegaly) — ~80 more packages from the DICOMs on disk (after the storage move)
-- [ ] Second thoracic-width source (CXAS thorax mask) for the CTR caveat; left-edge truth footnoted with the 1,000-image laterality check (0 mismatches)
+- [x] Second thoracic-width source (CXAS) done — cross-tool agreement; left-edge truth footnoted with the 1,000-image laterality check (0 mismatches)
 - [ ] **OEP-001**: External-section wording ablation (`misled_oip` vs `misled_oip_strong` vs omit-by-default), decide by adoption rate across ≥3 models (finding: gemma4 31B adopts a wrong label 100 % inside the External section vs 75 % as a plain note)
 - Cost estimate (dry run, 30 images): ≈ $11 Opus 5 + $5 GPT + $1 Gemini per full pass; 100 images ≈ $55 total. Anthropic id verified (`claude-opus-5`); GPT/Gemini ids must be confirmed before a paid run.
 - [x] Ollama provider in the harness (D-026): pilot on Ollama cloud/local multimodal models, no keys needed

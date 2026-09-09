@@ -54,7 +54,7 @@ Modality generalisation: bone-scan tasks (counts semantics, orientation of poste
 
 ## 9. Discussion and limitations
 - Why the effect is large: the failures were input failures. What the package does not fix (MedGemma's degenerate behaviours; models that adopt wrong labels regardless of wording → hence omit-by-default).
-- Ground-truth caveats: CTR from lung masks (bias quantified in §6), left-edge truth on stripped headers backed by the 1,000-image laterality check.
+- Ground-truth caveats: CTR from lung masks cross-checked against a rib-margin measurement from an independent tool (agreement within 1 % on the pilot set; per-image failures documented), final validation vs CheXmask/experts; left-edge truth on stripped headers backed by the 1,000-image laterality check.
 - Ceiling effects at n = 20 → final N; single-centre datasets; 2D only; no diagnosis by design.
 - Benchmark-driven protocol evolution (OEP process) as the maintenance model.
 
