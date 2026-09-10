@@ -11,9 +11,15 @@ for r in sorted((ROOT / "bench/results").glob("2026*")):
     dataset = {"vindr": "pilot-vindr-20", "vindr-paper": "paper-vindr-100", "nih-paper": "paper-nih-50", "bonescan": "bonescan-40"}.get(pkgdir, pkgdir)
     for l in f.read_text().splitlines():
         if l.strip():
-            x = json.loads(l); x["dataset"] = dataset; rows.append(x)
+            x = json.loads(l); x["dataset"] = dataset; x["_run"] = r.name; rows.append(x)
 import sys as _sys
 ONLY = _sys.argv[1] if len(_sys.argv) > 1 else None          # optional: report one dataset only
+# one run per (dataset, model, condition): keep the LATEST run directory that has rows for that combination, so repeated
+# pilot runs of the same images are not pooled (the pilot-vindr-20 table is therefore the most recent harness version)
+latest = {}
+for x in rows:
+    key = (x["dataset"], x["model"], x["condition"]); latest[key] = max(latest.get(key, ""), x["_run"])
+rows = [x for x in rows if x["_run"] == latest[(x["dataset"], x["model"], x["condition"])]]
 ALL_ROWS = rows
 rows = [x for x in rows if ONLY is None or x["dataset"] == ONLY]
 for x in rows:  # normalise tag spellings (a resume script once produced 'name:size:cloud' for 'name:size-cloud')
