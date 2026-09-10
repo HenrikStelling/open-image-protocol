@@ -45,7 +45,7 @@ Converter on 2,100 images from four sources, 0 failures; what the headers really
 
 ## 8. Results
 Table 1: understanding accuracy per model × condition (pilot: 8 models, +22…+45 pp; final **[pending]**).
-Figure 2: layer ablation — L0–L2 vs full vs annotated, per task (which layer carries the effect) **[pending v2 runs]**.
+Figure 2: layer ablation — L0–L2 vs full vs annotated, per task. Local-model numbers exist (VinDr-100: gemma4 e4b raw 36 → L0–L2 63 → full 83 → annotated 92 %; MedGemma 41 → 51 → 76 → 81 %; NIH-50: 33 → 46 → 80 → 90 % and 17 → 36 → 72 → 71 %). Roughly half of the uplift is geometry/orientation/units, the rest computed measurements; the annotated render adds 7–10 points through the mark tasks. **[pending cloud + frontier on the same set]**
 Table 2: localisation and flip consistency (does the annotated render earn its place; do models check pixels against text). Preliminary (gemma4 e4b): marks readable (100 %), mark-side 0 % (image side ≠ patient side even with edge labels), flip check at chance — models do not verify text against pixels. **[pending full set + frontier]**
 Figure 3: misleading text — adoption rate under plain note / v0.1 wording / revised template, per model (pilot numbers exist; the spec change is the story).
 Table 3: measurement validation vs CheXmask and experts **[pending]**.
@@ -65,10 +65,10 @@ arXiv preprint when frontier numbers and the ablation exist (target: +2 weeks). 
 | # | Experiment | Data | Status |
 |---|---|---|---|
 | E1 | 8 open models, 20 images, 3 conditions | VinDr | done (pilot) |
-| E2 | Harness v2 validation (ablation, localisation, flip) | VinDr 20, local models | running |
+| E2 | Harness v2 validation (ablation, localisation, flip) | VinDr 20, local models | done |
 | E3 | Frontier models (Claude, GPT, Gemini) | VinDr 20 → 100 | needs keys |
-| E4 | Scale to 100 VinDr + 50 NIH, stratified | on disk | after storage move |
-| E5 | Bone-scan benchmark tasks | Zenodo 60 pairs | needs NM task set |
+| E4 | Scale to 100 VinDr + 50 NIH, stratified | ~/oip-bench/*-paper | packages done; local baseline done; cloud/frontier pending |
+| E5 | Bone-scan benchmark tasks | 40 balanced packages | local models done; cloud/frontier pending |
 | E6 | CheXmask agreement | PhysioNet | needs approval |
 | E7 | Expert reading (100 CXR, 50 bone scans) | readers available | needs reading set |
-| E8 | CXAS thoracic width | local | to do |
+| E8 | CXAS thoracic width | isolated venv | done on pilot set (agrees within 1 %); run on paper set pending |
