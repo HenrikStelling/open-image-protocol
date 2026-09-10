@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-UNDERSTANDING_NM = ("modality_nm", "left_edge_nm", "scale_available_nm", "counts_semantics", "hot_side", "flip_check_nm")
+UNDERSTANDING_NM = ("left_edge_nm", "scale_available_nm", "hot_side", "flip_check_nm")   # counts_semantics and modality reported, not gating (known from priors)
 
 
 def tasks_for_nm_package(pkg: Path) -> list[dict]:
@@ -24,7 +24,7 @@ def tasks_for_nm_package(pkg: Path) -> list[dict]:
     # hottest side computed from the pixels (image-left vs image-right half, excluding the midline), then mapped to the patient side
     arr = np.asarray(Image.open(pkg / m["pixels"]["paths"][0])).astype(np.float64); w = arr.shape[1]; mid = int(w * 0.08)
     left, right = arr[:, : w // 2 - mid].sum(), arr[:, w // 2 + mid:].sum()
-    if el.get("left") in ("L", "R") and abs(left - right) / max(left + right, 1) > 0.04:      # only when the asymmetry is clear
+    if el.get("left") in ("L", "R") and abs(left - right) / max(left + right, 1) > 0.08:      # only when the asymmetry is clear (8 %: above positioning noise)
         img_side = "left" if left > right else "right"; pat = el[img_side]
         T.append(dict(type="hot_side", question="Ignoring the spine and bladder, which side of the PATIENT shows more total tracer uptake (more counts) in this image? Answer 'patient right' or 'patient left'.", answer="patient right" if pat == "R" else "patient left"))
     for t in T:
