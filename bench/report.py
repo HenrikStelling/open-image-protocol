@@ -20,6 +20,8 @@ latest = {}
 for x in rows:
     key = (x["dataset"], x["model"], x["condition"]); latest[key] = max(latest.get(key, ""), x["_run"])
 rows = [x for x in rows if x["_run"] == latest[(x["dataset"], x["model"], x["condition"])]]
+# NIH packages carry low-confidence dataset-derived spacing; the 'scale_available' truth was ill-defined there (fixed in tasks.py)
+rows = [x for x in rows if not (x["dataset"] == "paper-nih-50" and x["type"] == "scale_available")]
 ALL_ROWS = rows
 rows = [x for x in rows if ONLY is None or x["dataset"] == ONLY]
 for x in rows:  # normalise tag spellings (a resume script once produced 'name:size:cloud' for 'name:size-cloud')
