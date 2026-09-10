@@ -50,7 +50,7 @@ Table 2: localisation and flip consistency (does the annotated render earn its p
 Figure 3: misleading text — adoption rate under plain note / v0.1 wording / revised template, per model (pilot numbers exist; the spec change is the story).
 Table 3: measurement validation vs CheXmask and experts **[pending]**.
 Figure 4: cost — tokens and latency per condition; cross-model spread shrinking with the package.
-Modality generalisation: bone-scan tasks (counts semantics, orientation of posterior views) **[pending]**.
+Modality generalisation: bone-scan tasks. Preliminary (2 local models, 40 packages): posterior-view side identification from chance to 82–93 % with the package; modality and scale questions to ~100 %; hotter-side and flip consistency at chance. **[pending cloud/frontier]**
 
 ## 9. Discussion and limitations
 - Why the effect is large: the failures were input failures. What the package does not fix (MedGemma's degenerate behaviours; models that adopt wrong labels regardless of wording → hence omit-by-default).

@@ -56,6 +56,20 @@ for m in models:
     for c in ("misled_plain", "misled_oip_v01", "misled_oip"):
         a, n = adopt(m, c); cells.append(f"{fmt(a)} / {fmt(acc(m, c, 'findings_misled')[0])}" + (f" (n={n})" if n else ""))
     md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
+# scintigraphy (bone scans): separate task set
+nm_types = ("modality_nm", "left_edge_nm", "scale_available_nm", "counts_semantics", "hot_side", "flip_check_nm")
+if any(x["type"] in nm_types for x in rows):
+    md += ["", "## Planar scintigraphy (whole-body bone scans, 40 packages, 20 anterior / 20 posterior): raw → L0–L2 → full", "",
+           "| model | modality | left-edge side (posterior views mirrored) | scale available | counts comparable? | hotter patient side | flip check |", "|---|---|---|---|---|---|---|"]
+    nm_models = sorted({x["model"] for x in rows if x["type"] in nm_types})
+    for m in nm_models:
+        cells = []
+        for t in nm_types:
+            cs = ("ctx_l1", "ctx") if t == "flip_check_nm" else ("raw", "ctx_l1", "ctx")
+            cells.append(" → ".join(fmt(acc(m, c, t)[0]) for c in cs))
+        md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
+    md.append("")
+    md.append("Reading: the reference file resolves the posterior-mirroring problem (left-edge side from chance to ~90 %) and the modality/scale questions; counts-comparability is known by the models already; the hotter-side and flip-consistency tasks stay at chance — the pixels are not consulted against the stated orientation, in scintigraphy as in radiography.")
 errs = collections.Counter((x["model"], x["error"][:40]) for x in rows if x.get("error"))
 md += ["", f"Rows: {len(rows)}; errors: {sum(errs.values())}" + ("; " + "; ".join(f"{m.replace('ollama/','')}: {e} ×{c}" for (m, e), c in errs.most_common(5)) if errs else ""), ""]
 out = ROOT / "docs/reports/pilot-ollama-report.md"; out.write_text("\n".join(md)); print("\n".join(md))
