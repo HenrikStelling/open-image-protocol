@@ -69,7 +69,10 @@ def build(pkg_dir: Path, n: int = 100, seed: int = 0, labels_by_id: dict | None 
 def vindr_labels() -> dict:
     import csv, collections
     d = collections.defaultdict(set)
-    for r in csv.DictReader(open(Path.home() / ".cache/kagglehub/competitions/vinbigdata-chest-xray-abnormalities-detection/train.csv")):
+    # local copy first (independent of the external drive that hosts the Kaggle cache), then the cache
+    for cand in (Path.home() / "oip-bench/meta/vindr_train.csv", Path.home() / ".cache/kagglehub/competitions/vinbigdata-chest-xray-abnormalities-detection/train.csv"):
+        if cand.exists(): break
+    for r in csv.DictReader(open(cand)):
         if r["class_name"] != "No finding": d[r["image_id"]].add(r["class_name"])
         else: d.setdefault(r["image_id"], set())
     return {k: sorted(v) for k, v in d.items()}
