@@ -18,7 +18,10 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
     el = g["orientation"]["edge_labels"]
     if el.get("left") in ("L", "R"):
         T.append(dict(type="left_edge", question="Which side of the patient is at the LEFT edge of the image? Answer 'patient right' or 'patient left'.", answer="patient right" if el["left"] == "R" else "patient left"))
-    T.append(dict(type="scale_available", question="Can distances in this image be stated in millimetres with a known calibration? Answer 'yes' or 'no'.", answer="yes" if g["pixel_spacing_mm"] and g["calibration"]["confidence"] in ("high", "medium") else "no"))
+    # Scale availability is only asked when the answer is unambiguous: calibrated spacing (yes) or no spacing at all (no).
+    # Low-confidence dataset-derived spacing (e.g. NIH PNGs) is a legitimate 'yes, uncertain' and is skipped as a task.
+    if not g["pixel_spacing_mm"] or g["calibration"]["confidence"] in ("high", "medium"):
+        T.append(dict(type="scale_available", question="Can distances in this image be stated in millimetres with a known calibration? Answer 'yes' or 'no'.", answer="yes" if g["pixel_spacing_mm"] else "no"))
     if "ctr" in meas and meas["ctr"]["value"]:
         T.append(dict(type="ctr", question="Estimate the cardiothoracic ratio (maximum horizontal cardiac width divided by maximum internal thoracic width). Answer with a number between 0 and 1.", answer=meas["ctr"]["value"], tolerance=0.05))
     if "heart_width" in meas and meas["heart_width"]["value"]:
