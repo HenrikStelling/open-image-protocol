@@ -97,7 +97,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
                 "options": {"num_predict": 1600 if OLLAMA_THINK else 800}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
         last = None
-        for attempt in range(4):                       # cloud 502s/timeouts are transient; back off 15/30/60 s
+        for attempt in range(5):                       # cloud 502s/timeouts are transient; back off 30/60/120/240 s
             try:
                 t0 = time.time()
                 with urllib.request.urlopen(req, timeout=180) as r:
@@ -108,7 +108,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
                 msg = str(e)
                 if not ("timed out" in msg or "502" in msg or "503" in msg or "504" in msg or "429" in msg):
                     raise
-                time.sleep(15 * 2 ** attempt)
+                time.sleep(30 * 2 ** attempt)
         raise last
     if provider == "anthropic":
         import anthropic
@@ -184,10 +184,14 @@ def main():
                 except Exception as e:
                     reply, err, usage = "", f"{type(e).__name__}: {str(e)[:200]}", {}
                 rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "reply": reply, "error": err, "usage": usage, "score": score(t, reply) if not err else {}})
-                recent = [r["error"] for r in rows[-5:] if r["model"] == m]
-                if len(recent) == 5 and all(recent) and len({e[:60] for e in recent}) == 1:
+                # abort policy: deterministic client errors (404/410/401/400) after 5 identical in a row;
+                # transient server errors / timeouts (5xx, timed out, 429) only after 20 in a row (degraded cloud periods)
+                recent = [r["error"] for r in rows[-20:] if r["model"] == m]; last5 = recent[-5:]
+                transient = lambda e: any(k in (e or "") for k in ("502", "503", "504", "timed out", "429"))
+                if (len(last5) == 5 and all(last5) and len({e[:60] for e in last5}) == 1 and not transient(last5[-1])) or \
+                   (len(recent) == 20 and all(recent) and all(transient(e) for e in recent)):
                     (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
-                    sys.exit(f"ABORT {m}: 5 consecutive identical errors -> {recent[-1][:160]} (retired tag? auth? see bench/README.md)")
+                    sys.exit(f"ABORT {m}: consecutive errors -> {recent[-1][:160]} (retired tag? auth? degraded cloud? see bench/README.md)")
                 if i % 20 == 0: print(f"  {m}/{c}: {i}/{len(tasks)}", flush=True)
                 if len(rows) % 10 == 0: (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
             (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
