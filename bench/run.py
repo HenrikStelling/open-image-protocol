@@ -169,7 +169,7 @@ def main():
                           "approx_cost_usd_per_model": cost, "models": {m: (MODELS[m] if m in MODELS else ("ollama", m.split("/", 1)[1])) for m in models}, "run_dir": str(run)}, indent=1)); return
     rows = [json.loads(l) for l in (run / "results.jsonl").read_text().splitlines() if l.strip()] if (run / "results.jsonl").exists() else []
     rows = [r for r in rows if not r.get("error")]          # failed rows are retried
-    done = {(r["model"], r["condition"], r["task"]) for r in rows}
+    done = {(r["model"], r["condition"], r["task"]) for r in rows if not r.get("error")}   # error rows are retried on resume
     if done: print(f"resuming {run.name}: {len(done)} rows already done", flush=True)
     for m in models:
         prov, mid = MODELS[m] if m in MODELS else (("ollama", m.split("/", 1)[1]) if m.startswith("ollama/") else (_ for _ in ()).throw(KeyError(f"unknown model {m}; use a key in MODELS or ollama/<tag>")))
