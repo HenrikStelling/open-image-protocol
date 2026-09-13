@@ -97,7 +97,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
                 "options": {"num_predict": 1600 if OLLAMA_THINK else 800}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
         last = None
-        for attempt in range(5):                       # cloud 502s/timeouts are transient; back off 30/60/120/240 s
+        for attempt in range(5):                       # cloud 502s/timeouts are transient; back off 5/15/45/135 s
             try:
                 t0 = time.time()
                 with urllib.request.urlopen(req, timeout=180) as r:
@@ -108,7 +108,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
                 msg = str(e)
                 if not ("timed out" in msg or "502" in msg or "503" in msg or "504" in msg or "429" in msg):
                     raise
-                time.sleep(30 * 2 ** attempt)
+                time.sleep([5, 15, 45, 135, 300][min(attempt, 4)])   # sporadic failures cost seconds; sustained ones escalate
         raise last
     if provider == "anthropic":
         import anthropic
