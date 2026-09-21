@@ -10,7 +10,7 @@ from score import score
 
 # Anthropic id verified against current docs (2026-09). OpenAI/Google ids are placeholders: confirm against each provider's
 # model list before a paid run (override with --gpt-model / --gemini-model).
-MODELS = {"claude": ("anthropic", "claude-opus-5"), "gpt": ("openai", "gpt-5.2"), "gemini": ("google", "gemini-3.1-flash")}
+MODELS = {"claude": ("anthropic", "claude-opus-5"), "gpt": ("openai", "gpt-5.2"), "gemini": ("google", "gemini-3.8-flash")}
 # $ per 1M tokens (input, output) for the cost estimate; Anthropic from the current price table, others approximate.
 PRICES = {"claude": (5.0, 25.0), "gpt": (2.5, 10.0), "gemini": (0.5, 3.0)}
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
@@ -133,7 +133,8 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
         from google.genai import types
         c = genai.Client(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
         parts = [types.Part.from_bytes(data=_downscale(b), mime_type=mt) for mt, b in images] + [text]
-        r = c.models.generate_content(model=model, contents=parts, config=types.GenerateContentConfig(system_instruction=SYSTEM, max_output_tokens=300))
+        r = c.models.generate_content(model=model, contents=parts, config=types.GenerateContentConfig(system_instruction=SYSTEM, max_output_tokens=600,
+                                                                                            thinking_config=types.ThinkingConfig(thinking_level="low")))   # Gemini 3.x thinks by default; low keeps the answer inside the output budget
         um = getattr(r, "usage_metadata", None)
         return (r.text or ""), {"input_tokens": getattr(um, "prompt_token_count", None), "output_tokens": getattr(um, "candidates_token_count", None), "latency_s": None}
     raise KeyError(provider)
