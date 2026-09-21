@@ -120,13 +120,14 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
                               messages=[{"role": "user", "content": content}])
         if r.stop_reason == "refusal":
             cat = r.stop_details.category if r.stop_details else None
-            return f"[refusal:{cat}]"
-        return "".join(x.text for x in r.content if x.type == "text")
+            return f"[refusal:{cat}]", {}
+        return "".join(x.text for x in r.content if x.type == "text"), {"input_tokens": getattr(r.usage, "input_tokens", None), "output_tokens": getattr(r.usage, "output_tokens", None), "latency_s": None}
     if provider == "openai":
         from openai import OpenAI
         c = OpenAI()
         content = [{"type": "input_image", "image_url": f"data:{mt};base64,{base64.b64encode(_downscale(b)).decode()}"} for mt, b in images] + [{"type": "input_text", "text": text}]
-        r = c.responses.create(model=model, instructions=SYSTEM, input=[{"role": "user", "content": content}], max_output_tokens=300)
+        r = c.responses.create(model=model, instructions=SYSTEM, input=[{"role": "user", "content": content}], max_output_tokens=600,
+                               reasoning={"effort": "low"})   # reasoning tokens bill as output and eat the budget; low suits short factual answers
         return r.output_text, {"input_tokens": getattr(getattr(r, "usage", None), "input_tokens", None), "output_tokens": getattr(getattr(r, "usage", None), "output_tokens", None), "latency_s": None}
     if provider == "google":
         from google import genai
