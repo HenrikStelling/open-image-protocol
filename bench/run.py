@@ -85,7 +85,23 @@ def _downscale(png: bytes, max_side: int = 1568) -> bytes:
 
 
 def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) -> tuple[str, dict]:
-    """Returns (reply_text, usage) with usage = {input_tokens, output_tokens, latency_s} where the provider reports them."""
+    """Returns (reply_text, usage); transient transport/server failures on the API providers are retried with back-off."""
+    if provider == "ollama":
+        return _call(provider, model, text, images)
+    last = None
+    for attempt in range(5):
+        try:
+            return _call(provider, model, text, images)
+        except Exception as e:                     # noqa: BLE001
+            msg = f"{type(e).__name__}: {e}"
+            if not any(k in msg for k in ("503", "502", "504", "429", "500", "overloaded", "Broken pipe", "disconnected", "timed out", "Timeout", "ReadError", "ConnectError")):
+                raise
+            last = e; time.sleep([5, 15, 45, 135, 300][min(attempt, 4)])
+    raise last
+
+
+def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) -> tuple[str, dict]:
+    """Single provider call. usage = {input_tokens, output_tokens, latency_s} where the provider reports them."""
     if provider == "ollama":
         # Local daemon (http://localhost:11434 by default); ':cloud' / '-cloud' tags are routed to Ollama Cloud through the
         # signed-in account, so no API key is needed. Native /api/chat with base64 images. OLLAMA_HOST overrides the base URL.
