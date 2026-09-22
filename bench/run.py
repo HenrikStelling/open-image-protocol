@@ -10,9 +10,9 @@ from score import score
 
 # Anthropic id verified against current docs (2026-09). OpenAI/Google ids are placeholders: confirm against each provider's
 # model list before a paid run (override with --gpt-model / --gemini-model).
-MODELS = {"claude": ("anthropic", "claude-opus-5"), "gpt": ("openai", "gpt-5.6-terra"), "gemini": ("google", "gemini-3.8-flash")}
+MODELS = {"claude": ("anthropic", "claude-sonnet-5"), "gpt": ("openai", "gpt-5.6-terra"), "gemini": ("google", "gemini-3.8-flash")}
 # $ per 1M tokens (input, output) for the cost estimate; Anthropic from the current price table, others approximate.
-PRICES = {"claude": (5.0, 25.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   # $/1M tokens (in, out), Sep 2026 price pages
+PRICES = {"claude": (2.0, 10.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   # $/1M tokens (in, out), Sep 2026 price pages
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 OLLAMA_THINK = False
 SYSTEM = "You are assisting with medical image understanding for a benchmark. Answer the question only, briefly, with no disclaimers. This is not clinical use."
@@ -129,7 +129,14 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
     if provider == "anthropic":
         import anthropic
         c = anthropic.Anthropic()   # credentials: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile
-        content = [{"type": "image", "source": {"type": "base64", "media_type": mt, "data": base64.standard_b64encode(_downscale(b)).decode("utf-8")}} for mt, b in images] + [{"type": "text", "text": text}]
+        # Prompt caching: the image and the reference file are identical across the ~12 questions per package, so they are
+        # marked as cache breakpoints and only the question is billed at full price after the first call (5-min TTL).
+        content = [{"type": "image", "source": {"type": "base64", "media_type": mt, "data": base64.standard_b64encode(_downscale(b)).decode("utf-8")}, "cache_control": {"type": "ephemeral"}} for mt, b in images]
+        head, sep, q = text.rpartition("\n\nQuestion: ")
+        if sep:
+            content += [{"type": "text", "text": head + sep, "cache_control": {"type": "ephemeral"}}, {"type": "text", "text": q}]
+        else:
+            content.append({"type": "text", "text": text})
         # Adaptive thinking is on by default on claude-opus-5; low effort suits short factual answers. max_tokens must leave
         # room for thinking tokens. No server-side fallbacks on purpose: a benchmark must not silently swap models.
         r = c.messages.create(model=model, max_tokens=4000, system=SYSTEM, output_config={"effort": "low"},
@@ -137,7 +144,9 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
         if r.stop_reason == "refusal":
             cat = r.stop_details.category if r.stop_details else None
             return f"[refusal:{cat}]", {}
-        return "".join(x.text for x in r.content if x.type == "text"), {"input_tokens": getattr(r.usage, "input_tokens", None), "output_tokens": getattr(r.usage, "output_tokens", None), "latency_s": None}
+        u = r.usage
+        return "".join(x.text for x in r.content if x.type == "text"), {"input_tokens": getattr(u, "input_tokens", None), "output_tokens": getattr(u, "output_tokens", None), "latency_s": None,
+                                                                        "cache_read_input_tokens": getattr(u, "cache_read_input_tokens", None), "cache_creation_input_tokens": getattr(u, "cache_creation_input_tokens", None)}
     if provider == "openai":
         from openai import OpenAI
         c = OpenAI()
