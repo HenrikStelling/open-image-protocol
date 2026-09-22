@@ -10,9 +10,9 @@ from score import score
 
 # Anthropic id verified against current docs (2026-09). OpenAI/Google ids are placeholders: confirm against each provider's
 # model list before a paid run (override with --gpt-model / --gemini-model).
-MODELS = {"claude": ("anthropic", "claude-opus-5"), "gpt": ("openai", "gpt-5.2"), "gemini": ("google", "gemini-3.8-flash")}
+MODELS = {"claude": ("anthropic", "claude-opus-5"), "gpt": ("openai", "gpt-5.6-terra"), "gemini": ("google", "gemini-3.8-flash")}
 # $ per 1M tokens (input, output) for the cost estimate; Anthropic from the current price table, others approximate.
-PRICES = {"claude": (5.0, 25.0), "gpt": (2.5, 10.0), "gemini": (0.5, 3.0)}
+PRICES = {"claude": (5.0, 25.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   # $/1M tokens (in, out), Sep 2026 price pages
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 OLLAMA_THINK = False
 SYSTEM = "You are assisting with medical image understanding for a benchmark. Answer the question only, briefly, with no disclaimers. This is not clinical use."
