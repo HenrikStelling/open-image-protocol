@@ -20,8 +20,10 @@ from scipy.stats import binomtest
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "bench/results"
-OUT_MD = ROOT / "docs/paper/reference-sheet.md"
-OUT_JSON = ROOT / "docs/paper/paper-stats.json"
+import sys as _sys
+_SUFFIX = ("-" + _sys.argv[1]) if len(_sys.argv) > 1 else ""      # e.g. `paper_stats.py scorer-0.3` -> reference-sheet-scorer-0.3.md
+OUT_MD = ROOT / f"docs/paper/reference-sheet{_SUFFIX}.md"
+OUT_JSON = ROOT / f"docs/paper/paper-stats{_SUFFIX}.json"
 DATASETS = {"vindr": "pilot-vindr-20", "vindr-paper": "paper-vindr-100", "nih-paper": "paper-nih-50", "bonescan": "bonescan-40"}
 CONDS = ["raw", "ctx_l1", "ctx", "annot"]
 COMMON_GATING = ("left_edge", "scale_available", "ctr", "heart_mm")
