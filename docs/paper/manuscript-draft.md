@@ -1,3 +1,8 @@
+> **Superseded (2026-09-23) by the Research_Automation revision:**
+> `~/Projects/Research_Automation/oipbench/PAPER/manuscript_oip_revised.{md,docx,html}` (branch `claude/oip-ra-revision`),
+> built from `results_oip.json` and `PROTOCOL_oip.md` in this folder (amendment 10). Kept for reference only; note
+> that this draft states "seed 0" for the two paper sets, which is wrong — they were drawn with seed 1.
+
 # Open Image Protocol: self-describing medical image packages that let any vision-language model understand radiographs and scintigrams
 
 Henrik Stelling¹
