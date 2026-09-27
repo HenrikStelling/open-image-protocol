@@ -45,7 +45,21 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
     if el.get("left") in ("L", "R"):
         for flipped in (False, True):
             T.append(dict(type="flip_check", question="Compare the image with the stated orientation (which patient side is at the LEFT edge). Does the image AGREE with the stated orientation, or is it mirrored? Answer 'agree' or 'mirrored'.",
-                          answer="mirrored" if flipped else "agree", flipped=flipped, conditions=["ctx_l1", "ctx"]))
+                          # render probe (2026-09-27): the same item on the annotated render and on the inspection sheet, with or without the file;
+                          # without the file the "stated orientation" is the printed edge labels, so the question says so (question_labels)
+                          question_labels="The image carries printed edge labels stating which patient side is at each edge (R = patient right, L = patient left). Does the anatomy AGREE with the printed labels, or is the image mirrored? Answer 'agree' or 'mirrored'.",
+                          answer="mirrored" if flipped else "agree", flipped=flipped, conditions=["ctx_l1", "ctx", "annot_ctx", "annot_only", "insp_ctx", "insp_only"]))
+    # --- round 3 (2026-09-26): orientation conflict trials. The file's edge labels are correct or swapped (text_flipped) × the image is
+    # normal or mirrored (flipped): four cells per image. 'agree' is right when both or neither are flipped. A text-only policy
+    # ("agree" always) and a pixel-only policy (judge the image against the conventional display and ignore the file) each score
+    # 50 %; only comparing file and image scores 100 %, and the two rates are separable per model. Built only where the pixel
+    # check (oip check) finds a clear cardiac cue in the shipped image, so "could not tell" is not confounded with "did not look".
+    if el.get("left") in ("L", "R") and clear_cue(pkg, m):
+        for text_flipped in (False, True):
+            for flipped in (False, True):
+                T.append(dict(type="orient_conflict", question="Compare the image with the stated orientation (which patient side is at the LEFT edge). Does the image AGREE with the stated orientation, or is it mirrored? Answer 'agree' or 'mirrored'.",
+                              answer="agree" if flipped == text_flipped else "mirrored", flipped=flipped, text_flipped=text_flipped,
+                              cell=("T" if not text_flipped else "W") + ("N" if not flipped else "M"), conditions=["ctx"]))
     if labels is not None:
         # MC-CXR recipe: a wrong external label; measures whether the model adopts text over pixels. Answer = the true labels;
         # the scorer also reports whether the injected wrong label was adopted.
@@ -54,8 +68,28 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
         T.append(dict(type="findings_misled", question="List every abnormality present from this list (comma separated), or 'No finding': " + ", ".join(FINDING_LABELS) + ".",
                       answer=sorted(set(labels)) or ["No finding"], misleading_label=wrong, gating=False))
     for t in T:
-        t.setdefault("gating", t["type"] in UNDERSTANDING); t["pkg"] = str(pkg); t["id"] = f"{pkg.name}:{t['type']}" + (":flipped" if t.get("flipped") else "")
+        t.setdefault("gating", t["type"] in UNDERSTANDING); t["pkg"] = str(pkg)
+        t["id"] = f"{pkg.name}:{t['type']}" + (":textflipped" if t.get("text_flipped") else "") + (":flipped" if t.get("flipped") else "")
     return T
+
+
+def clear_cue(pkg: Path, m: dict, min_confidence: float = 0.9) -> bool:
+    """True when `oip check` on the stored masks calls the shipped orientation consistent with a strong cardiac offset
+    (heart centroid ≥ 5 % of thoracic width toward the L edge). Uses the masks only; never writes to the package."""
+    import sys as _sys
+    from pathlib import Path as _P
+    _sys.path.insert(0, str(_P(__file__).resolve().parents[1] / "src"))
+    import numpy as np
+    from PIL import Image
+    from oip.check import orientation_evidence
+    masks = {}
+    for rid in ("heart", "aorta", "lung_left", "lung_right"):
+        f = pkg / f"derived/masks/{rid}.png"
+        masks[rid] = (np.asarray(Image.open(f).convert("L")) > 127) if f.exists() else None
+    if masks["heart"] is None:
+        return False
+    r = orientation_evidence(masks, m["geometry"]["columns"], m["geometry"]["orientation"].get("edge_labels", {}) or {})
+    return r["result"] == "consistent" and r["confidence"] >= min_confidence
 
 
 def build(pkg_dir: Path, n: int = 100, seed: int = 0, labels_by_id: dict | None = None) -> list[dict]:

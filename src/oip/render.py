@@ -75,6 +75,75 @@ def _font(size: int):
     return ImageFont.load_default()
 
 
+def inspection_sheet(canon: np.ndarray, edge_labels: dict, spacing_mm, heart_bbox: list[int] | None = None,
+                     side: int = 1536, badge_px: int = 96, inset_px: int = 384) -> tuple[Image.Image, list[str]]:
+    """Encoder-safe inspection sheet (OEP-005 draft, 2026-09-27; Codex proposal 1). A fixed side×side canvas so that nothing
+    is lost to provider downscaling: the whole image fills ~70 % of the height, large R/L edge badges (badge_px tall after the
+    final resize), an enlarged heart-region inset with a locator, and a calibrated ruler with 10 mm ticks and 50 mm labels,
+    or a crossed-out ruler when no spacing is known. No region marks, no region names, no numeric measurement: the sheet
+    carries visual anchors only. The canonical pixels are resampled (Lanczos) for display; coordinates are recorded in notes."""
+    S = side; bg = 32; bw = badge_px + 40
+    canvas = Image.new("L", (S, S), bg); d = ImageDraw.Draw(canvas)
+    h, w = canon.shape; box_w, box_h = S - 2 * bw, int(0.70 * S)
+    sc = min(box_w / w, box_h / h); dw, dh = max(1, int(round(w * sc))), max(1, int(round(h * sc)))
+    im = Image.fromarray(canon).resize((dw, dh), Image.LANCZOS)
+    x0, y0 = bw + (box_w - dw) // 2, 8 + (box_h - dh) // 2
+    canvas.paste(im, (x0, y0))
+    notes = [f"sheet {S}x{S}; whole image at ({x0},{y0}) size {dw}x{dh}, scale {sc:.4f} (frame_coord = (sheet_coord - offset) / scale)"]
+    fb = _font(badge_px); yc = y0 + dh // 2
+    for key, xb in (("left", 12), ("right", S - bw + 12)):
+        lab = edge_labels.get(key)
+        if not lab:
+            continue
+        tw = d.textlength(lab, font=fb)
+        d.rounded_rectangle([xb, yc - badge_px * 0.75, xb + bw - 24, yc + badge_px * 0.75], radius=12, fill=0, outline=255, width=4)
+        d.text((xb + (bw - 24 - tw) / 2, yc - badge_px * 0.62), lab, fill=255, font=fb)
+        notes.append(f"badge {key} edge = {lab}, {badge_px} px letters")
+    fc = _font(26); ft = _font(28)
+    ys = box_h + 28; d.line([(bw, ys - 8), (S - bw, ys - 8)], fill=96, width=2)
+    # heart-region inset with a locator thumbnail
+    if heart_bbox:
+        r0, c0, r1, c1 = [int(v) for v in heart_bbox]; ph, pw = int(0.2 * (r1 - r0)), int(0.2 * (c1 - c0))
+        R0, C0, R1, C1 = max(0, r0 - ph), max(0, c0 - pw), min(h - 1, r1 + ph), min(w - 1, c1 + pw)
+        crop = Image.fromarray(canon[R0:R1 + 1, C0:C1 + 1]); csc = min(inset_px / crop.width, inset_px / crop.height)
+        crop = crop.resize((max(1, int(crop.width * csc)), max(1, int(crop.height * csc))), Image.LANCZOS)
+        ix, iy = bw, ys + 34; canvas.paste(crop, (ix, iy)); d.rectangle([ix - 2, iy - 2, ix + crop.width + 1, iy + crop.height + 1], outline=255, width=2)
+        d.text((ix, ys), "heart region, enlarged (inset)", fill=255, font=fc)
+        # locator: a small copy of the whole image with the inset rectangle
+        lsc = 120 / max(w, h); loc = Image.fromarray(canon).resize((max(1, int(w * lsc)), max(1, int(h * lsc))), Image.LANCZOS)
+        lx, ly = ix + inset_px + 24, iy; canvas.paste(loc, (lx, ly))
+        d.rectangle([lx + C0 * lsc, ly + R0 * lsc, lx + C1 * lsc, ly + R1 * lsc], outline=255, width=2)
+        d.text((lx, ly + loc.height + 6), "location", fill=200, font=fc)
+        notes.append(f"inset: frame rows {R0}-{R1}, cols {C0}-{C1}, scale {csc:.3f}, at ({ix},{iy})")
+        rx = lx + 120 + 48
+    else:
+        rx = bw
+    # ruler
+    ry = ys + 34 + inset_px // 2; rlen = S - bw - rx
+    if spacing_mm:
+        px_per_mm = sc / float(spacing_mm[1]); mm_total = int(rlen / px_per_mm // 50 * 50)
+        if mm_total >= 50:
+            d.text((rx, ys), "scale in mm (calibrated to the whole image)", fill=255, font=fc)
+            d.line([(rx, ry), (rx + mm_total * px_per_mm, ry)], fill=255, width=4)
+            for mm in range(0, mm_total + 1, 10):
+                x = rx + mm * px_per_mm; major = mm % 50 == 0
+                d.line([(x, ry), (x, ry - (36 if major else 16))], fill=255, width=4 if major else 2)
+                if major:
+                    d.text((x - d.textlength(str(mm), font=ft) / 2, ry + 10), str(mm), fill=255, font=ft)
+            notes.append(f"ruler: 0-{mm_total} mm at {px_per_mm:.3f} sheet px per mm, ticks every 10 mm, labels every 50 mm")
+        else:
+            spacing_mm = None
+    if not spacing_mm:
+        d.text((rx, ys), "NO CALIBRATED SCALE", fill=255, font=ft)
+        d.rectangle([rx, ry - 24, rx + min(rlen, 600), ry + 24], outline=255, width=4)
+        for k in range(0, min(rlen, 600), 60):
+            d.line([(rx + k, ry - 24), (rx + k, ry)], fill=255, width=2)
+        d.line([(rx, ry - 60), (rx + min(rlen, 600), ry + 60)], fill=255, width=10)
+        d.line([(rx, ry + 60), (rx + min(rlen, 600), ry - 60)], fill=255, width=10)
+        notes.append("ruler: none (no calibrated spacing), crossed-out ruler symbol")
+    return canvas, notes
+
+
 def annotated(canon: np.ndarray, edge_labels: dict, spacing_mm, title: str, marks: list[dict] | None = None,
               scale_bar_mm: float = 50.0, frame_labels: list[dict] | None = None) -> tuple[Image.Image, list[str]]:
     """Letterbox the canonical render with a margin carrying edge labels, a scale bar and region marks.

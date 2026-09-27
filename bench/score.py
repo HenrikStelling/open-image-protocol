@@ -88,7 +88,8 @@ def _decisive(t: str, r: str) -> bool:
 
 def score(task: dict, reply: str) -> dict:
     r = _tail((reply or "")).strip().lower(); t = task["type"]; ans = task["answer"]
-    t = {"modality_nm": "modality", "left_edge_nm": "left_edge", "scale_available_nm": "scale_available", "counts_semantics": "scale_available", "hot_side": "left_edge", "flip_check_nm": "flip_check"}.get(t, t)
+    # orient_conflict (round 3, 2026-09-26) is scored by the flip_check rule; no rule for an existing type changed, so the version stays 0.3
+    t = {"modality_nm": "modality", "left_edge_nm": "left_edge", "scale_available_nm": "scale_available", "counts_semantics": "scale_available", "hot_side": "left_edge", "flip_check_nm": "flip_check", "orient_conflict": "flip_check"}.get(t, t)
     if t in ("modality", "view", "left_edge", "scale_available"):
         ok = str(ans).lower() in r
         if t == "modality" and ans == "radiograph": ok = ok or "x-ray" in r or "xray" in r or "radiography" in r

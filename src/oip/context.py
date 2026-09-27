@@ -19,14 +19,62 @@ def _a(x: dict, unit_key="unit"):
     return f"[{x.get('assertion_level','unknown')}] {_fmt(x.get('value'), x.get(unit_key, ''))}"
 
 
-def build_context(m: dict, include_external: bool = False) -> str:
-    """include_external=False (default, OEP-001): external labels/report text stay in oip.json and are not rendered."""
+def _verification_cues(m: dict, fam: str, el: dict, geo: dict, acq: dict) -> list[str]:
+    """OEP-004 (template 0.3 draft): pixel cues for the inferred/external facts a reader can check in the image itself.
+    The cues name landmarks whose side is fixed by anatomy, so a mirrored image contradicts the stated orientation in a way
+    the reader can see; they never restate the answer. Returns markdown bullets for the 'How to read the renders' section."""
+    out: list[str] = []
+    left, right = el.get("left"), el.get("right")
+    view = str((acq.get("view") or {}).get("value") or "").upper()
+    body = str((acq.get("body_part") or {}).get("value") or "").upper()
+    has_annot = any(r.get("purpose") == "annotated" for r in m.get("renders", []))
+    if left not in ("L", "R"):
+        return out
+    if fam == "projection_radiography" and "CHEST" in body and view in ("PA", "AP"):
+        l_edge = "RIGHT" if right == "L" else "LEFT"
+        out.append("- Verify the stated orientation against the image before using it: on a frontal chest radiograph the cardiac apex "
+                   "and the aortic knob lie on the patient's LEFT, i.e. toward the image edge labelled L (here the " + l_edge + " edge); "
+                   "the gastric air bubble, when visible, lies on the same side, and the right hemidiaphragm (liver side) is usually the "
+                   "higher one. If these landmarks lie toward the other edge, the image is mirrored relative to this file (or, rarely, "
+                   "the patient has dextrocardia): report the disagreement instead of repeating the stated orientation.")
+    elif fam == "scintigraphy":
+        out.append("- Verify the stated view against the image: in a posterior whole-body view the spine, the scapulae and the kidneys are "
+                   "the sharpest structures; in an anterior view the sternum, the anterior ribs and the facial skeleton are. Left and right "
+                   "cannot be told reliably from a normal skeleton; an injection-site hot spot on a forearm or a printed marker may identify "
+                   "a side. If the view looks different from the stated one, report it instead of repeating the stated orientation.")
+    else:
+        out.append("- Verify the stated orientation against the image where the anatomy allows it; if the image disagrees, report the "
+                   "disagreement instead of repeating the stated orientation.")
+    if geo.get("pixel_spacing_mm") and has_annot and fam == "projection_radiography" and "CHEST" in body:
+        out.append("- Verify the stated scale: the scale bar on the annotated render represents 50 mm, and an adult thorax measures roughly "
+                   "250–350 mm across at its widest, so the bar should fit about five to seven times across the thorax. If it does not, the "
+                   "spacing may be wrong: say so rather than reporting sizes derived from it.")
+    if has_annot:
+        out.append(f"- Verify the printed edge labels on the annotated render against the stated orientation (left = {left}, right = {right}); "
+                   "if they differ, report it.")
+    return out
+
+
+def build_context(m: dict, include_external: bool = False, verification_cues: bool = False) -> str:
+    """include_external=False (default, OEP-001): external labels/report text stay in oip.json and are not rendered.
+    verification_cues=True (OEP-003/OEP-004, template 0.3 draft; off by default until the benchmark has measured it): every
+    [inferred] or [external] statement about orientation, view and scale carries a pixel cue to check it against, a 'How to
+    use this file' section asks for that check, and the self-check gains items that can be answered only from the image."""
     acq, geo, inten, q = m["acquisition"], m["geometry"], m["intensity"], m["quality"]
     mod = acq["modality"]["value"]; fam = acq.get("modality_family", "other")
     title = m["identity"].get("title", "medical image")
+    has_annot = any(r.get("purpose") == "annotated" for r in m.get("renders", []))
     L = []
     L.append(f"# OIP image reference — {title}")
-    L.append(f"OIP {m['oip']['version']} · profile `{m['oip']['profile']}` · layers {', '.join(m['oip']['layers'])} · de-identification: {m['deid']['status']}\n")
+    L.append(f"OIP {m['oip']['version']} · profile `{m['oip']['profile']}` · layers {', '.join(m['oip']['layers'])} · de-identification: {m['deid']['status']}"
+             + (" · template 0.3-draft (verification cues)" if verification_cues else "") + "\n")
+
+    if verification_cues:
+        L.append("## How to use this file")
+        L.append("Statements marked [measured] or [computed] come from the source metadata or from a deterministic tool and can be used as "
+                 "given, within their stated confidence. Statements marked [inferred] or [external] are hypotheses, not observations: verify "
+                 "each against the image using the cue given with it, and if the image disagrees, say so instead of repeating the statement.")
+        L.append("")
 
     L.append("## What this is")
     fam_txt = {"projection_radiography": "a projection radiograph (X-ray): pixel brightness relates to X-ray attenuation along the beam; the image is a 2D shadow, not a slice.",
@@ -64,6 +112,19 @@ def build_context(m: dict, include_external: bool = False) -> str:
     o = geo["orientation"]; el = o.get("edge_labels", {})
     if o["assertion_level"] != "unknown":
         L.append(f"- Orientation [{o['assertion_level']}]: image LEFT edge = {el.get('left')}, RIGHT edge = {el.get('right')}, TOP = {el.get('top')}, BOTTOM = {el.get('bottom')}. {o.get('note','')}")
+        chk = next((c for c in (q.get("checks") or []) if c.get("id") == "orientation_pixel_check"), None)
+        if chk:   # `oip check`: the tool's own pixel-side check of the stated orientation (design rule R4)
+            st = (chk.get("evidence") or {}).get("structures") or {}
+            named = " and ".join({"heart": "the heart", "aorta": "the aortic arch"}[k] for k in ("heart", "aorta") if k in st) or "the heart"
+            off = (st.get("heart") or st.get("aorta") or {}).get("centroid_offset_frac")
+            where = f" (centroid {abs(off):.0%} of the thoracic width from the midline; {chk['tool']} {chk['tool_version']})" if off is not None else f" ({chk['tool']} {chk['tool_version']})"
+            if chk["result"] == "consistent":
+                L.append(f"- Orientation cross-checked against the pixels [computed]: CONSISTENT, {named} lie{'s' if ' and ' not in named else ''} toward the edge labelled L{where}.")
+            elif chk["result"] == "inconsistent":
+                L.append(f"- Orientation cross-checked against the pixels [computed]: INCONSISTENT, {named} lie{'s' if ' and ' not in named else ''} toward the edge labelled R{where}. "
+                         "The stated left/right or the image may be mirrored: do not rely on the stated orientation, and say so when asked about sides.")
+            else:
+                L.append(f"- Orientation cross-checked against the pixels [computed]: indeterminate ({chk.get('reason', 'no usable evidence')}; {chk['tool']} {chk['tool_version']}). The stated orientation stands unverified.")
     else:
         L.append("- Orientation [unknown]: do not assume which side is the patient's left or right.")
     if geo["pixel_spacing_mm"]:
@@ -76,6 +137,8 @@ def build_context(m: dict, include_external: bool = False) -> str:
     L.append(f"- Pixel values: {inten['bits_stored']}-bit stored, units `{inten['units']}`; window for the canonical render: {inten['voi'].get('source')}"
              + (f" (center {inten['voi'].get('center'):g}, width {inten['voi'].get('width'):g})" if inten['voi'].get('center') is not None else "")
              + (f" (range {inten['voi'].get('lower'):.4g}–{inten['voi'].get('upper'):.4g})" if inten['voi'].get('lower') is not None else "") + ".")
+    if verification_cues:
+        L.extend(_verification_cues(m, fam, el, geo, acq))
     L.append("")
 
     L.append("## Measured facts")
@@ -122,6 +185,7 @@ def build_context(m: dict, include_external: bool = False) -> str:
                 "burned_in_annotation": "source declares burned-in annotation (possible text/PHI in pixels)",
                 "lossy_compression": "source was lossy-compressed",
                 "orientation_inferred": "left/right labels are inferred from the view, not read from the header",
+                "orientation_pixel_inconsistent": "the pixel check contradicts the stated left/right (heart toward the edge labelled R): the image or the labels may be mirrored",
                 "no_voi_in_source": "no display window in the source; the render window is automatic",
                 "derived_image": "source is a DERIVED image (already processed)",
                 "multi_frame": "multiple frames; read frames[] before comparing views",
@@ -156,10 +220,23 @@ def build_context(m: dict, include_external: bool = False) -> str:
 
     L.append("## Self-check")
     L.append("Before answering questions about this image, confirm you can answer these from the package:")
-    L.append(f"1. Which anatomical side is on the image's left edge? → {el.get('left') or 'unknown'}")
+    if verification_cues:
+        L.append(f"1. Which anatomical side does this file state for the image's left edge? → {el.get('left') or 'unknown'}")
+    else:
+        L.append(f"1. Which anatomical side is on the image's left edge? → {el.get('left') or 'unknown'}")
     L.append(f"2. What is the modality? → {mod}")
     L.append(f"3. Can sizes be given in mm? → {'yes, ' + str(geo['pixel_spacing_mm'][1]) + ' mm/px (column)' if geo['pixel_spacing_mm'] else 'no'}")
     L.append(f"4. Is bright = high {'counts' if fam=='scintigraphy' else 'attenuation'} in the canonical render? → yes")
+    if verification_cues and el.get("left") in ("L", "R"):
+        # OEP-004: items 5 and 6 have no answer in this file; they are answered from the image and compared with item 1.
+        if fam == "projection_radiography":
+            L.append("5. Look at the image, not the file: on which image side is the cardiac apex? It should point toward the edge labelled L. "
+                     "Does that agree with item 1? If not, the image is mirrored relative to this file: report it.")
+        else:
+            L.append("5. Look at the image, not the file: do the view (which structures are sharpest) and any side marker agree with item 1? "
+                     "If not, report it.")
+        if has_annot:
+            L.append(f"6. On the annotated render, do the printed edge labels read left = {el.get('left')}, right = {el.get('right')}? If not, report it.")   # OEP-003
     L.append("")
     L.append("## Machine-readable")
     L.append(f"- Manifest: `oip.json` (schema {m['oip'].get('schema','')}). Lossless pixels: `{(m.get('pixels') or {}).get('paths', ['pixels/'])[0]}`.")

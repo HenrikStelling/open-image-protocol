@@ -127,3 +127,56 @@ The pilot is preprint-grade evidence for a protocol but not paper-grade evaluati
 partly self-referential ground truth). Remaining Phase 3 work is organised around the paper's figures: layer ablation,
 localisation/flip tasks, misleading-text before/after, measurement validation (CheXmask + experts), cost and cross-model
 spread, frontier models, 150 images across two sources and two modalities. Outline: docs/paper/outline.md.
+
+## OEP-003 / OEP-004 — Verification cues and a pixel-based self-check: does the reference file make models look? · proposed · 2026-09-26
+Evidence (paper run, 11 models, VinDr-100 and NIH-50): with the full reference file every capable model answers the gating
+questions at 99–100 %, but the file states those answers, so the result shows use of facts the pixels do not carry, not a
+check of those facts against the image. On the one task that requires the check, the flip check (image mirrored while the
+file states normal orientation; two items per image so "always agree" scores 50 %), 8 of 11 models sit at chance; Gemini
+99 %, GPT 88–97 %, glm-5.3-flash 80–86 %. The shipped template gives no pixel cue a reader could check the orientation
+against, and nothing in the file or the prompt asks for a check.
+Proposal, measured before adoption (template 0.3 draft, `build_context(..., verification_cues=True)`):
+1. **OEP-004, cues.** Every [inferred] or [external] statement about orientation, view and scale carries a pixel cue with a
+   side fixed by anatomy (frontal chest: cardiac apex and aortic knob toward the edge labelled L, gastric bubble on the same
+   side, right hemidiaphragm higher; scintigraphy: which structures are sharp in a posterior vs anterior view, and the honest
+   note that a normal skeleton does not give left from right), followed by "if the image disagrees, report it instead of
+   repeating the stated orientation". A new "How to use this file" section says that [inferred]/[external] statements are
+   hypotheses to verify. The self-check gains item 5, answerable only from the image (which image side is the cardiac apex;
+   does it agree with item 1), with no arrow answer.
+2. **OEP-003, mirror item.** Self-check item 6 asks whether the printed edge labels on the annotated render agree with the
+   stated orientation.
+3. **Instruction arm.** The same check requested by one added sentence in the system prompt instead of in the file, to
+   locate where the remedy belongs.
+Measurement (2026-09-26, `bench/run.py`, conditions `ctx_ctl`, `ctx_cue`, `ctx_instr`, `ctx_cue_instr`; flip_check + left_edge;
+VinDr-100; claude-sonnet-5, gpt-5.6-terra, gemini-3.8-flash; the control has its own condition name so the latest-run rule
+never lets it replace the paper's `ctx` cells; every row now carries the harness commit and scorer version). Gate: adopt the
+cues into template 0.3 if the flip check rises by ≥ 20 pp against the same-day control for at least two of the three
+models without lowering left-edge accuracy; if only the instruction arm moves, the remedy is the sentence, which the file
+can carry in "How to use this file"; if nothing moves, the models cannot do the check on these images, and the tool-side
+check (`oip check`, planned) is the only guarantee. Cost estimate ≈ $22 list price (Claude cached).
+
+## D-029 — `oip check`: a pixel-side orientation check in the tools, two-pass to cancel the segmentation model's prior · accepted (tool), draft in spec · 2026-09-26
+Why: the only way to guarantee that a stated orientation was checked against the pixels is to have the tools do it (R4); a model
+may or may not. Design: the unsided heart (and aortic-arch) mask's column centroid relative to the thoracic midline, compared with
+the edge labelled L; no use of the model's left/right class labels (which inherit the display convention, review Q3).
+Evidence on 100 VinDr packages, normal and mirrored (`docs/reports/orientation-pixel-check.md`): pure geometry flips 98/98; a
+single re-segmentation of the mirrored render catches only 71/100 (24 indeterminate, 5 wrong) because TorchXRayVision's PSPNet
+places the heart partly where hearts usually are (offset median +0.079 as shipped, −0.053 mirrored). Segmenting the image and
+its mirror and halving the difference cancels that prior: 94/100 decided, 0 wrong at every threshold, 6 indeterminate (|s| < 2 %).
+Decision: two-pass is the default; verdicts go to `quality.checks[]` with the evidence and to context.md next to the orientation
+line; a failure sets `orientation_pixel_inconsistent` and a caution. The check reports, it never rewrites the stated orientation.
+Spec: verb table (§7) and schema extended, marked draft until v0.2. Open: no pixel check is defined for scintigraphy yet.
+
+**Measured 2026-09-26 (Gemini and GPT complete, 1,200 rows each; Claude control and cue arms, then paused on a billing stop, to be resumed).** Flip check / mirrored items / left-edge side on VinDr-100:
+gemini-3.8-flash: control 99 % (98/100) · cues 98 % (96/100) · instruction 98 % (95/99) · both 99 % (98/100); left edge 100 % in every arm.
+gpt-5.6-terra: control 92 % (84/100) · cues 92 % (84/100) · instruction 93 % (86/99) · both 90 % (81/100); left edge 100 % in every arm.
+claude-sonnet-5: control 50 % (1/100) · cues 49 % (0/83); left edge 95 → 100 %.
+Outcome: **no arm moves any model beyond noise.** The two models that check the image against the file do so with the shipped
+file already; the one that does not check keeps answering "agree" to every mirrored image with the cardiac cue named in the
+file, a "how to use this file" section, a pixel-only self-check item, and (for the other two) a system-prompt sentence asking
+for the check. OEP-004's gate (+20 pp for ≥ 2 of 3 models) is failed on the frontier models; OEP-003's mirror item cannot be
+assessed here (the annotated render was not part of the flip check). Consequences: (1) the cue-bearing template stays behind
+its flag; (2) the same four arms run on the eight Ollama models before either OEP is closed (cost rule: Ollama first);
+(3) the guarantee is the tool-side check, D-029, not the prose; (4) the paper's discussion can now say that neither a named
+cue, a usage instruction nor a self-check item changes whether a frontier model verifies text against pixels. Cost: Gemini
+$2.55, GPT $11.12, Claude $5.06 so far (list prices from the usage fields).

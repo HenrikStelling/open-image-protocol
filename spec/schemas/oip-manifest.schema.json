@@ -306,8 +306,29 @@
       "type": "object",
       "required": ["flags"],
       "properties": {
-        "flags": {"type": "array", "items": {"type": "string", "enum": ["missing_pixel_spacing", "spacing_uncalibrated", "implausible_extent", "burned_in_annotation", "lossy_compression", "orientation_inferred", "no_voi_in_source", "derived_image", "multi_frame", "low_resolution", "non_dicom_source", "counts_not_comparable", "unknown_modality"]}},
-        "notes": {"type": "array", "items": {"type": "string"}}
+        "flags": {"type": "array", "items": {"type": "string", "enum": ["missing_pixel_spacing", "spacing_uncalibrated", "implausible_extent", "burned_in_annotation", "lossy_compression", "orientation_inferred", "no_voi_in_source", "derived_image", "multi_frame", "low_resolution", "non_dicom_source", "counts_not_comparable", "unknown_modality", "orientation_pixel_inconsistent"]}},
+        "notes": {"type": "array", "items": {"type": "string"}},
+        "checks": {
+          "type": "array",
+          "description": "Pixel-side consistency checks run by tools (`oip check`), e.g. whether the stated orientation agrees with where the heart sits in the pixels. A failed check sets the matching flag.",
+          "items": {
+            "type": "object",
+            "required": ["id", "result", "tool", "tool_version", "assertion_level"],
+            "properties": {
+              "id": {"type": "string"},
+              "result": {"type": "string", "enum": ["consistent", "inconsistent", "indeterminate"]},
+              "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+              "assertion_level": {"type": "string", "enum": ["computed"]},
+              "tool": {"type": "string"},
+              "tool_version": {"type": "string"},
+              "method": {"type": "string"},
+              "reason": {"type": "string"},
+              "evidence": {"type": "object"},
+              "inputs": {"type": "array", "items": {"type": "string"}}
+            },
+            "additionalProperties": false
+          }
+        }
       },
       "additionalProperties": false
     },

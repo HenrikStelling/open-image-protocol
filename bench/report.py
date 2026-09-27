@@ -72,6 +72,21 @@ for m in models:
     md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
 abst = collections.Counter((x["model"], x["condition"]) for x in rows if (x.get("score") or {}).get("abstained"))
 if abst: md += ["", "Abstentions (model said it cannot determine): " + ", ".join(f"{m.replace('ollama/','')}/{c}: {n}" for (m, c), n in abst.most_common(8))]
+# abstention kinds (2026-09-26): 'correct abstention' = the materials cannot support the answer (image only: a cardiac width in mm needs a
+# scale the image does not carry; 'scale available?' asks about a calibration the pixels cannot show); 'withdrawal' = the fact is stated in
+# the file or readable from the pixels; 'no answer' = an empty reply (e.g. the output budget consumed by hidden reasoning). Only withdrawal
+# counts against a model's willingness to look.
+kinds = collections.Counter()
+for x in rows:
+    if x.get("error"): continue
+    if not (x.get("reply") or "").strip(): kinds[(x["model"], "no answer")] += 1
+    elif (x.get("score") or {}).get("abstained"):
+        kinds[(x["model"], "correct abstention" if x["condition"] == "raw" and x["type"] in ("heart_mm", "scale_available") else "withdrawal")] += 1
+if kinds:
+    md += ["", "Abstentions by kind (all datasets and conditions): correct abstention = image-only arm, cardiac width in mm or scale availability, which the pixels cannot settle; withdrawal = the fact was stated in the file or readable from the pixels; no answer = empty reply.", "",
+           "| model | correct abstention | withdrawal | no answer |", "|---|---|---|---|"]
+    for m in sorted({m for m, _ in kinds}):
+        md.append(f"| {m.replace('ollama/','')} | {kinds[(m, 'correct abstention')]} | {kinds[(m, 'withdrawal')]} | {kinds[(m, 'no answer')]} |")
 # render-dependent and consistency tasks, per dataset
 md += ["", "## Render-dependent and consistency tasks (per dataset)", "", "| dataset | model | heart mark (annot) | mark side (annot) | flip check L0–L2 | flip check full |", "|---|---|---|---|---|---|"]
 for ds in sorted({x["dataset"] for x in rows if x["type"] in RENDER_TASKS + CONSISTENCY_TASKS}):
@@ -81,6 +96,19 @@ for ds in sorted({x["dataset"] for x in rows if x["type"] in RENDER_TASKS + CONS
             sel = [x for x in sub if x["model"] == m and x["condition"] == c and x["type"] == t and not x.get("error")]
             return fmt(sum(1 for x in sel if x["score"].get("correct")) / len(sel)) if sel else "–"
         md.append(f"| {ds} | {m.replace('ollama/','')} | {a2('annot','mark_heart')} | {a2('annot','mark_side')} | {a2('ctx_l1','flip_check')} | {a2('ctx','flip_check')} |")
+# verification ablation (OEP-003/004, 2026-09-26): flip check and left-edge side under the full file, with and without cues / instruction
+ABL = ("ctx_ctl", "ctx_cue", "ctx_instr", "ctx_cue_instr")
+if any(x["condition"] in ABL for x in rows):
+    md += ["", "## Verification ablation (OEP-003/004): does the model check the stated orientation against the image?", "",
+           "Same 100 images and models as the paper run; `ctx_ctl` = the shipped file, re-run the same day as a control; `cues` = template 0.3 draft (pixel cues next to every inferred fact, pixel-based self-check items); `instr` = one added sentence in the system prompt asking to verify [inferred]/[external] statements against the image. Cells: flip check (chance = 50 %) / left-edge side.", "",
+           "| dataset | model | ctx (paper run) | ctx_ctl | + cues | + instruction | + both |", "|---|---|---|---|---|---|---|"]
+    for ds in sorted({x["dataset"] for x in rows if x["condition"] in ABL}):
+        sub = [x for x in rows if x["dataset"] == ds]
+        for m in sorted({x["model"] for x in sub if x["condition"] in ABL}):
+            def a3(c, t):
+                sel = [x for x in sub if x["model"] == m and x["condition"] == c and x["type"] == t and not x.get("error")]
+                return fmt(sum(1 for x in sel if x["score"].get("correct")) / len(sel)) if sel else "–"
+            md.append(f"| {ds} | {m.replace('ollama/','')} | " + " | ".join(f"{a3(c, 'flip_check')} / {a3(c, 'left_edge')}" for c in ("ctx",) + ABL) + " |")
 md += ["", "## Per task (raw → ctx_l1 → ctx → annot)", "", "| model | modality | view | left edge | scale avail. | CTR | heart mm | heart mark (annot) | mark side (annot) | flip check (ctx_l1 → ctx) | findings F1 |", "|---|---|---|---|---|---|---|---|---|---|---|"]
 for m in models:
     cells = []

@@ -81,12 +81,13 @@ The file SHOULD stay below ~1,500 tokens for the `core` profile. Each statement
 in sections 3–6 is prefixed with its assertion level in brackets.
 
 ## 7. Verb set (tool interface; MCP, CLI and SDK expose the same)
-Implementation status (v0.1 reference): `describe`, `measure`, `validate`, `window`, `crop`, `overlay` available in the Python SDK and CLI; `locate` is served through `derived.regions` and the MCP stub only.
+Implementation status (v0.1 reference): `describe`, `measure`, `validate`, `window`, `crop`, `overlay`, `check` available in the Python SDK and CLI; `locate` is served through `derived.regions` and the MCP stub only.
 | Verb | Input | Output | Guardrails |
 |---|---|---|---|
 | `describe` | package [, region] | manifest summary / context.md | — |
 | `locate` | structure label | region(s) with bbox and mark | only from `derived.regions`; otherwise "unknown" |
 | `measure` | geometry in px, or named measurement | value + unit + assertion + validation status | refuses mm when spacing is null; refuses count comparison across windows |
+| `check` | package | `quality.checks[]` record (consistent / inconsistent / indeterminate, with evidence); sets `orientation_pixel_inconsistent` on failure | pixel-side only: the unsided heart and aortic-arch masks against the edge labelled L; never rewrites the stated orientation, only reports on it, and context.md shows the result next to the orientation line (added 2026-09-26, draft) |
 | `window` | center/width or preset | new render + transform record | never overwrites canonical |
 | `crop` | bbox px, optional upscale | render + coordinate offset | records offset so coordinates map back |
 | `overlay` | regions / grid / scale | annotated render | — |

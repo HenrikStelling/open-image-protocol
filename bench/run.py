@@ -6,7 +6,7 @@ import argparse, base64, json, os, sys, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "bench")); sys.path.insert(0, str(ROOT / "src"))
 from tasks import build, vindr_labels
-from score import score
+from score import score, SCORER_VERSION
 
 # Anthropic id verified against current docs (2026-09). OpenAI/Google ids are placeholders: confirm against each provider's
 # model list before a paid run (override with --gpt-model / --gemini-model).
@@ -16,11 +16,30 @@ PRICES = {"claude": (2.0, 10.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   #
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 OLLAMA_THINK = False
 SYSTEM = "You are assisting with medical image understanding for a benchmark. Answer the question only, briefly, with no disclaimers. This is not clinical use."
+# Verification ablation (OEP-003/004, 2026-09-26): the *_instr conditions append this one sentence to the system prompt.
+VERIFY_INSTR = " Before using any statement in the reference file that is marked [inferred] or [external], check it against the image; if the image disagrees, say so instead of repeating the statement."
 
 
-def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None = None) -> str:
+def system_for(condition: str) -> str:
+    return SYSTEM + VERIFY_INSTR if condition.endswith("_instr") else SYSTEM
+
+
+def harness_commit() -> str:
+    """Short git commit of the harness, recorded in run_meta.json and in every result row (harness provenance, PLAN Phase 3b)."""
+    import subprocess
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, timeout=10)
+        dirty = subprocess.run(["git", "status", "--porcelain", "--", "bench", "src"], cwd=ROOT, capture_output=True, text=True, timeout=10).stdout.strip()
+        return (out.stdout.strip() or "unknown") + ("-dirty" if dirty else "")
+    except Exception:   # noqa: BLE001
+        return "unknown"
+
+
+def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None = None, cues: bool = False, flip_labels: bool = False) -> str:
     """Render the reference file from the manifest. strip_measurements -> layers L0-L2 only (no computed measurements, no regions);
-    external_text -> rendered through the shipped template (cautions first, unverified wording), i.e. what `--with-external` shows."""
+    external_text -> rendered through the shipped template (cautions first, unverified wording), i.e. what `--with-external` shows;
+    cues -> template 0.3 draft with verification cues and the pixel-based self-check items (OEP-003/004);
+    flip_labels -> the file's left/right edge labels swapped (round-3 conflict trials: wrong text against a normal or mirrored image)."""
     import json as _json
     sys.path.insert(0, str(ROOT / "src"))
     from oip.context import build_context
@@ -29,7 +48,14 @@ def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None 
         m["derived"] = {"regions": [], "measurements": [], "measurements_file": "derived/measurements.json"}
     if external_text is not None:
         m["external"] = {"dataset": "prior report note", "report_text": external_text}
-    return build_context(m, include_external=external_text is not None)
+    if flip_labels:
+        el = m["geometry"]["orientation"].get("edge_labels") or {}
+        el["left"], el["right"] = el.get("right"), el.get("left")
+        for fr in m.get("frames") or []:
+            fe = fr.get("edge_labels") or {}
+            if fe: fe["left"], fe["right"] = fe.get("right"), fe.get("left")
+        m["quality"]["checks"] = [c for c in m["quality"].get("checks", []) if c.get("id") != "orientation_pixel_check"]   # a stale tool verdict would give the swap away
+    return build_context(m, include_external=external_text is not None, verification_cues=cues)
 
 
 CONDITIONS = {
@@ -39,12 +65,53 @@ CONDITIONS = {
     "annot":        "annotated PNG (edge labels, scale bar, region marks) + full context.md",
     "misled_plain": "canonical PNG + a wrong finding as a bare 'Prior report note' (how reports are pasted today)",
     "misled_oip":   "canonical PNG + the same wrong finding delivered through the shipped template (external section after cautions, unverified wording; = `oip describe --with-external`)",
+    # verification ablation (OEP-003/004): same tasks as ctx; separate names so the latest-run rule in report.py / paper_stats.py never
+    # lets a partial ablation run replace the paper's ctx cells
+    "ctx_ctl":      "identical to ctx; same-day within-run control for the verification ablation",
+    "ctx_cue":      "canonical PNG + full context.md rendered with verification cues and pixel-based self-check items (template 0.3 draft)",
+    "ctx_instr":    "canonical PNG + full context.md (template 0.2) + a one-sentence system instruction to verify [inferred]/[external] statements against the image",
+    "ctx_cue_instr": "canonical PNG + cue-bearing context.md + the verify instruction (both)",
+    # render probe (2026-09-27, Codex proposal 1 / OEP-005 draft): does a render that survives provider downscaling move the flip check?
+    # Flip items show the render built from the MIRRORED canonical while printed labels (and the file) keep the true orientation.
+    "annot_ctx":    "annotated render (re-rendered; mirrored pixels for flip items, labels unchanged) + full context.md",
+    "annot_only":   "annotated render only, question refers to the printed edge labels (no file)",
+    "insp_ctx":     "inspection sheet (1536 px, 96 px R/L badges, heart inset, mm ruler) + full context.md",
+    "insp_only":    "inspection sheet only, question refers to the printed edge labels (no file)",
 }
+RENDER_CACHE = ROOT / "bench/results/_render_cache"   # bench artefacts live outside the packages (git-ignored with results/)
+
+
+def _variant(pkg: Path, kind: str, flipped: bool) -> bytes:
+    """Annotated render or inspection sheet re-rendered from the canonical pixels (mirrored for flip items) with the manifest's
+    edge labels; region marks / the heart inset follow the mirroring. Cached under bench/results/_render_cache/<pkg>/."""
+    f = RENDER_CACHE / pkg.name / f"{kind}{'_flipped' if flipped else ''}.png"
+    if f.exists():
+        return f.read_bytes()
+    import numpy as np
+    from PIL import Image
+    from oip.render import annotated, inspection_sheet
+    m = json.loads((pkg / "oip.json").read_text()); g = m["geometry"]; el = g["orientation"].get("edge_labels") or {}
+    canon = np.asarray(Image.open(pkg / "renders/canonical.png").convert("L"))
+    if flipped:
+        canon = canon[:, ::-1]
+    w = canon.shape[1]; regs = (m.get("derived") or {}).get("regions") or []
+    mb = (lambda b: [b[0], w - 1 - b[3], b[2], w - 1 - b[1]]) if flipped else (lambda b: b)
+    if kind == "annot":
+        marks = [dict(r, bbox_px=mb(r["bbox_px"])) for r in regs if r.get("bbox_px") and r.get("mark")]
+        im, _ = annotated(canon, el, g["pixel_spacing_mm"], f"{m['identity']['title']} · OIP {m['oip']['version']}", marks=marks)
+    else:
+        heart = next((r for r in regs if r["id"] == "heart" and r.get("bbox_px")), None)
+        im, _ = inspection_sheet(canon, el, g["pixel_spacing_mm"], mb(heart["bbox_px"]) if heart else None)
+    f.parent.mkdir(parents=True, exist_ok=True); im.save(f)
+    return f.read_bytes()
 DEFAULT_CONDITIONS = "raw,ctx_l1,ctx,annot,misled_plain,misled_oip"
+BASE_CONDITION = {"ctx_ctl": "ctx", "ctx_cue": "ctx", "ctx_instr": "ctx", "ctx_cue_instr": "ctx"}   # task applicability follows the base
 
 
 def applies(task: dict, condition: str) -> bool:
-    """Which conditions a task runs in: misled_* only for findings_misled; tasks with an explicit 'conditions' list only there."""
+    """Which conditions a task runs in: misled_* only for findings_misled; tasks with an explicit 'conditions' list only there.
+    Ablation conditions apply wherever their base condition applies."""
+    condition = BASE_CONDITION.get(condition, condition)
     if condition.startswith("misled") or task["type"] == "findings_misled":
         return condition.startswith("misled") and task["type"] == "findings_misled"
     return condition in task["conditions"] if task.get("conditions") else True
@@ -64,12 +131,21 @@ def build_prompt(task: dict, condition: str) -> tuple[str, list[tuple[str, bytes
     q = task["question"]; wrong = task.get("misleading_label", "Cardiomegaly")
     if condition == "raw":
         return q, [canon]
+    fl = bool(task.get("text_flipped"))   # round-3 conflict trials: the file's edge labels swapped
     if condition == "ctx_l1":
-        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, strip_measurements=True) + "\n\nQuestion: " + q, [canon]
-    if condition == "ctx":
-        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg) + "\n\nQuestion: " + q, [canon]   # rendered from the manifest with the current template
+        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, strip_measurements=True, flip_labels=fl) + "\n\nQuestion: " + q, [canon]
+    if condition in ("ctx", "ctx_ctl", "ctx_instr"):
+        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, flip_labels=fl) + "\n\nQuestion: " + q, [canon]   # rendered from the manifest with the current template
+    if condition in ("ctx_cue", "ctx_cue_instr"):
+        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, cues=True, flip_labels=fl) + "\n\nQuestion: " + q, [canon]
     if condition == "annot":
-        return "Reference file for the attached (annotated) image (OIP context.md):\n\n" + _ctx(pkg) + "\n\nQuestion: " + q, [("image/png", (pkg / "renders/annotated.png").read_bytes())]
+        return "Reference file for the attached (annotated) image (OIP context.md):\n\n" + _ctx(pkg, flip_labels=fl) + "\n\nQuestion: " + q, [("image/png", (pkg / "renders/annotated.png").read_bytes())]
+    if condition in ("annot_ctx", "annot_only", "insp_ctx", "insp_only"):
+        kind = "annot" if condition.startswith("annot") else "insp"
+        img = ("image/png", _variant(pkg, kind, bool(task.get("flipped"))))
+        if condition.endswith("_only"):
+            return "Question: " + task.get("question_labels", q), [img]
+        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, flip_labels=fl) + "\n\nQuestion: " + q, [img]
     if condition == "misled_plain":
         return f"Prior report note: {wrong}.\n\nQuestion: " + q, [canon]
     if condition == "misled_oip":
@@ -84,14 +160,14 @@ def _downscale(png: bytes, max_side: int = 1568) -> bytes:
     im.thumbnail((max_side, max_side)); b = io.BytesIO(); im.save(b, format="PNG"); return b.getvalue()
 
 
-def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) -> tuple[str, dict]:
+def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]], system: str = SYSTEM) -> tuple[str, dict]:
     """Returns (reply_text, usage); transient transport/server failures on the API providers are retried with back-off."""
     if provider == "ollama":
-        return _call(provider, model, text, images)
+        return _call(provider, model, text, images, system)
     last = None
     for attempt in range(5):
         try:
-            return _call(provider, model, text, images)
+            return _call(provider, model, text, images, system)
         except Exception as e:                     # noqa: BLE001
             msg = f"{type(e).__name__}: {e}"
             if not any(k in msg for k in ("503", "502", "504", "429", "500", "overloaded", "Broken pipe", "disconnected", "timed out", "Timeout", "ReadError", "ConnectError", "Connection error", "APIConnectionError")):
@@ -100,7 +176,7 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) 
     raise last
 
 
-def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]]) -> tuple[str, dict]:
+def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]], system: str = SYSTEM) -> tuple[str, dict]:
     """Single provider call. usage = {input_tokens, output_tokens, latency_s} where the provider reports them."""
     if provider == "ollama":
         # Local daemon (http://localhost:11434 by default); ':cloud' / '-cloud' tags are routed to Ollama Cloud through the
@@ -109,7 +185,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
         base = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
         if not base.startswith("http"): base = "http://" + base
         # reasoning models spend the output budget inside 'thinking'; keep it generous and let --ollama-think decide
-        body = {"model": model, "stream": False, "think": OLLAMA_THINK, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
+        body = {"model": model, "stream": False, "think": OLLAMA_THINK, "messages": [{"role": "system", "content": system}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
                 "options": {"num_predict": 1600 if OLLAMA_THINK else 800}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
         last = None
@@ -139,7 +215,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
             content.append({"type": "text", "text": text})
         # Adaptive thinking is on by default on claude-opus-5; low effort suits short factual answers. max_tokens must leave
         # room for thinking tokens. No server-side fallbacks on purpose: a benchmark must not silently swap models.
-        r = c.messages.create(model=model, max_tokens=4000, system=SYSTEM, output_config={"effort": "low"},
+        r = c.messages.create(model=model, max_tokens=4000, system=system, output_config={"effort": "low"},
                               messages=[{"role": "user", "content": content}])
         if r.stop_reason == "refusal":
             cat = r.stop_details.category if r.stop_details else None
@@ -151,7 +227,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
         from openai import OpenAI
         c = OpenAI()
         content = [{"type": "input_image", "image_url": f"data:{mt};base64,{base64.b64encode(_downscale(b)).decode()}"} for mt, b in images] + [{"type": "input_text", "text": text}]
-        r = c.responses.create(model=model, instructions=SYSTEM, input=[{"role": "user", "content": content}], max_output_tokens=600,
+        r = c.responses.create(model=model, instructions=system, input=[{"role": "user", "content": content}], max_output_tokens=600,
                                reasoning={"effort": "low"})   # reasoning tokens bill as output and eat the budget; low suits short factual answers
         return r.output_text, {"input_tokens": getattr(getattr(r, "usage", None), "input_tokens", None), "output_tokens": getattr(getattr(r, "usage", None), "output_tokens", None), "latency_s": None}
     if provider == "google":
@@ -159,7 +235,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
         from google.genai import types
         c = genai.Client(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
         parts = [types.Part.from_bytes(data=_downscale(b), mime_type=mt) for mt, b in images] + [text]
-        r = c.models.generate_content(model=model, contents=parts, config=types.GenerateContentConfig(system_instruction=SYSTEM, max_output_tokens=600,
+        r = c.models.generate_content(model=model, contents=parts, config=types.GenerateContentConfig(system_instruction=system, max_output_tokens=600,
                                                                                             thinking_config=types.ThinkingConfig(thinking_level="low")))   # Gemini 3.x thinks by default; low keeps the answer inside the output budget
         um = getattr(r, "usage_metadata", None)
         return (r.text or ""), {"input_tokens": getattr(um, "prompt_token_count", None), "output_tokens": getattr(um, "candidates_token_count", None), "latency_s": None}
@@ -168,11 +244,14 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]])
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
+    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks"); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
     global OLLAMA_THINK; OLLAMA_THINK = a.ollama_think
     labels = vindr_labels() if a.dataset == "vindr" else None
+    conds = a.conditions.split(","); models = a.models.split(",")
+    commit = harness_commit()
     if a.resume:
         run = Path(a.resume); tasks = json.loads((run / "tasks.json").read_text())
         if a.pkg_dir:
@@ -182,10 +261,17 @@ def main():
             from tasks_nm import build_nm; tasks = build_nm(Path(a.pkg_dir) if a.pkg_dir else ROOT / "data/oip" / a.dataset, a.n, a.seed)
         else:
             tasks = build(Path(a.pkg_dir) if a.pkg_dir else ROOT / "data/oip" / a.dataset, a.n, a.seed, labels)
+        if a.tasks:
+            keep = set(a.tasks.split(",")); tasks = [t for t in tasks if t["type"] in keep]
         tag = "+".join(m.replace("/", "_").replace(":", "_") for m in a.models.split(","))[:60]
-        run = ROOT / "bench/results" / f"{time.strftime('%Y%m%d-%H%M%S')}-{tag}-{os.getpid()}"; run.mkdir(parents=True, exist_ok=True)   # unique per process
-        (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
-    conds = a.conditions.split(","); models = a.models.split(",")
+        run = ROOT / "bench/results" / f"{time.strftime('%Y%m%d-%H%M%S')}-{tag}-{os.getpid()}"   # unique per process
+        if not a.dry_run:   # a dry run must not leave a results directory behind (report.py would read it)
+            run.mkdir(parents=True, exist_ok=True)
+            (run / "tasks.json").write_text(json.dumps(tasks, indent=1))
+            (run / "run_meta.json").write_text(json.dumps({"harness_commit": commit, "scorer": SCORER_VERSION, "dataset": a.dataset, "pkg_dir": a.pkg_dir,
+                                                           "n": a.n, "seed": a.seed, "models": models, "model_ids": {m: MODELS.get(m) for m in models}, "conditions": conds,
+                                                           "tasks_filter": a.tasks, "system_prompt": SYSTEM, "verify_instruction": VERIFY_INSTR if any(c.endswith("_instr") for c in conds) else None,
+                                                           "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
@@ -206,11 +292,12 @@ def main():
                     continue
                 try:
                     text, imgs = build_prompt(t, c)
-                    t_call = time.time(); reply, usage = call(prov, mid, text, imgs); err = None
+                    t_call = time.time(); reply, usage = call(prov, mid, text, imgs, system=system_for(c)); err = None
                     usage = dict(usage or {}); usage["latency_s"] = usage.get("latency_s") or round(time.time() - t_call, 2)
                 except Exception as e:
                     reply, err, usage = "", f"{type(e).__name__}: {str(e)[:200]}", {}
-                rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "reply": reply, "error": err, "usage": usage, "score": score(t, reply) if not err else {}})
+                rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "reply": reply, "error": err, "usage": usage,
+                             "score": score(t, reply) if not err else {}, "harness_commit": commit, "scorer": SCORER_VERSION})
                 # abort policy: deterministic client errors (404/410/401/400) after 5 identical in a row;
                 # transient server errors / timeouts (5xx, timed out, 429) only after 20 in a row (degraded cloud periods)
                 recent = [r["error"] for r in rows[-20:] if r["model"] == m]; last5 = recent[-5:]
