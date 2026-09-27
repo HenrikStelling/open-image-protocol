@@ -37,9 +37,9 @@ def main():
     fmt = lambda k, n: f"{100*k/n:.0f} % ({100*wilson(k, n)[0]:.0f}–{100*wilson(k, n)[1]:.0f}; n={n})" if n else "–"
     L = ["# Render probe: flip check and left edge on the annotated render and the inspection sheet", "", f"Runs: {', '.join(r.name for r in runs)}", ""]
     for typ, title in (("flip_check", "Flip check (mirrored render vs printed/stated orientation)"), ("left_edge", "Left edge (which patient side is at the image's left edge)")):
-        L += [f"## {title}", "", "| model | " + " | ".join(CONDS) + " | both flip items right (ctx_ctl → insp_only) |" if typ == "flip_check" else f"## {title}", ""]
+        L += [f"## {title}", ""]
         if typ == "flip_check":
-            L[-2] = "| model | " + " | ".join(CONDS) + " | both items right per image, by condition |"; L += ["|---|" + "---|" * (len(CONDS) + 1)]
+            L += ["| model | " + " | ".join(CONDS) + " | both items right per image, by condition |", "|---|" + "---|" * (len(CONDS) + 1)]
         else:
             L += ["| model | " + " | ".join(CONDS) + " |", "|---|" + "---|" * len(CONDS)]
         for m in models:
