@@ -22,3 +22,10 @@ radiologist boxes whose measurement names carried the finding class ("Long axis 
 `context.md`, inflating findings F1 from 0.62 to 0.93. Pilot packages are now generated with `convert` + `measure_chest`
 only (anatomy regions, CTR, mm widths), and a keyword leak check runs after generation. Understanding-task results from
 that first run stand (they do not depend on boxes): gemma4 e4b raw 61 % → ctx 99 % → annot 99 % (n = 118 gating items).
+
+## One cloud model at a time (2026-09-28)
+`bench/run.py` takes an exclusive file lock (`~/.config/oip/ollama-cloud.lock`, `bench/cloudlock.py`) before it starts an
+Ollama cloud model and holds it until that model's rows are done; a second runner, from any lane or any Claude session, waits
+at the lock and prints who holds it. Local models and the API providers do not take the lock. `--no-cloud-lock` skips it
+(diagnostics only). Reason: on Ollama Pro two concurrent cloud lanes reach the daily usage limit faster and the runs abort
+into each other's back-off (2026-09-27).

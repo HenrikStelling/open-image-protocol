@@ -245,7 +245,8 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
     ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks"); a = ap.parse_args()
+    ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks")
+    ap.add_argument("--no-cloud-lock", action="store_true", help="skip the shared one-cloud-model-at-a-time lock (bench/cloudlock.py); only for diagnostics"); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
     global OLLAMA_THINK; OLLAMA_THINK = a.ollama_think
@@ -284,8 +285,11 @@ def main():
     rows = [r for r in rows if not r.get("error")]          # failed rows are retried
     done = {(r["model"], r["condition"], r["task"]) for r in rows if not r.get("error")}   # error rows are retried on resume
     if done: print(f"resuming {run.name}: {len(done)} rows already done", flush=True)
+    from cloudlock import acquire as _lock_acquire, release as _lock_release, is_cloud as _is_cloud
     for m in models:
         prov, mid = MODELS[m] if m in MODELS else (("ollama", m.split("/", 1)[1]) if m.startswith("ollama/") else (_ for _ in ()).throw(KeyError(f"unknown model {m}; use a key in MODELS or ollama/<tag>")))
+        # one Ollama cloud model at a time across all lanes and sessions: block here until the shared lock is free (bench/cloudlock.py)
+        lock = _lock_acquire(m, log=lambda s: print(f"  {m}: {s}", flush=True)) if _is_cloud(m) and not a.no_cloud_lock else None
         for c in conds:
             for i, t in enumerate(tasks, 1):
                 if not applies(t, c) or (m, c, t["id"]) in done:
@@ -309,6 +313,7 @@ def main():
                 if i % 20 == 0: print(f"  {m}/{c}: {i}/{len(tasks)}", flush=True)
                 if len(rows) % 10 == 0: (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
             (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+        if lock: _lock_release(lock)
     print("done ->", run)
 
 
