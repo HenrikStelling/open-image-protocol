@@ -180,3 +180,15 @@ its flag; (2) the same four arms run on the eight Ollama models before either OE
 (3) the guarantee is the tool-side check, D-029, not the prose; (4) the paper's discussion can now say that neither a named
 cue, a usage instruction nor a self-check item changes whether a frontier model verifies text against pixels. Cost: Gemini
 $2.55, GPT $11.12, Claude $5.06 so far (list prices from the usage fields).
+
+## D-030 — OEP-005 (encoder-safe inspection sheet) not adopted: render size is not why models skip the pixel check · decided · 2026-09-28
+Probe of 2026-09-27/28 (`docs/reports/render-probe-2026-09-27.md`): 40 VinDr paper packages, flip check and left edge, five conditions
+(canonical + file as control; annotated render and a 1536 px inspection sheet with 96 px R/L badges, heart inset and mm ruler, each
+with and without the file), seven Ollama models, 4,200 replies. Result: no model's flip check improves in any condition; six of seven
+never detect a mirrored render whatever the render, glm-5.3-flash (the only partial pass) loses 21 points with the sheet through false
+alarms on normal images, and mistral-large-3 inverts the sheet's boxed badges while reading the margin letters correctly. The models
+that partly pass use anatomy and the burned-in source marker, not our annotations. Consequences: (1) the shipped annotated render
+stays as is; `inspection_sheet()` remains an optional, non-normative render for the vision-only track; (2) the protocol's guarantee
+for orientation is tool-side (`oip check`, D-029 / PLAN Phase 3b), and context.md should say what the tool found rather than imply
+that self-description causes pixel inspection; (3) the benchmark's flip check must mask burned-in markers for anatomy-only items and
+add a balanced badge-swap control before the vision-only track (Codex proposal, `docs/03-brainstorm/codex-vision-proposal-2026-09-27.md`).
