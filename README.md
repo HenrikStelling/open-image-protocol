@@ -10,6 +10,11 @@ scintigraphy; CT and MRI follow.
 > OIP-Bench run on 190 packages across three datasets and eleven models (eight open,
 > three frontier). A paper is in preparation ([docs/paper/](docs/paper/)). Plan and
 > milestones: [PLAN.md](PLAN.md).
+>
+> New here? [docs/README.md](docs/README.md) sorts the documentation into normative,
+> implementation, evidence and history. [REPRODUCE.md](REPRODUCE.md) takes you from
+> `make setup` to the paper's tables. Versions of the parts (spec, template, package,
+> scorer) are listed in [CHANGELOG.md](CHANGELOG.md); cite via [CITATION.cff](CITATION.cff).
 
 ## The problem
 
@@ -127,7 +132,9 @@ OIP 0.1.0 · profile `measured` · layers L0, L1, L2, L3, L4 · de-identificatio
   labels or report text are omitted by default (OEP-001, see below) and, when
   requested, rendered after the cautions with unverified-label wording.
 - **Access paths**: the same verbs (`describe`, `measure`, `validate`, `window`,
-  `crop`, `overlay`, `locate`) through the CLI, the Python SDK and an MCP server stub.
+  `crop`, `overlay`, `locate`) through the CLI and the Python SDK; the MCP server is a
+  stub until Phase 5 (nothing in the benchmark depends on it). `oip check` runs the
+  pixel-side orientation check and writes its verdict into the manifest.
   Guardrails live in the tools: HU presets refuse non-HU images, mm refuses
   uncalibrated images.
 
@@ -203,7 +210,7 @@ package's facts are.
 | Fact | Validation |
 |---|---|
 | Orientation on stripped headers | 1,000-image laterality check on VinDr |
-| CTR, cardiac and thoracic width | Tier 1: plausibility rules on the PSPNet-derived values; thoracic width cross-checked against an independent tool (CXAS) on 20 images, agreement within 1 % |
+| CTR, cardiac and thoracic width | Tier 1: plausibility rules on the PSPNet-derived values. Cross-check against an independent segmentation (CXAS) on 20 pilot images: cardiac width agrees (18 of 18 within the benchmark's 10 % tolerance, mean difference +2.6 %); the CTR does not (4 of 20 within 0.05), because the two tools define the thoracic width differently, and the converter's CTR is probably biased high (34 % of 1,000 VinDr images above 0.50 against a label prevalence near 18 %) |
 | Lesion sizes, finding labels | VinDr radiologist boxes and labels |
 | Pneumothorax area | SIIM-ACR radiologist masks |
 | Converter geometry, polarity, units | Synthetic phantoms with exact ground truth ([tests/](tests/)) |
@@ -250,10 +257,24 @@ make test           # phantom tests
 
 Benchmark: `python bench/run.py --pkg-dir path/to/packages --models ollama/<tag>,claude,gpt,gemini --conditions raw,ctx_l1,ctx,annot`
 (frontier providers read their keys from the environment; see [bench/README.md](bench/README.md)).
+`make setup-all` adds the anatomy adapter and the benchmark extras. Machine-specific
+locations are environment variables (`OIP_KAGGLE_CACHE`, `OIP_BENCH_DIR`, `OIP_VINDR_LABELS`,
+`OIP_CXAS_PYTHON`), listed with their defaults in [REPRODUCE.md](REPRODUCE.md).
 
-## Data
+## Data and code availability
 
-The datasets are not redistributed here. `scripts/fetch_data.py` with
+The benchmark's dataset is the set of frozen model replies (41 run directories,
+64,809 rows, with their task files) together with the benchmark packages. They are
+archived on Zenodo as the release bundle built by
+[scripts/export_release_bundle.py](scripts/export_release_bundle.py): full NIH and
+bone-scan packages, manifests and reference files of the VinDr packages (whose images
+are Kaggle competition data and are not redistributed), and a sha256 manifest of every
+file including the ones not bundled, so a rebuild can be verified. DOI: to be added at
+release. The analysis plan and the results file of the paper are in
+[docs/paper/](docs/paper/); the scoring is deterministic and re-runnable
+([REPRODUCE.md](REPRODUCE.md), level B).
+
+The source datasets are not redistributed here. `scripts/fetch_data.py` with
 `scripts/datasets.json` downloads VinDr-CXR, RSNA Pneumonia, SIIM-ACR and NIH
 ChestX-ray14 (Kaggle; the competition sets require accepting their rules) and the
 Paraguay bone scans (Zenodo, CC-BY-4.0). Each dataset carries a `SOURCE.md` with its
@@ -270,4 +291,4 @@ effect. See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Licence
 
 Code: Apache-2.0 (see [LICENSE](LICENSE)). Specification and documentation:
-CC-BY-4.0.
+CC-BY-4.0 (see [LICENSE-docs.md](LICENSE-docs.md)).

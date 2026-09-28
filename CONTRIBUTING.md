@@ -1,9 +1,12 @@
 # Contributing
 
-1. Changes to the spec or schema go through an OIP Enhancement Proposal: add an entry to `docs/03-brainstorm/decisions-log.md` with problem, evidence, prototype, benchmark effect.
-2. Code changes must keep `make test` and `make validate` green; regenerate `spec/examples` when the schema changes.
-3. Never commit real patient data. `data/` is ignored except synthetic samples.
+1. Changes to the spec or schema go through an OIP Enhancement Proposal: add an entry to `docs/03-brainstorm/decisions-log.md` with problem, evidence, prototype, benchmark effect. A proposal enters the spec only with a measured benchmark result (design rule R10).
+2. Code changes must keep `make test`, `make validate` and `make examples-check` green (CI runs all three); regenerate `spec/examples` when the schema or the template changes, and bump `TEMPLATE_VERSION` or the schema version accordingly.
+3. Never commit real patient data, packages derived from restricted datasets, API keys or Kaggle tokens. `data/` is ignored except synthetic samples; keys live outside the clone (`~/.config/oip/keys.env`).
 4. Commit messages: imperative subject, body explains *why*.
+5. Scorer changes: bump `SCORER_VERSION`, add a unit test in `bench/test_score.py`, re-apply with `bench/rescore.py` (it keeps the previous score per row and writes `docs/reports/rescore-scorer-<version>.md`), and never edit a stored reply.
+6. Benchmark runs: one Ollama cloud model at a time (the runner's lock enforces it); paid API models only for a like-for-like repeat of an earlier run or after a rebuild is complete (owner's cost rule, 2026-09-26). Record the run date; cloud tags are not pinned by their providers.
+7. Releases: update `CHANGELOG.md` and `CITATION.cff`, tag `vX.Y.Z`, build the Zenodo bundle with `scripts/export_release_bundle.py --tag vX.Y.Z`, upload, and put the DOI into README, CITATION.cff and the paper's availability statement.
 
 ## macOS note
 Recent CPython security releases ignore `.pth` files carrying the macOS `hidden` flag, which files created inside `.venv` inherit. `make setup` runs `chflags nohidden` on them; if `import oip` fails after a reinstall, run that again.

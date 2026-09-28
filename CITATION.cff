@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use the Open Image Protocol, its reference implementation or OIP-Bench, please cite it as below."
+type: software
+title: "Open Image Protocol (OIP): self-describing medical image packages for vision-language models"
+authors:
+  - family-names: Stelling
+    given-names: Henrik
+repository-code: "https://github.com/HenrikStelling/open-image-protocol"
+license: Apache-2.0
+version: 0.1.0
+date-released: "2026-09-08"
+keywords:
+  - medical imaging
+  - DICOM
+  - vision-language models
+  - benchmark
+  - chest radiography
+  - scintigraphy
+abstract: >-
+  A package format that turns one medical image into a self-describing directory a vision-language model can read
+  zero-shot: a schema-validated manifest with assertion levels, model-ready renders, tool-computed measurements with
+  provenance, and a fixed-template natural-language reference file. Includes the reference converter, the CLI and SDK,
+  and OIP-Bench, a benchmark of image-understanding tasks with frozen replies from eleven models.
+preferred-citation:
+  type: article
+  title: "Open Image Protocol: self-describing medical image packages supply the facts vision-language models cannot see in an image, but not the check against the pixels"
+  authors:
+    - family-names: Stelling
+      given-names: Henrik
+  year: 2026
+  notes: "arXiv preprint in preparation; identifier to be added. Benchmark replies and package manifests: Zenodo DOI to be added."
