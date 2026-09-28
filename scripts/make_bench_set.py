@@ -8,8 +8,9 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src")
 from oip.convert import convert
 from oip.convert_image import convert_image, nih_meta
 from oip.anatomy import measure_chest
-C = Path.home() / ".cache/kagglehub"
-OUT = Path.home() / "oip-bench"
+import os
+C = Path(os.environ.get("OIP_KAGGLE_CACHE", Path.home() / ".cache/kagglehub"))   # kagglehub download cache
+OUT = Path(os.environ.get("OIP_BENCH_DIR", Path.home() / "oip-bench"))            # package store, outside the clone (REPRODUCE.md)
 LEAK = ["aortic enlargement", "atelectasis", "calcification", "cardiomegaly", "consolidation", "ild", "infiltration", "lung opacity", "nodule", "other lesion", "pleural effusion", "pleural thickening", "pneumothorax", "pulmonary fibrosis"]
 
 

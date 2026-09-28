@@ -12,3 +12,4 @@ access_token
 build/
 dist/
 bench/results/
+.context/

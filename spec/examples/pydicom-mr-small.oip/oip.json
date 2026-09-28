@@ -10,8 +10,8 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "c3d4d6c5-6e51-4a20-9c2f-9b29845e8b48",
-    "created": "2026-09-09T08:05:36+00:00",
+    "package_id": "dcb7a6b5-24f0-5529-a47c-407f68854d75",
+    "created": "2025-09-09T08:00:00+00:00",
     "title": "MR slice",
     "source_uids": {
       "study": "e4c2d72eee037e98",

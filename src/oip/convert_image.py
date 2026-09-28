@@ -3,6 +3,7 @@ Everything that comes from a CSV or dataset documentation is marked assertion_le
 what cannot be known is 'unknown' and flagged. Used for NIH ChestX-ray14 (Kaggle PNG + CSV)."""
 from __future__ import annotations
 import datetime as _dt, hashlib, json, uuid
+from .identity import package_identity
 from pathlib import Path
 import numpy as np
 from PIL import Image

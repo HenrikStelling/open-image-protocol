@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-CXAS_PY = Path.home() / "cxas-venv/bin/python"
+CXAS_PY = Path(os.environ.get("OIP_CXAS_PYTHON", Path.home() / "cxas-venv/bin/python"))   # python of the isolated CXAS venv (REPRODUCE.md)
 WORKER = Path(__file__).resolve().parents[2] / "scripts/cxas_worker.py"
 
 

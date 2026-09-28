@@ -275,7 +275,8 @@ def main() -> None:
         if e:
             R["pilot_oep001"][m] = e
     # 10. CXAS vs PSPNet cross-check (20 pilot images)
-    cx = Path.home() / "oip-bench/cxas_vs_pspnet_20.json"
+    import os
+    cx = Path(os.environ.get("OIP_BENCH_DIR", Path.home() / "oip-bench")) / "cxas_vs_pspnet_20.json"
     if cx.exists():
         d = json.loads(cx.read_text())
         def agree(key_a, key_b, tol, relative):

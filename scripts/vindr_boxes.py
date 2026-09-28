@@ -1,12 +1,13 @@
 """VinDr-CXR: attach radiologist finding boxes (external) as regions and measure lesion long axis (px, and mm when
 spacing is calibrated). Boxes are in original pixel coordinates (train.csv: class_name, rad_id, x_min, y_min, x_max, y_max).
 Usage: python scripts/vindr_boxes.py [limit]"""
-import csv, json, sys, time, collections
+import csv, json, os, sys, time, collections
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src"))
 from oip.convert import add_measurements
 from oip.measure import px_to_mm, CalibrationError
-csv_path = Path.home() / ".cache/kagglehub/competitions/vinbigdata-chest-xray-abnormalities-detection/train.csv"
+C = Path(os.environ.get("OIP_KAGGLE_CACHE", Path.home() / ".cache/kagglehub"))
+csv_path = C / "competitions/vinbigdata-chest-xray-abnormalities-detection/train.csv"
 boxes = collections.defaultdict(list)
 for r in csv.DictReader(open(csv_path)):
     if r["class_name"] != "No finding" and r["x_min"]:

@@ -8,7 +8,8 @@ import pydicom
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src"))
 from oip.convert import convert
 from oip.convert_image import convert_image, nih_meta
-C = Path.home() / ".cache/kagglehub"
+import os
+C = Path(os.environ.get("OIP_KAGGLE_CACHE", Path.home() / ".cache/kagglehub"))   # kagglehub download cache (REPRODUCE.md)
 
 
 def dataset_files(name, limit, seed=0):

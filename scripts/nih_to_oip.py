@@ -1,9 +1,10 @@
 """Convert N images of the NIH ChestX-ray14 Kaggle sample to OIP packages (non-DICOM path)."""
-import csv, sys, glob, json
+import csv, os, sys, glob, json
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from oip.convert_image import convert_image, nih_meta
-base = sorted(glob.glob(str(Path.home() / ".cache/kagglehub/datasets/nih-chest-xrays/sample/versions/*")))[-1]
+C = Path(os.environ.get("OIP_KAGGLE_CACHE", Path.home() / ".cache/kagglehub"))
+base = sorted(glob.glob(str(C / "datasets/nih-chest-xrays/sample/versions/*")))[-1]
 n = int(sys.argv[1]) if len(sys.argv) > 1 else 5; out = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("data/oip/nih")
 rows = list(csv.DictReader(open(Path(base) / "sample_labels.csv")))[:n]
 for r in rows:

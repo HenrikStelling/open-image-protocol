@@ -103,9 +103,15 @@ def build(pkg_dir: Path, n: int = 100, seed: int = 0, labels_by_id: dict | None 
 def vindr_labels() -> dict:
     import csv, collections
     d = collections.defaultdict(set)
-    # local copy first (independent of the external drive that hosts the Kaggle cache), then the cache
-    for cand in (Path.home() / "oip-bench/meta/vindr_train.csv", Path.home() / ".cache/kagglehub/competitions/vinbigdata-chest-xray-abnormalities-detection/train.csv"):
+    # OIP_VINDR_LABELS, else a local copy in the package store (independent of the drive that hosts the Kaggle cache), else the cache
+    import os
+    cands = ([Path(os.environ["OIP_VINDR_LABELS"])] if os.environ.get("OIP_VINDR_LABELS") else []) + [
+        Path(os.environ.get("OIP_BENCH_DIR", Path.home() / "oip-bench")) / "meta/vindr_train.csv",
+        Path(os.environ.get("OIP_KAGGLE_CACHE", Path.home() / ".cache/kagglehub")) / "competitions/vinbigdata-chest-xray-abnormalities-detection/train.csv"]
+    for cand in cands:
         if cand.exists(): break
+    else:
+        raise FileNotFoundError("VinDr train.csv not found; set OIP_VINDR_LABELS or OIP_KAGGLE_CACHE (REPRODUCE.md)")
     for r in csv.DictReader(open(cand)):
         if r["class_name"] != "No finding": d[r["image_id"]].add(r["class_name"])
         else: d.setdefault(r["image_id"], set())

@@ -1,6 +1,6 @@
 """SIIM-ACR: attach radiologist pneumothorax masks (external) to converted packages and compute the pneumothorax /
 lung area ratio (spacing-free) plus, where present, areas in px. Usage: python scripts/siim_measure.py [limit]"""
-import csv, glob, json, sys, time
+import csv, glob, json, os, sys, time
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -8,7 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "src")
 from oip.convert import add_measurements
 from oip.anatomy import segment
 from oip.measure import mask_extent
-base = sorted(glob.glob(str(Path.home() / ".cache/kagglehub/datasets/jesperdramsch/siim-acr-pneumothorax-segmentation-data/versions/*")))[-1]
+C = Path(os.environ.get("OIP_KAGGLE_CACHE", Path.home() / ".cache/kagglehub"))
+base = sorted(glob.glob(str(C / "datasets/jesperdramsch/siim-acr-pneumothorax-segmentation-data/versions/*")))[-1]
 rle = {}
 for r in csv.DictReader(open(Path(base) / "train-rle.csv")):
     k = r["ImageId"].strip(); v = r[" EncodedPixels"].strip() if " EncodedPixels" in r else r["EncodedPixels"].strip()

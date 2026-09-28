@@ -12,15 +12,15 @@
     "schema": "https://open-image-protocol.org/schemas/0.1/oip-manifest.schema.json"
   },
   "identity": {
-    "package_id": "afe2acb0-22b2-463c-9ff7-e9755c8db001",
-    "created": "2026-09-09T08:05:35+00:00",
+    "package_id": "9307b297-4515-5ffc-a281-d4e352943745",
+    "created": "2025-09-09T08:00:00+00:00",
     "title": "Synthetic chest radiograph phantom, PA (MONOCHROME1 source)",
     "source_uids": {
-      "study": "0c3442e74d185783",
-      "series": "1aac3d80fe91fce6",
-      "instance": "fc5f8d25acbd07ef"
+      "study": "ec6b565f21511743",
+      "series": "40d087cca66eed92",
+      "instance": "ea801ee1c709d2ba"
     },
-    "source_hash": "dd583aa6a8b9618ff99aa2e5b40bfc6bbc529bc3e5386022c4cea06bb020006c"
+    "source_hash": "44d530953061e414ab1e3f3e4821b5d4ac3ee2b3c15532760e9af0459bca5cb5"
   },
   "provenance": {
     "producer": "oip-python",

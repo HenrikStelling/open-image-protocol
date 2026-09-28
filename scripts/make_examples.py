@@ -1,8 +1,11 @@
 """Build example OIP packages: synthetic DX phantom, synthetic NM whole-body phantom, and pydicom sample CT/MR.
 Synthetic phantoms have exactly known geometry so they double as measurement ground truth (Q11 Tier 0)."""
 from __future__ import annotations
-import json, sys
+import json, os, sys
 from pathlib import Path
+# Reproducible examples: fixed creation time and uuid5 package ids (src/oip/identity.py) and phantom UIDs derived from
+# fixed entropy, so `make examples` is byte-identical between runs and machines. Override by exporting your own value.
+os.environ.setdefault("SOURCE_DATE_EPOCH", "1757404800")   # 2026-09-09T08:00:00Z
 import numpy as np
 import pydicom
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
@@ -24,12 +27,17 @@ HEART_W, HEART_H = 130.0, 110.0
 DX_ROWS, DX_COLS = 1800, 1500   # 360 x 300 mm
 
 
+def _uid(*parts: str) -> str:
+    """Deterministic UID from fixed entropy (pydicom hashes the sources), so the phantom files do not change per run."""
+    return generate_uid(entropy_srcs=["oip-phantom-v1", *parts])
+
+
 def _base(modality, sop_class, rows, cols):
-    meta = FileMetaDataset(); meta.MediaStorageSOPClassUID = sop_class; meta.MediaStorageSOPInstanceUID = generate_uid()
+    meta = FileMetaDataset(); meta.MediaStorageSOPClassUID = sop_class; meta.MediaStorageSOPInstanceUID = _uid(modality, "instance")
     meta.TransferSyntaxUID = ExplicitVRLittleEndian
     ds = FileDataset(None, {}, file_meta=meta, preamble=b"\0" * 128)
     ds.SOPClassUID = sop_class; ds.SOPInstanceUID = meta.MediaStorageSOPInstanceUID
-    ds.StudyInstanceUID = generate_uid(); ds.SeriesInstanceUID = generate_uid()
+    ds.StudyInstanceUID = _uid(modality, "study"); ds.SeriesInstanceUID = _uid(modality, "series")
     ds.Modality = modality; ds.PatientName = "PHANTOM^SYNTHETIC"; ds.PatientID = "OIP-SYN-000"; ds.PatientSex = "O"; ds.PatientAge = "047Y"
     ds.StudyDate = "20260904"; ds.Manufacturer = "OIP synthetic"; ds.ManufacturerModelName = "phantom-v1"
     ds.Rows, ds.Columns = rows, cols; ds.SamplesPerPixel = 1; ds.PixelRepresentation = 0

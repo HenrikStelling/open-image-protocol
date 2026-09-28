@@ -4,6 +4,7 @@ import datetime as _dt
 import hashlib
 import json
 import uuid
+from .identity import package_identity
 from pathlib import Path
 
 import numpy as np
@@ -198,7 +199,7 @@ def convert(src: str | Path, out_dir: str | Path, *, external: dict | None = Non
 
     manifest = {
         "oip": {"version": SPEC_VERSION, "profile": "core", "layers": ["L0", "L1", "L2"], "schema": SCHEMA_URI},
-        "identity": {"package_id": str(uuid.uuid4()), "created": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"), "title": title,
+        "identity": {"package_id": package_identity(sha)[0], "created": package_identity(sha)[1], "title": title,
                      "source_uids": {"study": hash_uid(ds.get("StudyInstanceUID")), "series": hash_uid(ds.get("SeriesInstanceUID")), "instance": hash_uid(ds.get("SOPInstanceUID"))},
                      "source_hash": sha},
         "provenance": {"producer": "oip-python", "producer_version": __version__, "source_format": "dicom", "source_filename": src.name,

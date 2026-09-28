@@ -5,10 +5,23 @@ description = "Open Image Protocol: self-describing medical image packages for v
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
+authors = [{name = "Henrik Stelling"}]
+keywords = ["medical imaging", "DICOM", "vision-language models", "benchmark", "radiography", "scintigraphy"]
 dependencies = ["pydicom>=3.0", "numpy>=1.26", "pillow>=10", "jsonschema>=4.20"]
 
+[project.urls]
+Repository = "https://github.com/HenrikStelling/open-image-protocol"
+Specification = "https://github.com/HenrikStelling/open-image-protocol/blob/main/spec/oip-v0.1-draft.md"
+Reproduction = "https://github.com/HenrikStelling/open-image-protocol/blob/main/REPRODUCE.md"
+
 [project.optional-dependencies]
+# make test / make validate / make examples, plus the Kaggle downloader used by scripts/fetch_data.py
 dev = ["pytest>=8", "pylibjpeg", "pylibjpeg-libjpeg", "kagglehub"]
+# `oip measure` and `oip check`: the chest anatomy adapter (TorchXRayVision PSPNet). CPU is enough (~1 s per image).
+measure = ["torch>=2.2", "torchxrayvision>=1.3"]
+# OIP-Bench: statistics for the reference sheet, and the three frontier SDKs (keys from the environment, never in the repo)
+bench = ["scipy>=1.11", "anthropic>=1.0", "openai>=2.0", "google-genai>=1.0"]
+all = ["oip[dev,measure,bench]"]
 
 [project.scripts]
 oip = "oip.cli:main"
@@ -21,4 +34,5 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "bench"]
+python_files = ["test_*.py"]
