@@ -31,6 +31,7 @@ def acquire(model: str, poll: int = 60, log=print):
             time.sleep(poll); waited += poll
     f.seek(0); f.truncate()
     f.write(json.dumps({"pid": os.getpid(), "model": model, "started": time.strftime("%Y-%m-%dT%H:%M:%S")})); f.flush()
+    import atexit; atexit.register(release, f)      # an abort via sys.exit skips the runner's release; clear the holder record anyway
     return f
 
 
