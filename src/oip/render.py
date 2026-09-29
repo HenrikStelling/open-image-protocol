@@ -1,6 +1,7 @@
 """Render rules: canonical 8-bit (high_is_bright), annotated render with edge labels and scale bar."""
 from __future__ import annotations
 import numpy as np
+from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from pydicom.dataset import Dataset
 
@@ -65,9 +66,13 @@ def save_png16(arr: np.ndarray, path, bits_stored: int = 16) -> str:
     Image.fromarray(a.astype(np.uint16)).save(path); return "png16"
 
 
+_VENDORED_FONT = Path(__file__).resolve().parent / "fonts" / "DejaVuSans.ttf"   # shipped with the package (Bitstream Vera licence, see fonts/LICENSE_DEJAVU)
+
+
 def _font(size: int):
-    for name in ("/System/Library/Fonts/Helvetica.ttc", "/System/Library/Fonts/Supplemental/Arial.ttf",
-                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"):
+    """The vendored DejaVu Sans, so that annotated renders are identical on every platform; system fonts only as a fallback."""
+    for name in (str(_VENDORED_FONT), "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                 "/System/Library/Fonts/Helvetica.ttc", "/System/Library/Fonts/Supplemental/Arial.ttf"):
         try:
             return ImageFont.truetype(name, size)
         except Exception:
