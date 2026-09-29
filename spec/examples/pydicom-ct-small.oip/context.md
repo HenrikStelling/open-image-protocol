@@ -13,6 +13,7 @@ This package describes a tomographic slice: each pixel is a reconstructed value 
 - Polarity guarantee: in the canonical render, higher attenuation is BRIGHTER.
 - Orientation [unknown]: do not assume which side is the patient's left or right.
 - Scale [measured]: 0.661468 × 0.661468 mm per pixel (row × column), source `PixelSpacing`, valid in the patient plane, confidence high. Image extent ≈ 85 × 85 mm (height × width).
+- Estimating from the image: for a quantity that is not listed under `Computed measurements`, judge it directly from the picture (a ratio or a size relative to the thorax); do not compute it from pixel coordinates you estimate yourself, because such coordinate estimates are unreliable.
 - Pixel values: 16-bit stored, units `HU`; window for the canonical render: auto_percentile (range -861–785).
 
 ## Measured facts

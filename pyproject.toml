@@ -1,6 +1,6 @@
 [project]
 name = "oip"
-version = "0.1.0"
+version = "0.2.0"
 description = "Open Image Protocol: self-describing medical image packages for vision-language models"
 readme = "README.md"
 requires-python = ">=3.10"

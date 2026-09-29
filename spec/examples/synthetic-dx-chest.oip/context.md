@@ -14,6 +14,7 @@ This package describes a projection radiograph (X-ray): pixel brightness relates
 - Polarity guarantee: in the canonical render, higher attenuation is BRIGHTER (the source was stored inverted and has been corrected).
 - Orientation [measured]: image LEFT edge = R, RIGHT edge = L, TOP = H, BOTTOM = F. From DICOM PatientOrientation.
 - Scale [measured]: 0.2 × 0.2 mm per pixel (row × column), source `PixelSpacing_calibrated`, valid in the patient plane, confidence high. Image extent ≈ 360 × 300 mm (height × width).
+- Estimating from the image: for a quantity that is not listed under `Computed measurements`, judge it directly from the picture (a ratio or a size relative to the thorax); do not compute it from pixel coordinates you estimate yourself, because such coordinate estimates are unreliable.
 - Pixel values: 12-bit stored, units `relative`; window for the canonical render: WindowCenterWidth (center 2895, width 2600).
 
 ## Measured facts

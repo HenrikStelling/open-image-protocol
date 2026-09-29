@@ -22,6 +22,7 @@ This package describes a planar scintigraphy image (nuclear medicine): each pixe
 - Polarity guarantee: in the canonical render, higher counts is BRIGHTER.
 - Orientation [unknown]: do not assume which side is the patient's left or right.
 - Scale [measured]: 2.26 × 2.26 mm per pixel (row × column), source `PixelSpacing`, valid in the detector plane, confidence medium. Image extent ≈ 2314 × 579 mm (height × width).
+- Estimating from the image: for a quantity that is not listed under `Computed measurements`, judge it directly from the picture (a ratio or a size relative to the thorax); do not compute it from pixel coordinates you estimate yourself, because such coordinate estimates are unreliable.
 - Pixel values: 16-bit stored, units `counts`; window for the canonical render: sqrt (range 0–22).
 
 ## Measured facts
