@@ -230,3 +230,10 @@ gpt-5.6-terra (the paper's NIH drop, 57 → 42 %; 600 calls ≈ $3) confirms or 
 better answer under low-confidence spacing is untestable on NIH — a guard of this kind is measured again only on calibrated or
 Tier-2 truth. Side finding of the readout: glm-5.3-flash's visible reasoning was cut off by the harness's 800-token output cap in
 a third to two thirds of its L0–L2 numeric replies in the paper runs (RA amendment 12; `run.py --ollama-think on|auto`, `usage.done_reason`).
+**Addendum 2026-09-29 15:54 — frontier repeat done (gpt-5.6-terra, same four arms, 600 calls, $3.30, 0 errors):** caution lifts
+CTR 22 → 36 % (10/3 discordant, p = 0.092), guard neutral, no abstention under the guard (0/50, it computes from the nominal
+spacing like glm), left edge 98–100 %. The paper's gpt NIH L0–L2 drop did not reappear as a drop: today's image-only baseline is
+lower (CTR 34 → 24 %, cardiac width 36 → 26 %) while the L0–L2 cells are equal or higher (20 → 22 %, 6 → 20 %) under the same
+unpinned model id — a measured instance of the paper's snapshot-drift limitation. Pooled over the eight models the caution's CTR
+contrast is 56 improved / 26 worsened (p = 0.0012, +7.5 pp; images shared across models, so precision is overstated); per model
+5 for, 0 against, 3 ties. Decision (1) stands; no further OEP-002 spend.
