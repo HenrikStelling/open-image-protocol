@@ -10,8 +10,8 @@ setup-all:        ## also the anatomy adapter (torch, torchxrayvision) and the b
 examples:         ## rebuild spec/examples/*.oip and data/samples/*.dcm (deterministic: SOURCE_DATE_EPOCH is set by the script)
 	$(PY) scripts/make_examples.py
 
-examples-check:   ## rebuild the examples and fail if any committed file changed (CI)
-	$(PY) scripts/make_examples.py >/dev/null && git diff --exit-code --stat -- spec/examples data/samples
+examples-check:   ## rebuild the examples and fail if any committed file changed in content (PNGs compared as pixels; CI)
+	$(PY) scripts/check_examples.py
 
 test:             ## phantom tests (tests/) and benchmark unit tests (bench/test_*.py)
 	$(PY) -m pytest -q

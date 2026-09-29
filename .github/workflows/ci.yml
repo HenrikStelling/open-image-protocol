@@ -23,7 +23,5 @@ jobs:
         run: python -m pytest -q
       - name: Validate example packages
         run: for p in spec/examples/*.oip; do python -m oip.cli validate "$p"; done
-      - name: Examples are reproducible
-        run: |
-          python scripts/make_examples.py > /dev/null
-          git diff --exit-code --stat -- spec/examples data/samples
+      - name: Examples are reproducible (text byte-identical, PNGs pixel-identical)
+        run: python scripts/check_examples.py
