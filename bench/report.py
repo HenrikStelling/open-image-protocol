@@ -9,9 +9,15 @@ for r in sorted((ROOT / "bench/results").glob("2026*")):
     ts = json.loads((r / "tasks.json").read_text()) if (r / "tasks.json").exists() else []
     pkgdir = Path(ts[0]["pkg"]).parent.name if ts else "unknown"
     dataset = {"vindr": "pilot-vindr-20", "vindr-paper": "paper-vindr-100", "nih-paper": "paper-nih-50", "bonescan": "bonescan-40"}.get(pkgdir, pkgdir)
+    meta = json.loads((r / "run_meta.json").read_text()) if (r / "run_meta.json").exists() else {}
+    fourarm = {"ctx_ctl", "ctx_cue", "ctx_instr", "ctx_cue_instr"} <= set(meta.get("conditions") or [])   # the OEP-003/004 ablation design
     for l in f.read_text().splitlines():
         if l.strip():
-            x = json.loads(l); x["dataset"] = dataset; x["_run"] = r.name; rows.append(x)
+            x = json.loads(l); x["dataset"] = dataset; x["_run"] = r.name; x["_fourarm"] = fourarm; rows.append(x)
+# the ablation conditions are compared only within the four-arm design: other runs that reuse `ctx_ctl` as a control (e.g. the render
+# probe on a 40-image subset) would otherwise win the latest-run selection for that cell
+ABL = ("ctx_ctl", "ctx_cue", "ctx_instr", "ctx_cue_instr")
+rows = [x for x in rows if x["condition"] not in ABL or x.get("_fourarm")]
 import sys as _sys
 ONLY = _sys.argv[1] if len(_sys.argv) > 1 else None          # optional: report one dataset only
 # one run per (dataset, model, condition): keep the LATEST run directory that has rows for that combination, so repeated
@@ -97,7 +103,6 @@ for ds in sorted({x["dataset"] for x in rows if x["type"] in RENDER_TASKS + CONS
             return fmt(sum(1 for x in sel if x["score"].get("correct")) / len(sel)) if sel else "–"
         md.append(f"| {ds} | {m.replace('ollama/','')} | {a2('annot','mark_heart')} | {a2('annot','mark_side')} | {a2('ctx_l1','flip_check')} | {a2('ctx','flip_check')} |")
 # verification ablation (OEP-003/004, 2026-09-26): flip check and left-edge side under the full file, with and without cues / instruction
-ABL = ("ctx_ctl", "ctx_cue", "ctx_instr", "ctx_cue_instr")
 if any(x["condition"] in ABL for x in rows):
     md += ["", "## Verification ablation (OEP-003/004): does the model check the stated orientation against the image?", "",
            "Same 100 images and models as the paper run; `ctx_ctl` = the shipped file, re-run the same day as a control; `cues` = template 0.3 draft (pixel cues next to every inferred fact, pixel-based self-check items); `instr` = one added sentence in the system prompt asking to verify [inferred]/[external] statements against the image. Cells: flip check (chance = 50 %) / left-edge side.", "",
