@@ -6,6 +6,10 @@ authors:
   - family-names: Stelling
     given-names: Henrik
 repository-code: "https://github.com/HenrikStelling/open-image-protocol"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23040047
+    description: "OIP-Bench v0.2.0: frozen model replies and benchmark packages (Zenodo)"
 license: Apache-2.0
 version: 0.1.0
 date-released: "2026-09-08"
@@ -28,4 +32,4 @@ preferred-citation:
     - family-names: Stelling
       given-names: Henrik
   year: 2026
-  notes: "arXiv preprint in preparation; identifier to be added. Benchmark replies and package manifests: Zenodo DOI to be added."
+  notes: "arXiv preprint in preparation; identifier to be added. Benchmark replies and package manifests: https://doi.org/10.5281/zenodo.23040047"

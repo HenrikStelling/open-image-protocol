@@ -65,6 +65,7 @@ def main() -> None:
     ap.add_argument("--until", default="20260922", help="last run date (YYYYMMDD) to include as paper runs")
     ap.add_argument("--bench-dir", default=os.environ.get("OIP_BENCH_DIR", str(Path.home() / "oip-bench")))
     ap.add_argument("--out", default=str(ROOT / "dist"))
+    ap.add_argument("--doi", default="", help="Zenodo DOI of this bundle, written into README.md and MANIFEST.json (reserve it on Zenodo first)")
     a = ap.parse_args()
     bench = Path(a.bench_dir); out = Path(a.out) / f"oip-bench-{a.tag}"
     if out.exists():
@@ -101,7 +102,7 @@ def main() -> None:
     files = {str(f.relative_to(out)): {"sha256": sha(f), "bytes": f.stat().st_size} for f in sorted(out.rglob("*")) if f.is_file()}
     full_hashes = {DATASETS[s]: package_hashes(bench / s) for s in ("vindr-paper", "vindr", "nih-paper", "bonescan") if (bench / s).exists()}
     manifest = {"bundle": f"oip-bench-{a.tag}", "built": time.strftime("%Y-%m-%dT%H:%M:%S"), "repo": "https://github.com/HenrikStelling/open-image-protocol",
-                "repo_commit": commit, "paper_runs_until": a.until, "runs": runs, "bundled_files": files, "package_files_sha256": full_hashes,
+                "repo_commit": commit, "doi": a.doi or None, "paper_runs_until": a.until, "runs": runs, "bundled_files": files, "package_files_sha256": full_hashes,
                 "notes": ["VinDr-CXR images, renders and masks are Kaggle competition data and are not bundled; their hashes are listed so a rebuild can be verified.",
                           "Rows carry `score` (scorer 0.3) and, where it differs, `score_prev` (scorer 0.2, commit 050769a) — see docs/reports/rescore-scorer-0.3.md.",
                           "Abstentions and empty replies are scored incorrect; error rows have `error` set and are excluded from denominators."]}
@@ -109,6 +110,7 @@ def main() -> None:
     (out / "README.md").write_text(f"""# OIP-Bench release bundle {a.tag}
 
 Frozen model replies and benchmark packages of the Open Image Protocol paper. Built {manifest['built']} from repository commit {commit}.
+{('DOI: https://doi.org/' + a.doi) if a.doi else 'DOI: see the Zenodo record.'}
 How to use them: `REPRODUCE.md` in the repository (level B). Contents and hashes: `MANIFEST.json`.
 
 - `replies/`: {sum(1 for r in runs if not r['excluded'])} run directories dated up to {a.until}, {sum(r['rows'] for r in runs if not r['excluded'])} rows; `replies-excluded/`: the run discarded under the no-leakage rule.
