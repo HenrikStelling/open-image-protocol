@@ -48,6 +48,9 @@ def harness_commit() -> str:
 
 def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None = None, cues: bool = False, flip_labels: bool = False,
          guard: bool = False, est: bool = False) -> str:
+    # est=False by default: every legacy condition (paper `ctx`/`ctx_l1`, the OEP-004 arms) keeps the template-0.2 wording it was
+    # measured with; only the OEP-002 arm passes True. Template 0.2.1 (D-031) renders the caution by default outside the harness;
+    # round-3 conditions should pass est=None to test what packages actually ship.
     """Render the reference file from the manifest. strip_measurements -> layers L0-L2 only (no computed measurements, no regions);
     external_text -> rendered through the shipped template (cautions first, unverified wording), i.e. what `--with-external` shows;
     cues -> template 0.3 draft with verification cues and the pixel-based self-check items (OEP-003/004);

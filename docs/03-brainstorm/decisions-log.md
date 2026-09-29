@@ -192,3 +192,41 @@ stays as is; `inspection_sheet()` remains an optional, non-normative render for 
 for orientation is tool-side (`oip check`, D-029 / PLAN Phase 3b), and context.md should say what the tool found rather than imply
 that self-description causes pixel inspection; (3) the benchmark's flip check must mask burned-in markers for anatomy-only items and
 add a balanced badge-swap control before the vision-only track (Codex proposal, `docs/03-brainstorm/codex-vision-proposal-2026-09-27.md`).
+
+**Measured on the Ollama models 2026-09-27/28 (same four arms, VinDr-100, flip_check + left_edge; 1,200 rows per model, 0 errors; qwen3.5:cloud retired by the provider 2026-09-25 and dropped).** Flip check shipped → cues → instruction → both (mirrored images caught of 100) · left-edge side across the four arms:
+gemma4:31b-cloud 50 → 57 → 54 → 66 % (2 → 15 → 9 → 34) · left edge 100 % throughout.
+minimax-m3:cloud 54 → 62 → 58 → 66 % (13 → 35 → 20 → 45) · left edge 100/99/100/99 %.
+kimi-k3:cloud 64 → 60 → 64 → 59 % (31 → 24 → 32 → 21) · 100 % throughout.
+glm-5.3-flash:cloud 78 → 74 → 82 → 64 % (92 → 89 → 92 → 87; the drop is false "mirrored" calls on normal images, 65 → 60 → 71 → 41/100) · **left edge 99 → 48 → 87 → 40 %**.
+mistral-large-3:675b-cloud 50 → 50 → 50 → 50 % (0 caught in any arm) · left edge 100 → 87 → 100 → 91 %.
+gemma4:e4b-it-qat (local) 50 → 47 → 50 → 48 % (0 → 3 → 0 → 1) · left edge 100 → 97 → 99 → 91 %.
+medgemma1.5:4b (local) 50 → 48 → 51 → 50 % (1 → 2 → 3 → 4) · left edge 66 → 40 → 63 → 39 %.
+Outcome across all ten models measured (three frontier, seven open): the cue-bearing file plus the instruction lifts two
+models by 12–16 pp (gemma4 31B, minimax-m3), well short of the +20 pp gate and only in combination; it leaves five unchanged;
+and it **costs four models on the plain left-edge question** (glm −59 pp, MedGemma −27, mistral −13, gemma4 e4b −9 with
+both): the sentence "toward the image edge labelled L (here the RIGHT edge)" makes weaker readers confuse the image edge with
+the patient side. The instruction sentence alone is harmless and lifts glm and gemma4 31B by 4 pp. **Decision: OEP-004 not
+adopted; the cue template stays behind its flag; OEP-003's mirror item unassessed (no annotated render in this design) and
+folded into the round-3 render probe (OEP-005). The guarantee remains the tool-side check (D-029).** Claude's frontier arm is
+still paused on the Anthropic balance and will be added when resumed.
+
+## D-031 — OEP-002: the estimation caution is adopted (template 0.2.1); the low-confidence-scale guard is not · decided · 2026-09-29
+Ablation of 2026-09-29 (`docs/reports/oep-002-2026-09-29.md`): NIH-50 (dataset-derived spacing, confidence low), tasks CTR,
+cardiac width, left edge; arms image only, L0–L2 file as shipped, L0–L2 + guard ("LOW-CONFIDENCE SCALE … do NOT derive sizes in
+millimetres from it yourself", self-check item 3 rewritten), L0–L2 + guard + caution ("judge it directly from the picture … do not
+compute it from pixel coordinates you estimate yourself"); seven Ollama models, 4,200 replies, 0 errors; exact McNemar on paired
+items, Holm over models. The L0–L2 CTR drop the paper reported for gpt and glm on NIH appears on three of the seven (MedGemma
+38 → 10 %, minimax 52 → 32, glm 38 → 26) and reverses on one (mistral 24 → 38). **The caution repairs it on all three** (glm → 50 %,
+minimax → 50 %, MedGemma → 18 %; two fully, back to or above image-only) and changes nothing on the other four, on cardiac width
+or on the left-edge question; the CTR replies stop citing pixel coordinates (minimax 10 → 0 of 50). No model survives Holm over
+seven at n = 50 (glm 0.12, minimax 0.14). **The guard never improves an endpoint:** three models comply fully and lose every
+correct cardiac width (gemma4:31b 26, mistral 15, e4b 5 of 50, Holm < 0.001 for the first two), three comply partly and lose
+accuracy without abstaining (minimax 42 → 18 %, kimi 38 → 22, MedGemma), glm acknowledges it in all 50 replies and multiplies by the
+nominal spacing anyway. Decision: (1) the caution ships in "How to read" by default (`TEMPLATE_VERSION` 0.2.1, `build_context`
+`estimation_caution=None`); (2) the guard stays behind its flag, off; (3) the benchmark's legacy conditions keep the 0.2 wording
+(`run._ctx(est=False)`) so paper cells stay reproducible, round 3 renders the shipped template; (4) the pre-specified repeat on
+gpt-5.6-terra (the paper's NIH drop, 57 → 42 %; 600 calls ≈ $3) confirms or refutes on a frontier model before the paper cites it;
+(5) caveat: the NIH cardiac-width truth is computed with the same nominal spacing the file states, so whether abstaining is the
+better answer under low-confidence spacing is untestable on NIH — a guard of this kind is measured again only on calibrated or
+Tier-2 truth. Side finding of the readout: glm-5.3-flash's visible reasoning was cut off by the harness's 800-token output cap in
+a third to two thirds of its L0–L2 numeric replies in the paper runs (RA amendment 12; `run.py --ollama-think on|auto`, `usage.done_reason`).

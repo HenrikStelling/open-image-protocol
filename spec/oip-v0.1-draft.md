@@ -71,12 +71,13 @@ declare `oip.profile` and `oip.layers` and MUST NOT claim a layer it did not fil
    that is the conventional display.
 
 ## 6. `context.md` (reference file)
-Fixed section order (template 0.2); every section present even if it only says "none":
+Fixed section order (template 0.2.1); every section present even if it only says "none":
 `What this is` · `How to read the renders` · `Measured facts` ·
 `Computed measurements` · `Inferred` · `Unknowns and cautions` · `External context`
 · `Self-check` · `Machine-readable`.
 External content (dataset labels, prior report text) is NOT rendered by default (D-027): it stays in `oip.json.external`.
 When a consumer requests it, it is rendered after the cautions with the wording "UNVERIFIED … do not repeat unless the pixels clearly show it".
+Template 0.2.1 (2026-09-29, D-031, OEP-002): `How to read the renders` carries one estimation caution — a quantity that is not listed under `Computed measurements` is judged from the picture as a ratio or relative size, not computed from pixel coordinates the reader estimates itself. Measured on NIH-50 with seven open models: it repairs the drop in cardiothoracic-ratio accuracy that the L0–L2 file causes on the models that compute from self-estimated coordinates, and changes nothing else. A stronger "do not derive millimetres from a low-confidence spacing" guard was measured in the same ablation and NOT adopted (`docs/reports/oep-002-2026-09-29.md`).
 The file SHOULD stay below ~1,500 tokens for the `core` profile. Each statement
 in sections 3–6 is prefixed with its assertion level in brackets.
 

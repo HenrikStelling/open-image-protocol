@@ -1,7 +1,7 @@
 """Generate context.md, the natural-language reference file, from a manifest (fixed template, section 6 of the spec)."""
 from __future__ import annotations
 
-TEMPLATE_VERSION = "0.2"
+TEMPLATE_VERSION = "0.2.1"   # 0.2.1 (2026-09-29, OEP-002): the estimation caution in "How to read" is on by default (D-031)
 
 
 def _fmt(v, unit=""):
@@ -56,13 +56,16 @@ def _verification_cues(m: dict, fam: str, el: dict, geo: dict, acq: dict) -> lis
 
 
 def build_context(m: dict, include_external: bool = False, verification_cues: bool = False, low_confidence_guard: bool = False,
-                  estimation_caution: bool = False) -> str:
+                  estimation_caution: bool | None = None) -> str:
     """include_external=False (default, OEP-001): external labels/report text stay in oip.json and are not rendered.
-    low_confidence_guard=True (OEP-002 draft, 2026-09-29; off until measured): when the calibration confidence is `low`, the scale
-    statement and self-check item 3 tell the model not to derive millimetres from the nominal spacing and to use the measurements
-    table or pixels/ratios instead. estimation_caution=True (OEP-002 variant b): a caution that quantities absent from the table
-    should be judged visually, not computed from self-estimated pixel coordinates. Evidence: on NIH (dataset-derived spacing,
-    confidence low) the L0-L2 file lowered gpt-5.6-terra from 57 to 42 % and glm-5.3-flash from 61 to 43 % gating accuracy.
+    estimation_caution (OEP-002, adopted as template 0.2.1 on 2026-09-29, D-031; None = template default, i.e. on): one line in
+    "How to read" saying that a quantity absent from the measurements table is judged from the picture as a ratio, not computed
+    from self-estimated pixel coordinates. Measured on NIH-50 (`docs/reports/oep-002-2026-09-29.md`): it repairs the L0-L2 CTR
+    drop on the three Ollama models that show it (glm 26 → 50 %, minimax 32 → 50 %, MedGemma 10 → 18 %) and moves nothing else;
+    pass False to render the 0.2 wording (the benchmark's legacy conditions do).
+    low_confidence_guard=True (OEP-002 variant a, NOT adopted, D-031): when the calibration confidence is `low`, the scale
+    statement and self-check item 3 tell the model not to derive millimetres from the nominal spacing. Measured: three models
+    comply fully and lose every correct answer, three comply partly and lose accuracy without abstaining, one ignores it.
     verification_cues=True (OEP-003/OEP-004, template 0.3 draft; off by default until the benchmark has measured it): every
     [inferred] or [external] statement about orientation, view and scale carries a pixel cue to check it against, a 'How to
     use this file' section asks for that check, and the self-check gains items that can be answered only from the image."""
@@ -143,7 +146,7 @@ def build_context(m: dict, include_external: bool = False, verification_cues: bo
                      "Do NOT derive sizes in millimetres from it yourself. If a size in mm is listed under `Computed measurements`, report that value; otherwise give sizes in pixels or as ratios and say that no calibrated scale is available.")
     else:
         L.append("- Scale [unknown]: NO pixel spacing is available. Do not state sizes in mm or cm; use pixels or ratios only.")
-    if estimation_caution:
+    if estimation_caution is None or estimation_caution:
         L.append("- Estimating from the image: for a quantity that is not listed under `Computed measurements`, judge it directly from the picture (a ratio or a size relative to the thorax); "
                  "do not compute it from pixel coordinates you estimate yourself, because such coordinate estimates are unreliable.")
     L.append(f"- Pixel values: {inten['bits_stored']}-bit stored, units `{inten['units']}`; window for the canonical render: {inten['voi'].get('source')}"

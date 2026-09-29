@@ -12,9 +12,11 @@ def _low():
     return m
 
 
-def test_default_unchanged():
+def test_defaults_after_d031():
+    # template 0.2.1: the estimation caution is on by default (adopted), the guard stays off (not adopted); False renders 0.2
     t = build_context(_low())
-    assert "LOW-CONFIDENCE SCALE" not in t and "Estimating from the image" not in t
+    assert "LOW-CONFIDENCE SCALE" not in t and "Estimating from the image" in t
+    assert "Estimating from the image" not in build_context(_low(), estimation_caution=False)
 
 
 def test_guard_only_when_low():
