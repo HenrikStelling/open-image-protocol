@@ -14,8 +14,19 @@ MODELS = {"claude": ("anthropic", "claude-sonnet-5"), "gpt": ("openai", "gpt-5.6
 # $ per 1M tokens (input, output) for the cost estimate; Anthropic from the current price table, others approximate.
 PRICES = {"claude": (2.0, 10.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   # $/1M tokens (in, out), Sep 2026 price pages
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
-OLLAMA_THINK = False
-SYSTEM = "You are assisting with medical image understanding for a benchmark. Answer the question only, briefly, with no disclaimers. This is not clinical use."
+OLLAMA_THINK = False          # set from --ollama-think (off | on | auto); see _call()
+OLLAMA_THINK_MODE = "off"
+_NO_THINK: dict[str, bool] = {}   # models that rejected think=true in 'auto' mode (per process)
+
+
+def _compose_reply(content: str, thinking: str) -> tuple[str, str]:
+    """Store separately returned reasoning in front of the answer as <think>…</think>, the form visible-reasoning models
+    emit themselves, so bench/score.py's _tail() scores the answer alone and audits can still read the reasoning."""
+    thinking = (thinking or "").strip()
+    return (f"<think>{thinking}</think>{content}" if thinking else content), thinking
+
+
+SYSTEM ="You are assisting with medical image understanding for a benchmark. Answer the question only, briefly, with no disclaimers. This is not clinical use."
 # Verification ablation (OEP-003/004, 2026-09-26): the *_instr conditions append this one sentence to the system prompt.
 VERIFY_INSTR = " Before using any statement in the reference file that is marked [inferred] or [external], check it against the image; if the image disagrees, say so instead of repeating the statement."
 
@@ -194,9 +205,15 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
         import urllib.request
         base = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
         if not base.startswith("http"): base = "http://" + base
-        # reasoning models spend the output budget inside 'thinking'; keep it generous and let --ollama-think decide
-        body = {"model": model, "stream": False, "think": OLLAMA_THINK, "messages": [{"role": "system", "content": system}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
-                "options": {"num_predict": 1600 if OLLAMA_THINK else 800}}
+        # Thinking (2026-09-29, OEP-002 readout): with think=false, glm-5.3-flash still reasons inside `content` and closes it
+        # with </think>; at num_predict 800 that reasoning is cut off before the answer in up to 57/82 replies of a cell
+        # (paper runs, L0-L2 heart width). With think=true the daemon returns the reasoning in message.thinking and the
+        # answer alone in content. --ollama-think on|auto turns that on ('auto' falls back to think=false for models that
+        # reject the field); the reply is then stored as "<think>…</think>" + answer so the scorer's _tail() rule applies
+        # unchanged, and usage records done_reason ("length" = output cap reached), num_predict and thinking_chars.
+        think = OLLAMA_THINK and not _NO_THINK.get(model, False)
+        body = {"model": model, "stream": False, "think": think, "messages": [{"role": "system", "content": system}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
+                "options": {"num_predict": 1600 if think else 800}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
         last = None
         for attempt in range(5):                       # cloud 502s/timeouts are transient; back off 5/15/45/135 s
@@ -204,10 +221,16 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
                 t0 = time.time()
                 with urllib.request.urlopen(req, timeout=180) as r:
                     d = json.load(r)
-                    return d["message"]["content"], {"input_tokens": d.get("prompt_eval_count"), "output_tokens": d.get("eval_count"), "latency_s": round(time.time() - t0, 2)}
+                    reply, thinking = _compose_reply(d["message"].get("content") or "", d["message"].get("thinking") or "")
+                    return reply, {"input_tokens": d.get("prompt_eval_count"), "output_tokens": d.get("eval_count"), "latency_s": round(time.time() - t0, 2),
+                                   "done_reason": d.get("done_reason"), "think": think, "num_predict": body["options"]["num_predict"], "thinking_chars": len(thinking)}
             except Exception as e:                     # noqa: BLE001
                 last = e
                 msg = str(e)
+                if think and OLLAMA_THINK_MODE == "auto" and "400" in msg:
+                    # the daemon answers HTTP 400 for models without the thinking capability: remember it and retry without
+                    _NO_THINK[model] = True
+                    return _call(provider, model, text, images, system)
                 if not ("timed out" in msg or "502" in msg or "503" in msg or "504" in msg or "429" in msg):
                     raise
                 time.sleep([5, 15, 45, 135, 300][min(attempt, 4)])   # sporadic failures cost seconds; sustained ones escalate
@@ -254,12 +277,12 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", action="store_true", help="let Ollama reasoning models think (slower; default off)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", nargs="?", const="on", default="off", choices=["off", "on", "auto"], help="Ollama think field: off (default; glm then reasons inside content and can hit the 800-token cap), on (think=true, num_predict 1600, reasoning stored as <think>…</think>), auto (on, per-model fallback when the daemon rejects it)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks")
     ap.add_argument("--no-cloud-lock", action="store_true", help="skip the shared one-cloud-model-at-a-time lock (bench/cloudlock.py); only for diagnostics"); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
-    global OLLAMA_THINK; OLLAMA_THINK = a.ollama_think
+    global OLLAMA_THINK, OLLAMA_THINK_MODE; OLLAMA_THINK_MODE = a.ollama_think; OLLAMA_THINK = a.ollama_think != "off"
     labels = vindr_labels() if a.dataset == "vindr" else None
     conds = a.conditions.split(","); models = a.models.split(",")
     commit = harness_commit()
@@ -282,7 +305,7 @@ def main():
             (run / "run_meta.json").write_text(json.dumps({"harness_commit": commit, "scorer": SCORER_VERSION, "dataset": a.dataset, "pkg_dir": a.pkg_dir,
                                                            "n": a.n, "seed": a.seed, "models": models, "model_ids": {m: MODELS.get(m) for m in models}, "conditions": conds,
                                                            "tasks_filter": a.tasks, "system_prompt": SYSTEM, "verify_instruction": VERIFY_INSTR if any(c.endswith("_instr") for c in conds) else None,
-                                                           "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
+                                                           "ollama_think": OLLAMA_THINK_MODE, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))

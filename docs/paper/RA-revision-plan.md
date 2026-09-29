@@ -134,3 +134,26 @@ For scintigraphy we used a public whole-body bone-scan collection [17] of 16-bit
 `ingest` (unverändert) → `analysis_oip` → `reconcile` (die neuen Felder sind nicht Teil des Scoreboard-Abgleichs, Abgleich muss weiter 0 unexplained zeigen) → `citations_oip --top 30` (neue Einträge prüfen; Standards-Seiten bleiben flagged) → `build` → `audit_oip` (eval, claim, citation) → Peer-Review-Handoff mit denselben eingefrorenen Items plus Tabelle 1. Deliverable erneut `manuscript_oip_revised.{md,docx,html}`; anschließend `PROTOCOL_oip.md` und `results.json` nach `~/oip-work/docs/paper/` kopieren (Runbook Phase I) und dort `manuscript-draft.md` als „superseded by the RA revision" markieren.
 
 Nicht Teil dieses Plans, sondern der Benchmark-Todos in `PLAN.md` (Phase 3b): Scorer-Korrekturen, neue Wahrnehmungs-Tasks, entkonfundierter Misleading-Test, Bone-Scan-Sampling, Mehrfachantworten. Diese verändern Zahlen und gehören in eine zweite Benchmark-Runde, nicht in die Revision dieses Papers.
+
+## G. Nachtrag 2026-09-29: Amendment 12 — Output-Cap-Abschneidung bei glm-5.3-flash (Limitation, keine Zahl ändert sich)
+
+Befund (OIP-Session, `docs/reports/oep-002-2026-09-29.md`, Abschnitt „Paper-run truncation"): glm-5.3-flash ist das einzige Modell, das sein Reasoning sichtbar im Antworttext führt und mit `</think>` abschließt, auch bei `think=false`. Der Harness begrenzt Ollama-Antworten auf 800 Tokens (`num_predict`). In den L0–L2-Zellen wird das Reasoning vor der Antwort abgeschnitten, und der Scorer liest dann eine Zahl aus dem abgeschnittenen Text:
+
+| Set | Task | Bedingung | n | korrekt (alle Zeilen) | abgeschnitten | korrekt (vollständige Zeilen) |
+|---|---|---|---|---|---|---|
+| VinDr-100 | CTR | raw | 100 | 50 % | 4 | 52 % (n = 96) |
+| VinDr-100 | CTR | L0–L2 | 100 | 28 % | 33 | 39 % (n = 67) |
+| VinDr-100 | Herzbreite | raw | 82 | 40 % | 7 | 44 % (n = 75) |
+| VinDr-100 | Herzbreite | L0–L2 | 82 | 26 % | 57 | 40 % (n = 25) |
+| NIH-50 | CTR | raw | 50 | 54 % | 4 | 59 % (n = 46) |
+| NIH-50 | CTR | L0–L2 | 50 | 26 % | 20 | 40 % (n = 30) |
+| NIH-50 | Herzbreite | raw | 50 | 42 % | 4 | 46 % (n = 46) |
+| NIH-50 | Herzbreite | L0–L2 | 50 | 40 % | 13 | 43 % (n = 37) |
+
+Volle-Datei- und Annotations-Zellen: 0 abgeschnitten. Kategoriale Tasks: 0 abgeschnitten. Kein anderes Modell betroffen (keine `</think>`-Tags, kurze Ausgaben). Die Zahlen oben sind Scorer 0.3 (RA-Paper führt 0.2; die Richtung ist dieselbe).
+
+Umsetzung in der RA-Fassung:
+1. **PROTOCOL_oip.md, Amendment 12:** „2026-09-29 — post-hoc limitation, no cell changed: glm-5.3-flash replies in the L0–L2 arm were cut off by the harness output cap (800 tokens) inside visible reasoning in 33/100 (VinDr CTR), 57/82 (VinDr cardiac width), 20/50 and 13/50 (NIH) rows; the scorer read a number from the truncated text. On complete rows the L0–L2 drop remains (VinDr CTR 52 → 39 %, NIH 59 → 40 %) but is smaller. Detected in the OEP-002 readout; the harness now records `done_reason` per row and can route reasoning to a separate field."
+2. **§5.3 / §6 (L0–L2-Absatz):** den Satz „glm computed widths from its own pixel estimates" ergänzen um: „…and in a third to two thirds of its L0–L2 replies was cut off by the harness's output cap before answering, so its L0–L2 cells combine a real drop with a truncation artefact (Amendment 12)". gpt ist nicht betroffen (kein sichtbares Reasoning); der gpt-Befund (57 → 42) bleibt wie er ist.
+3. **§7 Limitations:** ein Satz zur Output-Cap-Abschneidung als Harness-Limitation, nur glm, nur numerische Tasks unter L0–L2.
+4. Kein Re-Scoring, kein Re-Run für die Revision (Korrektheitsregel unverändert; ein glm-Wiederholungslauf mit `think=true` gehört in Runde 3).

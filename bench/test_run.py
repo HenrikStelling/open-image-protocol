@@ -79,3 +79,14 @@ def test_no_conflict_tasks_without_a_clear_cue(tmp_path):
     import shutil, tasks
     src = ROOT / "spec/examples/synthetic-dx-chest.oip"; pkg = tmp_path / "0123456789ab.oip"; shutil.copytree(src, pkg)
     assert not [t for t in tasks.tasks_for_package(pkg) if t["type"] == "orient_conflict"]   # no heart mask -> no cue -> no trial
+
+
+def test_separately_returned_thinking_is_stored_in_front_of_the_answer_and_not_scored():
+    # think=true: the daemon returns reasoning in message.thinking; the row keeps it as <think>…</think> + answer (the form
+    # glm emits itself with think=false), so score._tail() scores the answer alone.
+    from score import score
+    reply, thinking = run._compose_reply("**0.41**", "CTR = 350/850 = 0.41")
+    assert reply == "<think>CTR = 350/850 = 0.41</think>**0.41**" and thinking == "CTR = 350/850 = 0.41"
+    assert run._compose_reply("**0.41**", "") == ("**0.41**", "")
+    task = {"type": "ctr", "answer": 0.55, "tolerance": 0.05}
+    assert score(task, run._compose_reply("**0.55**", "first 350/850 = 0.41, no, 0.55")[0])["value"] == 0.55
