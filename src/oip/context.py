@@ -55,8 +55,14 @@ def _verification_cues(m: dict, fam: str, el: dict, geo: dict, acq: dict) -> lis
     return out
 
 
-def build_context(m: dict, include_external: bool = False, verification_cues: bool = False) -> str:
+def build_context(m: dict, include_external: bool = False, verification_cues: bool = False, low_confidence_guard: bool = False,
+                  estimation_caution: bool = False) -> str:
     """include_external=False (default, OEP-001): external labels/report text stay in oip.json and are not rendered.
+    low_confidence_guard=True (OEP-002 draft, 2026-09-29; off until measured): when the calibration confidence is `low`, the scale
+    statement and self-check item 3 tell the model not to derive millimetres from the nominal spacing and to use the measurements
+    table or pixels/ratios instead. estimation_caution=True (OEP-002 variant b): a caution that quantities absent from the table
+    should be judged visually, not computed from self-estimated pixel coordinates. Evidence: on NIH (dataset-derived spacing,
+    confidence low) the L0-L2 file lowered gpt-5.6-terra from 57 to 42 % and glm-5.3-flash from 61 to 43 % gating accuracy.
     verification_cues=True (OEP-003/OEP-004, template 0.3 draft; off by default until the benchmark has measured it): every
     [inferred] or [external] statement about orientation, view and scale carries a pixel cue to check it against, a 'How to
     use this file' section asks for that check, and the self-check gains items that can be answered only from the image."""
@@ -132,8 +138,14 @@ def build_context(m: dict, include_external: bool = False, verification_cues: bo
         L.append(f"- Scale [{'measured' if geo['spacing_source']!='dataset_metadata' else 'external'}]: {sp[0]:g} × {sp[1]:g} mm per pixel (row × column), source `{geo['spacing_source']}`, valid in the {cal['plane']} plane, confidence {cal['confidence']}. Image extent ≈ {geo['physical_extent_mm'][0]:.0f} × {geo['physical_extent_mm'][1]:.0f} mm (height × width)."
                  + (" Anatomy is magnified relative to the detector; absolute sizes may be over-estimated by roughly 5–10 % unless corrected." if cal["plane"] == "detector" and fam == "projection_radiography" else "")
                  + (" Planar gamma-camera images have no geometric magnification, but resolution is coarse (several mm) and the pixel size here is not from the header." if fam == "scintigraphy" and geo["spacing_source"] in ("dataset_metadata",) else ""))
+        if low_confidence_guard and cal.get("confidence") == "low":
+            L.append("- LOW-CONFIDENCE SCALE: the spacing above is nominal (dataset documentation or an uncalibrated tag, not a calibrated header value) and may be wrong by a large factor. "
+                     "Do NOT derive sizes in millimetres from it yourself. If a size in mm is listed under `Computed measurements`, report that value; otherwise give sizes in pixels or as ratios and say that no calibrated scale is available.")
     else:
         L.append("- Scale [unknown]: NO pixel spacing is available. Do not state sizes in mm or cm; use pixels or ratios only.")
+    if estimation_caution:
+        L.append("- Estimating from the image: for a quantity that is not listed under `Computed measurements`, judge it directly from the picture (a ratio or a size relative to the thorax); "
+                 "do not compute it from pixel coordinates you estimate yourself, because such coordinate estimates are unreliable.")
     L.append(f"- Pixel values: {inten['bits_stored']}-bit stored, units `{inten['units']}`; window for the canonical render: {inten['voi'].get('source')}"
              + (f" (center {inten['voi'].get('center'):g}, width {inten['voi'].get('width'):g})" if inten['voi'].get('center') is not None else "")
              + (f" (range {inten['voi'].get('lower'):.4g}–{inten['voi'].get('upper'):.4g})" if inten['voi'].get('lower') is not None else "") + ".")
@@ -225,7 +237,11 @@ def build_context(m: dict, include_external: bool = False, verification_cues: bo
     else:
         L.append(f"1. Which anatomical side is on the image's left edge? → {el.get('left') or 'unknown'}")
     L.append(f"2. What is the modality? → {mod}")
-    L.append(f"3. Can sizes be given in mm? → {'yes, ' + str(geo['pixel_spacing_mm'][1]) + ' mm/px (column)' if geo['pixel_spacing_mm'] else 'no'}")
+    if low_confidence_guard and geo["pixel_spacing_mm"] and geo["calibration"].get("confidence") == "low":
+        has_mm = any(x.get("unit") == "mm" for x in ((m.get("derived") or {}).get("measurements") or []))
+        L.append("3. Can sizes be given in mm? → " + ("only the values listed under `Computed measurements` (spacing confidence low); do not compute mm yourself" if has_mm else "no (the spacing is nominal, confidence low); use pixels or ratios"))
+    else:
+        L.append(f"3. Can sizes be given in mm? → {'yes, ' + str(geo['pixel_spacing_mm'][1]) + ' mm/px (column)' if geo['pixel_spacing_mm'] else 'no'}")
     L.append(f"4. Is bright = high {'counts' if fam=='scintigraphy' else 'attenuation'} in the canonical render? → yes")
     if verification_cues and el.get("left") in ("L", "R"):
         # OEP-004: items 5 and 6 have no answer in this file; they are answered from the image and compared with item 1.

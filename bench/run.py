@@ -35,7 +35,8 @@ def harness_commit() -> str:
         return "unknown"
 
 
-def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None = None, cues: bool = False, flip_labels: bool = False) -> str:
+def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None = None, cues: bool = False, flip_labels: bool = False,
+         guard: bool = False, est: bool = False) -> str:
     """Render the reference file from the manifest. strip_measurements -> layers L0-L2 only (no computed measurements, no regions);
     external_text -> rendered through the shipped template (cautions first, unverified wording), i.e. what `--with-external` shows;
     cues -> template 0.3 draft with verification cues and the pixel-based self-check items (OEP-003/004);
@@ -55,7 +56,7 @@ def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None 
             fe = fr.get("edge_labels") or {}
             if fe: fe["left"], fe["right"] = fe.get("right"), fe.get("left")
         m["quality"]["checks"] = [c for c in m["quality"].get("checks", []) if c.get("id") != "orientation_pixel_check"]   # a stale tool verdict would give the swap away
-    return build_context(m, include_external=external_text is not None, verification_cues=cues)
+    return build_context(m, include_external=external_text is not None, verification_cues=cues, low_confidence_guard=guard, estimation_caution=est)
 
 
 CONDITIONS = {
@@ -77,6 +78,12 @@ CONDITIONS = {
     "annot_only":   "annotated render only, question refers to the printed edge labels (no file)",
     "insp_ctx":     "inspection sheet (1536 px, 96 px R/L badges, heart inset, mm ruler) + full context.md",
     "insp_only":    "inspection sheet only, question refers to the printed edge labels (no file)",
+    # OEP-002 ablation (2026-09-29): low-confidence spacing. Same-day controls plus the L0-L2 file with the guard wording (a) and with
+    # the guard plus the estimation caution (b); NIH-50, tasks ctr / heart_mm / left_edge
+    "raw_ctl":      "identical to raw; same-day control for the OEP-002 ablation",
+    "ctx_l1_ctl":   "identical to ctx_l1; same-day control for the OEP-002 ablation",
+    "ctx_l1_oep2":  "canonical PNG + L0-L2 file with the OEP-002 low-confidence-scale guard (do not derive mm from a low-confidence spacing)",
+    "ctx_l1_oep2e": "canonical PNG + L0-L2 file with the OEP-002 guard and the estimation caution (judge unlisted quantities visually, not from self-estimated pixel coordinates)",
 }
 RENDER_CACHE = ROOT / "bench/results/_render_cache"   # bench artefacts live outside the packages (git-ignored with results/)
 
@@ -105,7 +112,8 @@ def _variant(pkg: Path, kind: str, flipped: bool) -> bytes:
     f.parent.mkdir(parents=True, exist_ok=True); im.save(f)
     return f.read_bytes()
 DEFAULT_CONDITIONS = "raw,ctx_l1,ctx,annot,misled_plain,misled_oip"
-BASE_CONDITION = {"ctx_ctl": "ctx", "ctx_cue": "ctx", "ctx_instr": "ctx", "ctx_cue_instr": "ctx"}   # task applicability follows the base
+BASE_CONDITION = {"ctx_ctl": "ctx", "ctx_cue": "ctx", "ctx_instr": "ctx", "ctx_cue_instr": "ctx",
+                  "raw_ctl": "raw", "ctx_l1_ctl": "ctx_l1", "ctx_l1_oep2": "ctx_l1", "ctx_l1_oep2e": "ctx_l1"}   # task applicability follows the base
 
 
 def applies(task: dict, condition: str) -> bool:
@@ -129,11 +137,13 @@ def _flipped(pkg: Path) -> bytes:
 def build_prompt(task: dict, condition: str) -> tuple[str, list[tuple[str, bytes]]]:
     pkg = Path(task["pkg"]); canon = ("image/png", _flipped(pkg) if task.get("flipped") else (pkg / "renders/canonical.png").read_bytes())
     q = task["question"]; wrong = task.get("misleading_label", "Cardiomegaly")
-    if condition == "raw":
+    if condition in ("raw", "raw_ctl"):
         return q, [canon]
     fl = bool(task.get("text_flipped"))   # round-3 conflict trials: the file's edge labels swapped
-    if condition == "ctx_l1":
+    if condition in ("ctx_l1", "ctx_l1_ctl"):
         return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, strip_measurements=True, flip_labels=fl) + "\n\nQuestion: " + q, [canon]
+    if condition in ("ctx_l1_oep2", "ctx_l1_oep2e"):
+        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, strip_measurements=True, flip_labels=fl, guard=True, est=condition.endswith("e")) + "\n\nQuestion: " + q, [canon]
     if condition in ("ctx", "ctx_ctl", "ctx_instr"):
         return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, flip_labels=fl) + "\n\nQuestion: " + q, [canon]   # rendered from the manifest with the current template
     if condition in ("ctx_cue", "ctx_cue_instr"):
