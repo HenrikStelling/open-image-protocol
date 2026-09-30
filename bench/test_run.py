@@ -158,15 +158,17 @@ def test_prompt_hash_identifies_what_was_sent():
     assert len({a, run.prompt_sha256("s", "t", [("image/png", b"y")]), run.prompt_sha256("s", "u", [("image/png", b"x")]), run.prompt_sha256("z", "t", [("image/png", b"x")])}) == 4
 
 
-def test_think_auto_only_for_models_that_reason_inside_content(monkeypatch):
+def test_think_policy_and_output_caps(monkeypatch):
     monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "auto"); monkeypatch.setattr(run, "_NO_THINK", {})
-    assert run._think_for("glm-5.3-flash:cloud") and not run._think_for("kimi-k3:cloud") and not run._think_for("gemma4:e4b-it-qat")
+    # auto: nobody thinks (the paper's setting); models that reason inside content get the larger output cap
+    assert not run._think_for("glm-5.3-flash:cloud") and not run._think_for("kimi-k3:cloud")
+    assert run._num_predict("glm-5.3-flash:cloud", False) == 2400 and run._num_predict("kimi-k3:cloud", False) == 800
     monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "on")
-    assert run._think_for("kimi-k3:cloud")
+    assert run._think_for("kimi-k3:cloud") and run._num_predict("kimi-k3:cloud", True) == 4000
     monkeypatch.setattr(run, "_NO_THINK", {"kimi-k3:cloud": True})
-    assert not run._think_for("kimi-k3:cloud")
+    assert not run._think_for("kimi-k3:cloud") and run._num_predict("kimi-k3:cloud", False) == 800
     monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "off")
-    assert not run._think_for("glm-5.3-flash:cloud")
+    assert not run._think_for("glm-5.3-flash:cloud") and run._num_predict("glm-5.3-flash:cloud", False) == 800   # paper runs
 
 
 def test_misleading_label_is_stable_across_processes(tmp_path, monkeypatch):

@@ -16,16 +16,26 @@ PRICES = {"claude": (2.0, 10.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   #
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 OLLAMA_THINK = False          # set from --ollama-think (off | on | auto); see _call()
 OLLAMA_THINK_MODE = "off"
-# Models that reason inside `content` even with think=false (the reasoning then eats the output cap): in 'auto' mode only these
-# get think=true, so every other model keeps the setting the paper runs used.
+# Models that reason inside `content` even with think=false (the reasoning then eats the output cap). In 'auto' mode (default
+# since round 3) every model keeps think=false, the paper runs' setting, and these models get a three times larger output cap so
+# the visible reasoning can finish. think=true was measured on glm-5.3-flash on 2026-09-30 and rejected as the default: it
+# switches the model into a long deliberation (median 1,600 output tokens on a two-word question, 11 of 20 replies cut off at a
+# 1,600-token cap, ~12 s per call), i.e. a different operating mode, not the paper's mode without the truncation.
 THINK_IN_CONTENT = ("glm-",)
+NUM_PREDICT = {"default": 800, "in_content": 2400, "think": 4000}
 _NO_THINK: dict[str, bool] = {}   # models that rejected think=true in 'auto' mode (per process)
 
 
 def _think_for(model: str) -> bool:
-    """think=true for every model in 'on' mode, only for THINK_IN_CONTENT models in 'auto' mode; never for a model that rejected it."""
-    want = OLLAMA_THINK_MODE == "on" or (OLLAMA_THINK_MODE == "auto" and model.startswith(THINK_IN_CONTENT))
-    return want and not _NO_THINK.get(model, False)
+    """think=true only in 'on' mode, and never for a model that rejected the field."""
+    return OLLAMA_THINK_MODE == "on" and not _NO_THINK.get(model, False)
+
+
+def _num_predict(model: str, think: bool) -> int:
+    """Output cap: 4,000 with think=true; in 'auto' mode 2,400 for models that reason inside content; otherwise 800 (paper runs)."""
+    if think:
+        return NUM_PREDICT["think"]
+    return NUM_PREDICT["in_content"] if OLLAMA_THINK_MODE == "auto" and model.startswith(THINK_IN_CONTENT) else NUM_PREDICT["default"]
 
 
 def _compose_reply(content: str, thinking: str) -> tuple[str, str]:
@@ -280,12 +290,13 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
         # Thinking (2026-09-29, OEP-002 readout): with think=false, glm-5.3-flash still reasons inside `content` and closes it
         # with </think>; at num_predict 800 that reasoning is cut off before the answer in up to 57/82 replies of a cell
         # (paper runs, L0-L2 heart width). With think=true the daemon returns the reasoning in message.thinking and the
-        # answer alone in content. --ollama-think on|auto turns that on ('auto' falls back to think=false for models that
-        # reject the field); the reply is then stored as "<think>…</think>" + answer so the scorer's _tail() rule applies
-        # unchanged, and usage records done_reason ("length" = output cap reached), num_predict and thinking_chars.
+        # answer alone in content. --ollama-think on turns that on (falling back to think=false for models that reject the
+        # field); the reply is then stored as "<think>…</think>" + answer so the scorer's _tail() rule applies unchanged.
+        # --ollama-think auto (default) keeps think=false and raises the output cap for such models instead (_num_predict).
+        # usage records done_reason ("length" = output cap reached), num_predict, think and thinking_chars in every mode.
         think = _think_for(model)
         body = {"model": model, "stream": False, "think": think, "messages": [{"role": "system", "content": system}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
-                "options": {"num_predict": 1600 if think else 800}}
+                "options": {"num_predict": _num_predict(model, think)}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
         last = None
         for attempt in range(5):                       # cloud 502s/timeouts are transient; back off 5/15/45/135 s
@@ -349,7 +360,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", nargs="?", const="on", default="auto", choices=["off", "on", "auto"], help="Ollama think field: auto (default since round 3: think=true only for models that reason inside content regardless, i.e. glm; reasoning stored as <think>…</think>, num_predict 1600), on (every model, falling back per model when the daemon rejects the field), off (the paper runs' setting)"); ap.add_argument("--repeats", type=int, default=1, help="replies per (model, condition, task); rows carry rep = 0..N-1, and --resume with a larger N adds the missing replies"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", nargs="?", const="on", default="auto", choices=["off", "on", "auto"], help="Ollama thinking: auto (default since round 3: think=false for every model; models that reason inside content, i.e. glm, get a 2,400-token output cap instead of 800), off (the paper runs' setting: think=false, 800 tokens for all), on (think=true with a 4,000-token cap, reasoning stored as <think>…</think>, per-model fallback when the daemon rejects the field)"); ap.add_argument("--repeats", type=int, default=1, help="replies per (model, condition, task); rows carry rep = 0..N-1, and --resume with a larger N adds the missing replies"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks")
     ap.add_argument("--no-cloud-lock", action="store_true", help="skip the shared one-cloud-model-at-a-time lock (bench/cloudlock.py); only for diagnostics"); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
