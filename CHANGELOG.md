@@ -13,7 +13,7 @@ All notable changes to the specification, the reference implementation and the b
 
 ## 0.2.0 (2026-09-29): the state of the paper, its audits and the first benchmark-driven revisions
 
-Frozen benchmark replies and packages for this version: https://doi.org/10.5281/zenodo.23040047
+Source code of this release: https://doi.org/10.5281/zenodo.23052075 · frozen benchmark replies and packages: https://doi.org/10.5281/zenodo.23040047
 
 ### Specification and reference file
 - OEP-001 / D-027: external labels and report text are omitted from `context.md` by default; when requested, cautions precede them and they carry unverified-label wording (template 0.2). Evidence: the benchmark's misleading-text test.

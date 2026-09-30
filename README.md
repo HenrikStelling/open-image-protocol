@@ -270,7 +270,8 @@ archived on Zenodo as the release bundle built by
 bone-scan packages, manifests and reference files of the VinDr packages (whose images
 are Kaggle competition data and are not redistributed), and a sha256 manifest of every
 file including the ones not bundled, so a rebuild can be verified. Zenodo:
-https://doi.org/10.5281/zenodo.23040047 (v0.2.0 bundle). The analysis plan and the results file of the paper are in
+https://doi.org/10.5281/zenodo.23040047 (v0.2.0 bundle). The source code of the same
+release is archived at https://doi.org/10.5281/zenodo.23052075. The analysis plan and the results file of the paper are in
 [docs/paper/](docs/paper/); the scoring is deterministic and re-runnable
 ([REPRODUCE.md](REPRODUCE.md), level B).
 
