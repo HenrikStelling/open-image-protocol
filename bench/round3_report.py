@@ -8,7 +8,10 @@ Conflict cells per image (file labels True/Wrong x image Normal/Mirrored): TN, T
   comparing policy  (file against pixels):        agree, mirrored, mirrored, agree   -> 100 %
   text-only policy  (trust the file, never look):  agree, agree,    agree,    agree   ->  50 %
   pixel-only policy (judge the image by the display convention, ignore the file): agree, mirrored, agree, mirrored -> 50 %
-so the three are separable per image from the four verdicts."""
+  file-vs-convention policy (call 'mirrored' when the FILE states the unconventional side, never look at the pixels):
+                                                   agree, agree,    mirrored, mirrored -> 50 %
+so the four are separable per image from the four verdicts. On the paper's flip check (true-file cells only) the last policy
+is indistinguishable from 'always agree', and the pixel-only policy from comparing."""
 from __future__ import annotations
 import argparse, json, sys
 from collections import Counter, defaultdict
@@ -19,7 +22,9 @@ from score import score                                                # noqa: E
 
 CELLS = ("TN", "TM", "WN", "WM")
 POLICY = {("agree", "mirrored", "mirrored", "agree"): "compares file and image", ("agree", "agree", "agree", "agree"): "text only (always agree)",
-          ("agree", "mirrored", "agree", "mirrored"): "pixels only (ignores the file)", ("mirrored", "mirrored", "mirrored", "mirrored"): "always mirrored"}
+          ("agree", "mirrored", "agree", "mirrored"): "pixels only (ignores the file)", ("agree", "agree", "mirrored", "mirrored"): "file vs convention (ignores the pixels)",
+          ("mirrored", "mirrored", "mirrored", "mirrored"): "always mirrored"}
+POLICIES = ("compares file and image", "text only (always agree)", "pixels only (ignores the file)", "file vs convention (ignores the pixels)", "always mirrored", "other")
 
 
 def verdict(reply: str) -> str | None:
@@ -67,7 +72,7 @@ def main() -> None:
 
     # ---- 1. conflict cells
     L += ["## 1. Orientation conflict trials (file labels true/wrong × image normal/mirrored)", "",
-          "| model | render | TN | TM | WN | WM | all four cells | images: compares / text only / pixels only / always mirrored / other |", "|---|---|---|---|---|---|---|---|"]
+          "| model | render | TN | TM | WN | WM | all four cells | images: compares / text only / pixels only / file vs convention / always mirrored / other |", "|---|---|---|---|---|---|---|---|"]
     pol_rows = {}
     for m in models:
         for c, name in (("ctx3", "canonical"), ("ctx3_mask", "marker-masked")):
@@ -79,8 +84,9 @@ def main() -> None:
             pol = Counter(POLICY.get(tuple(v.get(x) for x in CELLS), "other") for v in per_img.values() if len(v) == 4)
             pol_rows[(m, c)] = pol; K, N = sum(k.values()), sum(n.values())
             L.append(f"| {m.split('/', 1)[-1]} | {name} | " + " | ".join(pct(k[x], n[x]) for x in CELLS) + f" | {pct(K, N)} | "
-                     + " / ".join(str(pol.get(p, 0)) for p in ("compares file and image", "text only (always agree)", "pixels only (ignores the file)", "always mirrored", "other")) + f" (of {sum(pol.values())}) |")
-    L += ["", "Chance for the four-cell total is 50 % under either single-source policy; only comparing scores above it on every cell.", ""]
+                     + " / ".join(str(pol.get(p, 0)) for p in POLICIES) + f" (of {sum(pol.values())}) |")
+    L += ["", "Cells: T/W = the file's edge labels are true / swapped; N/M = the image is normal / mirrored; 'agree' is right in TN and WM. "
+          "Every single-source policy scores 50 % on the four cells; only comparing file and image is right on all of them.", ""]
 
     # ---- 2. mask effect (paired)
     L += ["## 2. Does removing the burned-in side marker change the verdicts? (canonical vs marker-masked, paired items)", "",
