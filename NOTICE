@@ -1,0 +1,24 @@
+Open Image Protocol (OIP)
+Copyright 2026 Henrik Stelling
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this software except in compliance with the License. You may obtain a copy of
+the License in the LICENSE file or at http://www.apache.org/licenses/LICENSE-2.0
+
+The specification, documentation and reports (spec/, docs/, README.md,
+REPRODUCE.md, PLAN.md) are licensed under Creative Commons Attribution 4.0
+International, see LICENSE-docs.md.
+
+Third-party material distributed with this software:
+
+- DejaVu Sans (src/oip/fonts/DejaVuSans.ttf), used for the labels of annotated
+  renders. Fonts are (c) Bitstream; DejaVu changes are in the public domain;
+  glyphs imported from Arev fonts are (c) Tavmjong Bah. Licence text:
+  src/oip/fonts/LICENSE_DEJAVU.
+
+- Two example packages under spec/examples/ (pydicom-ct-small, pydicom-mr-small)
+  are derived from the test files shipped with pydicom (MIT licence).
+
+Datasets referenced by the scripts (VinDr-CXR, RSNA Pneumonia, SIIM-ACR,
+NIH ChestX-ray14, the IICS-UNA Paraguay bone scans) are not distributed with
+this software and keep their own licences.
