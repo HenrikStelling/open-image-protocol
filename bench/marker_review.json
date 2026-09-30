@@ -1,0 +1,11 @@
+{
+ "dataset": "vindr-paper (100 packages)",
+ "reviewed": "2026-09-30",
+ "method": "every clear-cue package (85) rendered with run._masked() and read by eye on contact sheets at 400 px per image (assistant session; not a radiologist read). 82 show no burned-in side marker inside the kept box; the three below do and are excluded from round-3 items (ctx3, ctx3_mask). Symmetric ECG electrodes and clips are not side cues and were kept. Small markers below the sheet resolution could have been missed.",
+ "mask": "run.mask_box(): lung-union box, top moved down 15 % of its height, sides +2 % of width, bottom +3 % of height",
+ "excluded": {
+  "6818b9a73dbaf129b63a2848ac1e576f.oip": "side marker 'R' at the lower-left corner inside the kept box",
+  "d79068eb77a5aa51eb57904fbfce1720.oip": "marker fragment at the lower-left corner of the kept box",
+  "f04b3db35749d0bb959a9dbb8e5858c9.oip": "side marker 'R' over the right upper lung field, inside the kept box"
+ }
+}

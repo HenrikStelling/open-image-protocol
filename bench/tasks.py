@@ -1,7 +1,13 @@
 """Build OIP-Bench tasks from converted packages. Each task: {id, pkg, type, question, answer, gating, tolerance}."""
 from __future__ import annotations
-import json, random
+import hashlib, json, random
 from pathlib import Path
+
+# Task-builder version and thresholds, written into run_meta.json (harness provenance, PLAN Phase 3b). 3.0 = round 3 (2026-09-30):
+# badge_read (label-reading control with balanced truth), mark_side also without the region list (annot3_l1), orientation conflict
+# trials on the masked render (ctx3_mask), misleading-label seed from sha256 of the package name (hash() is salted per process).
+TASKS_VERSION = "3.0"
+THRESHOLDS = {"ctr_tolerance_abs": 0.05, "heart_mm_tolerance_rel": 0.10, "clear_cue_min_confidence": 0.9, "clear_cue_min_offset": 0.05}
 
 # Gating (release) tasks: answerable only by reading the image correctly or by using the package's facts about it.
 # 'modality' and 'view' are reported but no longer gate: every model gets them right from pixels alone on frontal CXR.
@@ -39,7 +45,7 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
         pick = [r for r in side_regs if r["id"].endswith(want)] or side_regs
         r0 = pick[0]; cx = (r0["bbox_px"][1] + r0["bbox_px"][3]) / 2; img_side = "left" if cx < g["columns"] / 2 else "right"
         pat = el[img_side]  # anatomical side at that image edge
-        T.append(dict(type="mark_side", question=f"On the annotated image, mark {r0['mark']} lies on which side of the PATIENT? Answer 'patient right' or 'patient left'.", answer="patient right" if pat == "R" else "patient left", conditions=["annot"]))
+        T.append(dict(type="mark_side", question=f"On the annotated image, mark {r0['mark']} lies on which side of the PATIENT? Answer 'patient right' or 'patient left'.", answer="patient right" if pat == "R" else "patient left", conditions=["annot", "annot3", "annot3_l1"]))
     # --- flip consistency: the shown image may be mirrored while the reference file states normal orientation.
     # Two tasks per image (flipped and unflipped) so 'always agree' scores 50 %. Needs the reference file -> ctx conditions only.
     if el.get("left") in ("L", "R"):
@@ -49,28 +55,46 @@ def tasks_for_package(pkg: Path, labels: list[str] | None = None) -> list[dict]:
                           # without the file the "stated orientation" is the printed edge labels, so the question says so (question_labels)
                           question_labels="The image carries printed edge labels stating which patient side is at each edge (R = patient right, L = patient left). Does the anatomy AGREE with the printed labels, or is the image mirrored? Answer 'agree' or 'mirrored'.",
                           answer="mirrored" if flipped else "agree", flipped=flipped, conditions=["ctx_l1", "ctx", "annot_ctx", "annot_only", "insp_ctx", "insp_only"]))
+    # --- round 3 (2026-09-30): label-reading control with balanced truth. The annotated render is shown without the file, its printed
+    # edge labels as in the manifest or swapped (label_swap); the pixels are never mirrored. Truth follows the PRINTED labels, so
+    # 'patient right' and 'patient left' are each correct on half of the items and a display-convention prior scores 50 %. The
+    # 2026-09-27 probe's left-edge control had constant truth (all PA), which could not separate reading from prior.
+    if el.get("left") in ("L", "R"):
+        for swap in (False, True):
+            shown = el["right"] if swap else el["left"]
+            T.append(dict(type="badge_read", question="The image carries printed edge labels stating which patient side is at each edge (R = patient right, L = patient left). "
+                          "According to the printed labels, which side of the patient is at the LEFT edge of the image? Answer 'patient right' or 'patient left'.",
+                          answer="patient right" if shown == "R" else "patient left", label_swap=swap, conditions=["labels3"], gating=False))
     # --- round 3 (2026-09-26): orientation conflict trials. The file's edge labels are correct or swapped (text_flipped) × the image is
     # normal or mirrored (flipped): four cells per image. 'agree' is right when both or neither are flipped. A text-only policy
     # ("agree" always) and a pixel-only policy (judge the image against the conventional display and ignore the file) each score
     # 50 %; only comparing file and image scores 100 %, and the two rates are separable per model. Built only where the pixel
     # check (oip check) finds a clear cardiac cue in the shipped image, so "could not tell" is not confounded with "did not look".
     if el.get("left") in ("L", "R") and clear_cue(pkg, m):
+        # round-3 conditions only for packages whose masked render was reviewed marker-free (bench/marker_review.json)
+        r3 = [] if pkg.name in _marker_excluded() else ["ctx3", "ctx3_mask"]
         for text_flipped in (False, True):
             for flipped in (False, True):
                 T.append(dict(type="orient_conflict", question="Compare the image with the stated orientation (which patient side is at the LEFT edge). Does the image AGREE with the stated orientation, or is it mirrored? Answer 'agree' or 'mirrored'.",
                               answer="agree" if flipped == text_flipped else "mirrored", flipped=flipped, text_flipped=text_flipped,
-                              cell=("T" if not text_flipped else "W") + ("N" if not flipped else "M"), conditions=["ctx"]))
+                              cell=("T" if not text_flipped else "W") + ("N" if not flipped else "M"), conditions=["ctx"] + r3))
     if labels is not None:
         # MC-CXR recipe: a wrong external label; measures whether the model adopts text over pixels. Answer = the true labels;
         # the scorer also reports whether the injected wrong label was adopted.
         pool = [l for l in FINDING_LABELS if l not in (labels or [])]
-        wrong = random.Random(hash(pkg.name) & 0xffff).choice(pool)
+        wrong = random.Random(int(hashlib.sha256(pkg.name.encode()).hexdigest()[:8], 16)).choice(pool)   # stable across processes
         T.append(dict(type="findings_misled", question="List every abnormality present from this list (comma separated), or 'No finding': " + ", ".join(FINDING_LABELS) + ".",
                       answer=sorted(set(labels)) or ["No finding"], misleading_label=wrong, gating=False))
     for t in T:
         t.setdefault("gating", t["type"] in UNDERSTANDING); t["pkg"] = str(pkg)
-        t["id"] = f"{pkg.name}:{t['type']}" + (":textflipped" if t.get("text_flipped") else "") + (":flipped" if t.get("flipped") else "")
+        t["id"] = f"{pkg.name}:{t['type']}" + (":textflipped" if t.get("text_flipped") else "") + (":flipped" if t.get("flipped") else "") + (":swapped" if t.get("label_swap") else "")
     return T
+
+
+def _marker_excluded() -> set:
+    """Package names whose marker-masked render still shows a burned-in side marker (visual review, bench/marker_review.json)."""
+    f = Path(__file__).resolve().parent / "marker_review.json"
+    return set(json.loads(f.read_text()).get("excluded", {})) if f.exists() else set()
 
 
 def clear_cue(pkg: Path, m: dict, min_confidence: float = 0.9) -> bool:

@@ -53,7 +53,7 @@ def test_text_flipped_swaps_the_edge_labels_in_the_file_only():
     assert normal.replace("LEFT edge = R, RIGHT edge = L", "").count("Question:") == 1
 
 
-def test_conflict_tasks_have_the_right_answers_and_unique_ids(tmp_path):
+def test_conflict_tasks_have_the_right_answers_and_unique_ids(tmp_path, monkeypatch):
     import json, shutil
     import numpy as np
     from PIL import Image
@@ -67,7 +67,9 @@ def test_conflict_tasks_have_the_right_answers_and_unique_ids(tmp_path):
     assert len(T) == 4 and len({t["id"] for t in T}) == 4
     cells = {t["cell"]: t["answer"] for t in T}
     assert cells == {"TN": "agree", "TM": "mirrored", "WN": "mirrored", "WM": "agree"}
-    assert all(t["conditions"] == ["ctx"] and t["gating"] is False for t in T)
+    assert all(t["conditions"] == ["ctx", "ctx3", "ctx3_mask"] and t["gating"] is False for t in T)
+    monkeypatch.setattr(tasks, "_marker_excluded", lambda: {pkg.name})          # a package with a residual marker keeps the legacy condition only
+    assert all(t["conditions"] == ["ctx"] for t in tasks.tasks_for_package(pkg) if t["type"] == "orient_conflict")
     # a text-only policy ("agree" always) and a pixel-only policy (judge the image alone) each score 2 of 4
     from score import score
     assert sum(score(t, "agree")["correct"] for t in T) == 2
@@ -90,3 +92,87 @@ def test_separately_returned_thinking_is_stored_in_front_of_the_answer_and_not_s
     assert run._compose_reply("**0.41**", "") == ("**0.41**", "")
     task = {"type": "ctr", "answer": 0.55, "tolerance": 0.05}
     assert score(task, run._compose_reply("**0.55**", "first 350/850 = 0.41, no, 0.55")[0])["value"] == 0.55
+
+
+# ---------------------------------------------------------------- round 3 (2026-09-30)
+def _r3_pkg(tmp_path, monkeypatch):
+    """Synthetic example package with two lung regions added (image-left lung = patient right) and the render cache redirected."""
+    import json, shutil
+    src = ROOT / "spec/examples/synthetic-dx-chest.oip"; pkg = tmp_path / "abcdef012345.oip"; shutil.copytree(src, pkg)
+    m = json.loads((pkg / "oip.json").read_text())
+    base = m["derived"]["regions"][0]   # copy an existing region so every field the template reads is present
+    m["derived"]["regions"] += [dict(base, id="lung_right", label="right lung", assertion_level="inferred", mark="3", bbox_px=[300, 150, 1400, 700]),
+                                dict(base, id="lung_left", label="left lung", assertion_level="inferred", mark="4", bbox_px=[300, 800, 1400, 1350])]
+    (pkg / "oip.json").write_text(json.dumps(m))
+    monkeypatch.setattr(run, "RENDER_CACHE", tmp_path / "cache")
+    return pkg, m
+
+
+def test_marker_mask_keeps_the_size_and_blanks_everything_outside_the_box(tmp_path, monkeypatch):
+    import io
+    import numpy as np
+    from PIL import Image
+    pkg, m = _r3_pkg(tmp_path, monkeypatch)
+    box = run.mask_box(m)
+    assert box == [300 + int(0.15 * 1100), 150 - 30, 1400 + 54, 1350 + 30]          # top moved down 15 % of the lung height
+    canon = np.asarray(Image.open(pkg / "renders/canonical.png").convert("L"))
+    a = np.asarray(Image.open(io.BytesIO(run._masked(pkg, False)))); b = np.asarray(Image.open(io.BytesIO(run._masked(pkg, True))))
+    assert a.shape == canon.shape and (b == a[:, ::-1]).all()
+    fy, fx = canon.shape[0] / 1800, canon.shape[1] / 1500
+    r0, c0, r1, c1 = int(box[0] * fy), int(box[1] * fx), int(box[2] * fy), int(box[3] * fx)
+    assert (a[r0:r1, c0:c1] == canon[r0:r1, c0:c1]).all()
+    outside = a.copy(); outside[r0:r1, c0:c1] = 0
+    assert outside.max() == 0
+    m["derived"]["regions"] = [r for r in m["derived"]["regions"] if not r["id"].startswith("lung")]
+    assert run.mask_box(m) is None                                                   # no lungs, no mask
+
+
+def test_badge_read_truth_is_balanced_and_follows_the_printed_labels(tmp_path, monkeypatch):
+    import tasks
+    from score import score
+    pkg, _ = _r3_pkg(tmp_path, monkeypatch)
+    T = [t for t in tasks.tasks_for_package(pkg) if t["type"] == "badge_read"]
+    assert [t["answer"] for t in T] == ["patient right", "patient left"] and [t["label_swap"] for t in T] == [False, True]
+    assert len({t["id"] for t in T}) == 2 and all(t["gating"] is False and t["conditions"] == ["labels3"] for t in T)
+    (txt0, img0), (txt1, img1) = (run.build_prompt(t, "labels3") for t in T)
+    assert txt0 == txt1 and "Reference file" not in txt0 and img0[0][1] != img1[0][1]   # same question, no file, different printed labels
+    assert sum(score(t, "patient right")["correct"] for t in T) == 1                    # a convention prior scores 50 %
+    assert run.applies(T[0], "labels3") and not run.applies(T[0], "ctx") and not run.applies(T[0], "annot")
+
+
+def test_mark_side_runs_with_and_without_the_region_list(tmp_path, monkeypatch):
+    import tasks
+    pkg, _ = _r3_pkg(tmp_path, monkeypatch)
+    t = next(t for t in tasks.tasks_for_package(pkg) if t["type"] == "mark_side")
+    assert run.applies(t, "annot") and run.applies(t, "annot3") and run.applies(t, "annot3_l1") and not run.applies(t, "ctx3")
+    full, _ = run.build_prompt(t, "annot3"); l1, _ = run.build_prompt(t, "annot3_l1")
+    assert "lung_left" in full and "lung_left" not in l1 and "lung_right" not in l1    # the leak is in the region list only
+    assert "Estimating from the image" in full                                          # round 3 renders the shipped template (0.2.1)
+    ctx, _ = run.build_prompt(t, "annot")
+    assert "Estimating from the image" not in ctx                                       # legacy condition keeps the 0.2 wording
+
+
+def test_prompt_hash_identifies_what_was_sent():
+    a = run.prompt_sha256("s", "t", [("image/png", b"x")])
+    assert a == run.prompt_sha256("s", "t", [("image/png", b"x")]) and len(a) == 64
+    assert len({a, run.prompt_sha256("s", "t", [("image/png", b"y")]), run.prompt_sha256("s", "u", [("image/png", b"x")]), run.prompt_sha256("z", "t", [("image/png", b"x")])}) == 4
+
+
+def test_think_auto_only_for_models_that_reason_inside_content(monkeypatch):
+    monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "auto"); monkeypatch.setattr(run, "_NO_THINK", {})
+    assert run._think_for("glm-5.3-flash:cloud") and not run._think_for("kimi-k3:cloud") and not run._think_for("gemma4:e4b-it-qat")
+    monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "on")
+    assert run._think_for("kimi-k3:cloud")
+    monkeypatch.setattr(run, "_NO_THINK", {"kimi-k3:cloud": True})
+    assert not run._think_for("kimi-k3:cloud")
+    monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "off")
+    assert not run._think_for("glm-5.3-flash:cloud")
+
+
+def test_misleading_label_is_stable_across_processes(tmp_path, monkeypatch):
+    import subprocess, tasks
+    pkg, _ = _r3_pkg(tmp_path, monkeypatch)
+    here = next(t for t in tasks.tasks_for_package(pkg, labels=[]) if t["type"] == "findings_misled")["misleading_label"]
+    code = f"import sys; sys.path.insert(0, {str(ROOT / 'bench')!r}); import tasks, pathlib; print(next(t for t in tasks.tasks_for_package(pathlib.Path({str(pkg)!r}), labels=[]) if t['type'] == 'findings_misled')['misleading_label'])"
+    other = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env={"PYTHONHASHSEED": "12345", "PATH": ""}).stdout.strip()
+    assert other == here

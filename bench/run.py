@@ -2,10 +2,10 @@
   python bench/run.py --dataset vindr --n 50 --models claude,gpt,gemini --conditions raw,ctx,annot [--dry-run]
 Raw replies and scores go to bench/results/<timestamp>/. Model ids are pinned in MODELS; keys from env."""
 from __future__ import annotations
-import argparse, base64, json, os, sys, time
+import argparse, base64, hashlib, json, os, sys, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT / "bench")); sys.path.insert(0, str(ROOT / "src"))
-from tasks import build, vindr_labels
+from tasks import build, vindr_labels, TASKS_VERSION, THRESHOLDS
 from score import score, SCORER_VERSION
 
 # Anthropic id verified against current docs (2026-09). OpenAI/Google ids are placeholders: confirm against each provider's
@@ -16,7 +16,16 @@ PRICES = {"claude": (2.0, 10.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   #
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 OLLAMA_THINK = False          # set from --ollama-think (off | on | auto); see _call()
 OLLAMA_THINK_MODE = "off"
+# Models that reason inside `content` even with think=false (the reasoning then eats the output cap): in 'auto' mode only these
+# get think=true, so every other model keeps the setting the paper runs used.
+THINK_IN_CONTENT = ("glm-",)
 _NO_THINK: dict[str, bool] = {}   # models that rejected think=true in 'auto' mode (per process)
+
+
+def _think_for(model: str) -> bool:
+    """think=true for every model in 'on' mode, only for THINK_IN_CONTENT models in 'auto' mode; never for a model that rejected it."""
+    want = OLLAMA_THINK_MODE == "on" or (OLLAMA_THINK_MODE == "auto" and model.startswith(THINK_IN_CONTENT))
+    return want and not _NO_THINK.get(model, False)
 
 
 def _compose_reply(content: str, thinking: str) -> tuple[str, str]:
@@ -47,7 +56,7 @@ def harness_commit() -> str:
 
 
 def _ctx(pkg: Path, strip_measurements: bool = False, external_text: str | None = None, cues: bool = False, flip_labels: bool = False,
-         guard: bool = False, est: bool = False) -> str:
+         guard: bool = False, est: bool | None = False) -> str:
     # est=False by default: every legacy condition (paper `ctx`/`ctx_l1`, the OEP-004 arms) keeps the template-0.2 wording it was
     # measured with; only the OEP-002 arm passes True. Template 0.2.1 (D-031) renders the caution by default outside the harness;
     # round-3 conditions should pass est=None to test what packages actually ship.
@@ -98,20 +107,63 @@ CONDITIONS = {
     "ctx_l1_ctl":   "identical to ctx_l1; same-day control for the OEP-002 ablation",
     "ctx_l1_oep2":  "canonical PNG + L0-L2 file with the OEP-002 low-confidence-scale guard (do not derive mm from a low-confidence spacing)",
     "ctx_l1_oep2e": "canonical PNG + L0-L2 file with the OEP-002 guard and the estimation caution (judge unlisted quantities visually, not from self-estimated pixel coordinates)",
+    # round 3 (2026-09-30): files rendered with the SHIPPED template (0.2.1); separate names so paper cells are never replaced
+    "ctx3":         "canonical PNG + full context.md as shipped (template 0.2.1); same-day control for ctx3_mask",
+    "ctx3_mask":    "canonical PNG with everything outside the lower thorax blanked (burned-in side markers removed) + full context.md as shipped",
+    "annot3":       "annotated render (re-rendered) + full context.md as shipped (the region list names lung_left / lung_right: leak control for mark_side)",
+    "annot3_l1":    "annotated render (re-rendered) + L0-L2 file as shipped (no region list, so mark_side must be read off the image)",
+    "labels3":      "annotated render only, printed edge labels as in the manifest or swapped (badge_read); no file",
 }
 RENDER_CACHE = ROOT / "bench/results/_render_cache"   # bench artefacts live outside the packages (git-ignored with results/)
 
 
-def _variant(pkg: Path, kind: str, flipped: bool) -> bytes:
+def mask_box(m: dict) -> list[int] | None:
+    """[row0, col0, row1, col1] (source pixels) of the region kept by the marker mask: the lung-union box with its top moved DOWN by
+    15 % of its height (burned-in side markers sit at the level of the apices and shoulders, inside or just above the lung box:
+    survey of the VinDr paper set, 2026-09-30), its sides widened by 2 % of the image width and its bottom by 3 % of the height.
+    Aortic knob, cardiac apex, hemidiaphragms and gastric bubble stay visible; the box itself is left-right symmetric in shape."""
+    g = m["geometry"]; H, W = g["rows"], g["columns"]
+    lungs = [r for r in (m.get("derived") or {}).get("regions") or [] if r["id"] in ("lung_left", "lung_right") and r.get("bbox_px")]
+    if len(lungs) < 2:
+        return None
+    r0 = min(r["bbox_px"][0] for r in lungs); c0 = min(r["bbox_px"][1] for r in lungs); r1 = max(r["bbox_px"][2] for r in lungs); c1 = max(r["bbox_px"][3] for r in lungs)
+    return [int(r0 + 0.15 * (r1 - r0)), max(0, int(c0 - 0.02 * W)), min(H, int(r1 + 0.03 * H)), min(W, int(c1 + 0.02 * W))]
+
+
+def _masked(pkg: Path, flipped: bool) -> bytes:
+    """Canonical render with everything outside mask_box() set to black (same size, so pixel coordinates in the file stay valid);
+    mirrored afterwards for flip items. Cached under bench/results/_render_cache/<pkg>/masked[_flipped].png."""
+    f = RENDER_CACHE / pkg.name / f"masked{'_flipped' if flipped else ''}.png"
+    if f.exists():
+        return f.read_bytes()
+    import numpy as np
+    from PIL import Image
+    m = json.loads((pkg / "oip.json").read_text()); box = mask_box(m)
+    if box is None:
+        raise ValueError(f"{pkg.name}: no lung regions, cannot build the marker mask")
+    canon = np.asarray(Image.open(pkg / "renders/canonical.png").convert("L")); h, w = canon.shape
+    fy, fx = h / m["geometry"]["rows"], w / m["geometry"]["columns"]          # the canonical render may be smaller than the source
+    out = np.zeros_like(canon); r0, c0, r1, c1 = int(box[0] * fy), int(box[1] * fx), int(box[2] * fy), int(box[3] * fx)
+    out[r0:r1, c0:c1] = canon[r0:r1, c0:c1]
+    if flipped:
+        out = out[:, ::-1]
+    f.parent.mkdir(parents=True, exist_ok=True); Image.fromarray(out).save(f)
+    return f.read_bytes()
+
+
+def _variant(pkg: Path, kind: str, flipped: bool, swap: bool = False) -> bytes:
     """Annotated render or inspection sheet re-rendered from the canonical pixels (mirrored for flip items) with the manifest's
-    edge labels; region marks / the heart inset follow the mirroring. Cached under bench/results/_render_cache/<pkg>/."""
-    f = RENDER_CACHE / pkg.name / f"{kind}{'_flipped' if flipped else ''}.png"
+    edge labels; region marks / the heart inset follow the mirroring. swap=True prints the left/right edge labels exchanged on
+    unmirrored pixels (badge_read). Cached under bench/results/_render_cache/<pkg>/."""
+    f = RENDER_CACHE / pkg.name / f"{kind}{'_flipped' if flipped else ''}{'_swap' if swap else ''}.png"
     if f.exists():
         return f.read_bytes()
     import numpy as np
     from PIL import Image
     from oip.render import annotated, inspection_sheet
-    m = json.loads((pkg / "oip.json").read_text()); g = m["geometry"]; el = g["orientation"].get("edge_labels") or {}
+    m = json.loads((pkg / "oip.json").read_text()); g = m["geometry"]; el = dict(g["orientation"].get("edge_labels") or {})
+    if swap:
+        el["left"], el["right"] = el.get("right"), el.get("left")
     canon = np.asarray(Image.open(pkg / "renders/canonical.png").convert("L"))
     if flipped:
         canon = canon[:, ::-1]
@@ -128,6 +180,15 @@ def _variant(pkg: Path, kind: str, flipped: bool) -> bytes:
 DEFAULT_CONDITIONS = "raw,ctx_l1,ctx,annot,misled_plain,misled_oip"
 BASE_CONDITION = {"ctx_ctl": "ctx", "ctx_cue": "ctx", "ctx_instr": "ctx", "ctx_cue_instr": "ctx",
                   "raw_ctl": "raw", "ctx_l1_ctl": "ctx_l1", "ctx_l1_oep2": "ctx_l1", "ctx_l1_oep2e": "ctx_l1"}   # task applicability follows the base
+
+
+def prompt_sha256(system: str, text: str, images: list[tuple[str, bytes]]) -> str:
+    """Hash of exactly what was sent (system prompt, user text, image bytes before provider-side downscaling): two rows with the same
+    hash received the same prompt, whatever their condition names say."""
+    h = hashlib.sha256(); h.update(system.encode()); h.update(b"\0"); h.update(text.encode())
+    for mime, b in images:
+        h.update(b"\0"); h.update(mime.encode()); h.update(hashlib.sha256(b).digest())
+    return h.hexdigest()
 
 
 def applies(task: dict, condition: str) -> bool:
@@ -170,6 +231,14 @@ def build_prompt(task: dict, condition: str) -> tuple[str, list[tuple[str, bytes
         if condition.endswith("_only"):
             return "Question: " + task.get("question_labels", q), [img]
         return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, flip_labels=fl) + "\n\nQuestion: " + q, [img]
+    if condition in ("ctx3", "ctx3_mask"):     # round 3: shipped template (est=None), canonical or marker-masked pixels
+        img = ("image/png", _masked(pkg, bool(task.get("flipped")))) if condition == "ctx3_mask" else canon
+        return "Reference file for the attached image (OIP context.md):\n\n" + _ctx(pkg, flip_labels=fl, est=None) + "\n\nQuestion: " + q, [img]
+    if condition in ("annot3", "annot3_l1"):   # round 3: mark_side with (leak) and without (no leak) the region list
+        return ("Reference file for the attached (annotated) image (OIP context.md):\n\n" + _ctx(pkg, strip_measurements=condition.endswith("_l1"), flip_labels=fl, est=None)
+                + "\n\nQuestion: " + q), [("image/png", _variant(pkg, "annot", False))]
+    if condition == "labels3":                 # round 3: badge_read, no file
+        return "Question: " + q, [("image/png", _variant(pkg, "annot", False, swap=bool(task.get("label_swap"))))]
     if condition == "misled_plain":
         return f"Prior report note: {wrong}.\n\nQuestion: " + q, [canon]
     if condition == "misled_oip":
@@ -214,7 +283,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
         # answer alone in content. --ollama-think on|auto turns that on ('auto' falls back to think=false for models that
         # reject the field); the reply is then stored as "<think>…</think>" + answer so the scorer's _tail() rule applies
         # unchanged, and usage records done_reason ("length" = output cap reached), num_predict and thinking_chars.
-        think = OLLAMA_THINK and not _NO_THINK.get(model, False)
+        think = _think_for(model)
         body = {"model": model, "stream": False, "think": think, "messages": [{"role": "system", "content": system}, {"role": "user", "content": text, "images": [base64.b64encode(_downscale(b)).decode() for _, b in images]}],
                 "options": {"num_predict": 1600 if think else 800}}
         req = urllib.request.Request(base + "/api/chat", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
@@ -230,7 +299,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
             except Exception as e:                     # noqa: BLE001
                 last = e
                 msg = str(e)
-                if think and OLLAMA_THINK_MODE == "auto" and "400" in msg:
+                if think and "400" in msg:
                     # the daemon answers HTTP 400 for models without the thinking capability: remember it and retry without
                     _NO_THINK[model] = True
                     return _call(provider, model, text, images, system)
@@ -280,7 +349,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
-    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", nargs="?", const="on", default="off", choices=["off", "on", "auto"], help="Ollama think field: off (default; glm then reasons inside content and can hit the 800-token cap), on (think=true, num_predict 1600, reasoning stored as <think>…</think>), auto (on, per-model fallback when the daemon rejects it)"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", nargs="?", const="on", default="auto", choices=["off", "on", "auto"], help="Ollama think field: auto (default since round 3: think=true only for models that reason inside content regardless, i.e. glm; reasoning stored as <think>…</think>, num_predict 1600), on (every model, falling back per model when the daemon rejects the field), off (the paper runs' setting)"); ap.add_argument("--repeats", type=int, default=1, help="replies per (model, condition, task); rows carry rep = 0..N-1, and --resume with a larger N adds the missing replies"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks")
     ap.add_argument("--no-cloud-lock", action="store_true", help="skip the shared one-cloud-model-at-a-time lock (bench/cloudlock.py); only for diagnostics"); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
@@ -308,7 +377,7 @@ def main():
             (run / "run_meta.json").write_text(json.dumps({"harness_commit": commit, "scorer": SCORER_VERSION, "dataset": a.dataset, "pkg_dir": a.pkg_dir,
                                                            "n": a.n, "seed": a.seed, "models": models, "model_ids": {m: MODELS.get(m) for m in models}, "conditions": conds,
                                                            "tasks_filter": a.tasks, "system_prompt": SYSTEM, "verify_instruction": VERIFY_INSTR if any(c.endswith("_instr") for c in conds) else None,
-                                                           "ollama_think": OLLAMA_THINK_MODE, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
+                                                           "ollama_think": OLLAMA_THINK_MODE, "tasks_version": TASKS_VERSION, "thresholds": THRESHOLDS, "repeats": a.repeats, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
@@ -319,25 +388,29 @@ def main():
                           "approx_cost_usd_per_model": cost, "models": {m: (MODELS[m] if m in MODELS else ("ollama", m.split("/", 1)[1])) for m in models}, "run_dir": str(run)}, indent=1)); return
     rows = [json.loads(l) for l in (run / "results.jsonl").read_text().splitlines() if l.strip()] if (run / "results.jsonl").exists() else []
     rows = [r for r in rows if not r.get("error")]          # failed rows are retried
-    done = {(r["model"], r["condition"], r["task"]) for r in rows if not r.get("error")}   # error rows are retried on resume
+    done = {(r["model"], r["condition"], r["task"], r.get("rep", 0)) for r in rows if not r.get("error")}   # error rows are retried on resume
     if done: print(f"resuming {run.name}: {len(done)} rows already done", flush=True)
     from cloudlock import acquire as _lock_acquire, release as _lock_release, is_cloud as _is_cloud
     for m in models:
         prov, mid = MODELS[m] if m in MODELS else (("ollama", m.split("/", 1)[1]) if m.startswith("ollama/") else (_ for _ in ()).throw(KeyError(f"unknown model {m}; use a key in MODELS or ollama/<tag>")))
         # one Ollama cloud model at a time across all lanes and sessions: block here until the shared lock is free (bench/cloudlock.py)
         lock = _lock_acquire(m, log=lambda s: print(f"  {m}: {s}", flush=True)) if _is_cloud(m) and not a.no_cloud_lock else None
-        for c in conds:
+        # replies are collected repeat by repeat, so a partial run always holds complete earlier repeats
+        for rep, c in ((rep, c) for rep in range(a.repeats) for c in conds):
             for i, t in enumerate(tasks, 1):
-                if not applies(t, c) or (m, c, t["id"]) in done:
+                if not applies(t, c) or (m, c, t["id"], rep) in done:
                     continue
+                psha = None
                 try:
                     text, imgs = build_prompt(t, c)
+                    psha = prompt_sha256(system_for(c), text, imgs)
                     t_call = time.time(); reply, usage = call(prov, mid, text, imgs, system=system_for(c)); err = None
                     usage = dict(usage or {}); usage["latency_s"] = usage.get("latency_s") or round(time.time() - t_call, 2)
                 except Exception as e:
                     reply, err, usage = "", f"{type(e).__name__}: {str(e)[:200]}", {}
-                rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "reply": reply, "error": err, "usage": usage,
-                             "score": score(t, reply) if not err else {}, "harness_commit": commit, "scorer": SCORER_VERSION})
+                rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "rep": rep, "reply": reply, "error": err, "usage": usage,
+                             "score": score(t, reply) if not err else {}, "harness_commit": commit, "scorer": SCORER_VERSION, "tasks_version": TASKS_VERSION,
+                             "prompt_sha256": psha, "reply_sha256": hashlib.sha256(reply.encode()).hexdigest() if not err else None})
                 # abort policy: deterministic client errors (404/410/401/400) after 5 identical in a row;
                 # transient server errors / timeouts (5xx, timed out, 429) only after 20 in a row (degraded cloud periods)
                 recent = [r["error"] for r in rows[-20:] if r["model"] == m]; last5 = recent[-5:]
@@ -346,7 +419,7 @@ def main():
                    (len(recent) == 20 and all(recent) and all(transient(e) for e in recent)):
                     (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
                     sys.exit(f"ABORT {m}: consecutive errors -> {recent[-1][:160]} (retired tag? auth? degraded cloud? see bench/README.md)")
-                if i % 20 == 0: print(f"  {m}/{c}: {i}/{len(tasks)}", flush=True)
+                if i % 20 == 0: print(f"  {m}/{c}" + (f" rep {rep}" if a.repeats > 1 else "") + f": {i}/{len(tasks)}", flush=True)
                 if len(rows) % 10 == 0: (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
             (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
         if lock: _lock_release(lock)
