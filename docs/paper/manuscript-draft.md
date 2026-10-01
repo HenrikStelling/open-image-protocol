@@ -88,7 +88,7 @@ For scintigraphy we used the Paraguay whole-body bone-scan collection [25], 582 
 
 ### 5.1 Data
 
-Three package sets were built for the paper, all with the no-leakage rule: no radiologist box, finding label or report text enters any package, and a keyword check runs after generation. The VinDr-CXR set holds 100 images sampled with seed 0 and stratified by findings, cardiomegaly label and spacing availability; 82 of them have calibrated spacing. The NIH set holds 50 images (seed 0) converted through the non-DICOM path, so their spacing is dataset-derived and low-confidence. The bone-scan set holds 40 packages, 20 anterior and 20 posterior views. A 20-image VinDr-CXR pilot set, used while the harness was developed, appears only in the descriptive wording ablation of Section 6.6.
+Three package sets were built for the paper, all with the no-leakage rule: no radiologist box, finding label or report text enters any package, and a keyword check runs after generation. The VinDr-CXR set holds 100 images sampled with seed 1 (the sampling script's default; a re-run of the selection rule reproduces the set only with this seed) and stratified by findings, cardiomegaly label and spacing availability; 82 of them have calibrated spacing. The NIH set holds 50 images (seed 1) converted through the non-DICOM path, so their spacing is dataset-derived and low-confidence. The bone-scan set holds 40 packages, 20 anterior and 20 posterior views. A 20-image VinDr-CXR pilot set, used while the harness was developed, appears only in the descriptive wording ablation of Section 6.6.
 
 ### 5.2 Conditions
 

@@ -219,12 +219,13 @@ def main() -> None:
                 smp = [common[rng.randrange(len(common))] for _ in common]
                 boots.append(statistics.pstdev([sum(per_model[m][i] for i in smp) / len(smp) for m in models]))
             boots.sort(); R["spread"][ds][c] = {"sd_pp": 100 * sd, "ci_lo_pp": 100 * boots[49], "ci_hi_pp": 100 * boots[1949], "items": len(common), "models": len(models)}
-    # 7. cost: tokens, latency, list price per call (paper sets pooled: VinDr-100 + NIH-50 + bone scans)
+    # 7. cost: tokens, latency, list price per call over the two radiograph paper sets (the bone scans have much smaller images and a
+    # different task mix, so pooling them lowered the means; this matches the RA study's definition)
     R["cost"] = {}
     for m in models:
         R["cost"][m] = {}
         for c in CONDS:
-            sel = [x for d in ("paper-vindr-100", "paper-nih-50", "bonescan-40") for x in idx.get((d, m, c), {}).values() if (x.get("usage") or {}).get("input_tokens")]
+            sel = [x for d in ("paper-vindr-100", "paper-nih-50") for x in idx.get((d, m, c), {}).values() if (x.get("usage") or {}).get("input_tokens")]
             if not sel:
                 continue
             tot_in = [x["usage"]["input_tokens"] + (x["usage"].get("cache_read_input_tokens") or 0) + (x["usage"].get("cache_creation_input_tokens") or 0) for x in sel]
@@ -248,13 +249,19 @@ def main() -> None:
     # 8. bone scans
     ds = "bonescan-40"; R["nm"] = {"per_task": {}, "left_edge_by_view": {}, "gating_contrasts": {}}
     nm_models = sorted({x["model"] for x in rows if x["dataset"] == ds})
+    # the hotter-side question was asked on 22 images in the early local-model run and on 8 after the asymmetry threshold was raised;
+    # all models are compared on the items every model received (RA protocol amendment 6)
+    hot_sets = [{x["task"] for x in idx.get((ds, m, "raw"), {}).values() if x["type"] == "hot_side"} for m in nm_models]
+    common_hot = set.intersection(*hot_sets) if hot_sets else set()
+    R["nm"]["hot_side_items_common"] = len(common_hot)
+    nm_item = lambda x: x["type"] != "hot_side" or x["task"] in common_hot
     for m in nm_models:
         R["nm"]["per_task"][m] = {}
         for t in NM_TYPES:
             cs = ("ctx_l1", "ctx") if t == "flip_check_nm" else ("raw", "ctx_l1", "ctx")
             R["nm"]["per_task"][m][t] = {}
             for c in cs:
-                ce = acc_cell(idx, ds, m, c, lambda x, t=t: x["type"] == t)
+                ce = acc_cell(idx, ds, m, c, lambda x, t=t: x["type"] == t and nm_item(x))
                 if t in ("hot_side", "flip_check_nm"):
                     ce["p_vs_chance"] = binom_vs_chance(ce["correct"], ce["n"])
                 R["nm"]["per_task"][m][t][c] = ce
@@ -262,8 +269,8 @@ def main() -> None:
         for view in ("anterior", "posterior"):
             R["nm"]["left_edge_by_view"][m][view] = {c: acc_cell(idx, ds, m, c, lambda x, view=view: x["type"] == "left_edge_nm" and view in taskmeta[(ds, x["task"])]["question"]) for c in ("raw", "ctx_l1", "ctx")}
     for name, (a, b) in {"ctx_vs_raw": ("raw", "ctx"), "ctx_l1_vs_raw": ("raw", "ctx_l1")}.items():
-        con = {m: paired(idx, ds, m, a, b, lambda x: is_gating(x, nm=True)) for m in nm_models}; with_holm(con); R["nm"]["gating_contrasts"][name] = con
-    R["nm"]["gating"] = {m: {c: acc_cell(idx, ds, m, c, lambda x: is_gating(x, nm=True)) for c in ("raw", "ctx_l1", "ctx")} for m in nm_models}
+        con = {m: paired(idx, ds, m, a, b, lambda x: is_gating(x, nm=True) and nm_item(x)) for m in nm_models}; with_holm(con); R["nm"]["gating_contrasts"][name] = con
+    R["nm"]["gating"] = {m: {c: acc_cell(idx, ds, m, c, lambda x: is_gating(x, nm=True) and nm_item(x)) for c in ("raw", "ctx_l1", "ctx")} for m in nm_models}
     # 9. pilot-20: OEP-001 wording ablation (descriptive)
     ds = "pilot-vindr-20"; R["pilot_oep001"] = {}
     for m in sorted({x["model"] for x in rows if x["dataset"] == ds}):

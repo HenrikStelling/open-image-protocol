@@ -66,16 +66,22 @@ rows = _all
 import statistics
 md += ["", "Cross-model spread of gating accuracy (std across models; lower = more model-independent): " + ", ".join(f"{c}: {100*statistics.pstdev(v):.0f} pp" for c, v in ((c, [acc(m, c, gating=True)[0] for m in models if acc(m, c, gating=True)[0] is not None]) for c in conds) if len(v) >= 2)]
 # tokens / latency per condition (where the provider reported usage)
-md += ["", "## Cost: mean input tokens / output tokens / latency per call", "", "| model | " + " | ".join(conds) + " |", "|---|" + "---|" * len(conds)]
-for m in models:
-    cells = []
-    for c in conds:
-        sel = [x for x in rows if x["model"] == m and x["condition"] == c and not x.get("error") and (x.get("usage") or {}).get("input_tokens")]
-        if not sel: cells.append("–"); continue
-        it = sum(x["usage"]["input_tokens"] for x in sel) / len(sel); ot = sum(x["usage"].get("output_tokens") or 0 for x in sel) / len(sel)
-        lat = [x["usage"]["latency_s"] for x in sel if x["usage"].get("latency_s")]
-        cells.append(f"{it:.0f} / {ot:.0f} / {sum(lat)/len(lat):.1f}s" if lat else f"{it:.0f} / {ot:.0f}")
-    md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
+# per dataset (2026-10-01): the three paper sets differ in image size and task mix, so pooled token means mislead; the Claude input
+# count includes cache reads and writes (the provider reports input_tokens net of cache); latency is wall-clock per call and includes
+# client-side retries for the API providers, not for Ollama
+ALL_DATASETS = sorted({x["dataset"] for x in _all})
+md += ["", "## Cost per dataset: mean input tokens / output tokens / median latency per call", "", "| dataset | model | " + " | ".join(conds) + " |", "|---|---|" + "---|" * len(conds)]
+for ds in ALL_DATASETS:
+    for m in sorted({x["model"] for x in _all if x["dataset"] == ds}):
+        cells = []
+        for c in conds:
+            sel = [x for x in _all if x["dataset"] == ds and x["model"] == m and x["condition"] == c and not x.get("error") and (x.get("usage") or {}).get("input_tokens")]
+            if not sel: cells.append("–"); continue
+            it = sum(x["usage"]["input_tokens"] + (x["usage"].get("cache_read_input_tokens") or 0) + (x["usage"].get("cache_creation_input_tokens") or 0) for x in sel) / len(sel)
+            ot = sum(x["usage"].get("output_tokens") or 0 for x in sel) / len(sel)
+            lat = sorted(x["usage"]["latency_s"] for x in sel if x["usage"].get("latency_s"))
+            cells.append(f"{it:.0f} / {ot:.0f} / {lat[len(lat)//2]:.1f}s" if lat else f"{it:.0f} / {ot:.0f}")
+        md.append(f"| {ds} | {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
 abst = collections.Counter((x["model"], x["condition"]) for x in rows if (x.get("score") or {}).get("abstained"))
 if abst: md += ["", "Abstentions (model said it cannot determine): " + ", ".join(f"{m.replace('ollama/','')}/{c}: {n}" for (m, c), n in abst.most_common(8))]
 # abstention kinds (2026-09-26): 'correct abstention' = the materials cannot support the answer (image only: a cardiac width in mm needs a
@@ -114,21 +120,28 @@ if any(x["condition"] in ABL for x in rows):
                 sel = [x for x in sub if x["model"] == m and x["condition"] == c and x["type"] == t and not x.get("error")]
                 return fmt(sum(1 for x in sel if x["score"].get("correct")) / len(sel)) if sel else "–"
             md.append(f"| {ds} | {m.replace('ollama/','')} | " + " | ".join(f"{a3(c, 'flip_check')} / {a3(c, 'left_edge')}" for c in ("ctx",) + ABL) + " |")
-md += ["", "## Per task (raw → ctx_l1 → ctx → annot)", "", "| model | modality | view | left edge | scale avail. | CTR | heart mm | heart mark (annot) | mark side (annot) | flip check (ctx_l1 → ctx) | findings F1 |", "|---|---|---|---|---|---|---|---|---|---|---|"]
-for m in models:
-    cells = []
-    for t in ("modality", "view", "left_edge", "scale_available", "ctr", "heart_mm"):
-        cells.append(" → ".join(fmt(acc(m, c, t)[0]) for c in conds))
-    cells.append(fmt(acc(m, "annot", "mark_heart")[0])); cells.append(fmt(acc(m, "annot", "mark_side")[0]))
-    cells.append(" → ".join(fmt(acc(m, c, "flip_check")[0]) for c in ("ctx_l1", "ctx")))
-    cells.append(" → ".join(fmt(acc(m, c, "findings")[0]) for c in conds))
-    md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
-md += ["", "## Misleading text: adoption rate of a wrong label (lower is better) and findings F1 under it", "", "| model | plain note: adopted / F1 | v0.1 External section (superseded): adopted / F1 | shipped template (D-027, `--with-external`): adopted / F1 |", "|---|---|---|---|"]
-for m in models:
-    cells = []
-    for c in ("misled_plain", "misled_oip_v01", "misled_oip"):
-        a, n = adopt(m, c); cells.append(f"{fmt(a)} / {fmt(acc(m, c, 'findings_misled')[0])}" + (f" (n={n})" if n else ""))
-    md.append(f"| {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
+# per dataset (2026-10-01; earlier versions pooled the pilot-20 with the paper sets here, which the RA reconciliation flagged)
+md += ["", "## Per task and dataset (raw → ctx_l1 → ctx → annot)", "", "| dataset | model | modality | view | left edge | scale avail. | CTR | heart mm | heart mark (annot) | mark side (annot) | flip check (ctx_l1 → ctx) | findings F1 |", "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+for ds in [d for d in ALL_DATASETS if d != "bonescan-40"]:
+    rows = [x for x in _all if x["dataset"] == ds]
+    for m in sorted({x["model"] for x in rows}):
+        cells = []
+        for t in ("modality", "view", "left_edge", "scale_available", "ctr", "heart_mm"):
+            cells.append(" → ".join(fmt(acc(m, c, t)[0]) for c in conds))
+        cells.append(fmt(acc(m, "annot", "mark_heart")[0])); cells.append(fmt(acc(m, "annot", "mark_side")[0]))
+        cells.append(" → ".join(fmt(acc(m, c, "flip_check")[0]) for c in ("ctx_l1", "ctx")))
+        cells.append(" → ".join(fmt(acc(m, c, "findings")[0]) for c in conds))
+        md.append(f"| {ds} | {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
+rows = _all
+md += ["", "## Misleading text per dataset: adoption rate of a wrong label (lower is better) and findings F1 under it", "", "| dataset | model | plain note: adopted / F1 | v0.1 External section (superseded): adopted / F1 | shipped template (D-027, `--with-external`): adopted / F1 |", "|---|---|---|---|---|"]
+for ds in [d for d in ALL_DATASETS if any(x["type"] == "findings_misled" and x["dataset"] == d for x in _all)]:
+    rows = [x for x in _all if x["dataset"] == ds]
+    for m in sorted({x["model"] for x in rows if x["type"] == "findings_misled"}):
+        cells = []
+        for c in ("misled_plain", "misled_oip_v01", "misled_oip"):
+            a, n = adopt(m, c); cells.append(f"{fmt(a)} / {fmt(acc(m, c, 'findings_misled')[0])}" + (f" (n={n})" if n else ""))
+        md.append(f"| {ds} | {m.replace('ollama/','')} | " + " | ".join(cells) + " |")
+rows = _all
 # scintigraphy (bone scans): separate task set
 nm_types = ("modality_nm", "left_edge_nm", "scale_available_nm", "counts_semantics", "hot_side", "flip_check_nm")
 if any(x["type"] in nm_types for x in rows):

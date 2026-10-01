@@ -33,11 +33,15 @@ def main(argv=None):
     elif a.cmd == "check":
         from .check import check_orientation; print(json.dumps(check_orientation(Path(a.pkg), write=not a.no_write), indent=1))
     elif a.cmd == "describe":
-        pkg = Path(a.pkg)
+        pkg = Path(a.pkg); m = json.loads((pkg / "oip.json").read_text())
         if a.json: print((pkg / "oip.json").read_text())
         elif a.with_external:
-            from .context import build_context; print(build_context(json.loads((pkg / "oip.json").read_text()), include_external=True))
+            from .context import build_context; print(build_context(m, include_external=True))
         else: print((pkg / "context.md").read_text())
+        if m["oip"].get("profile") == "core" and not a.json:
+            # D-031 / OEP-002 evidence: a file that states geometry without the computed measurements made two of eleven models worse
+            # on quantitative questions; the consumer default for such questions is the `measured` profile
+            print("note: `core` profile (no regions or measurements). For quantitative questions use the `measured` profile: run `oip measure` first.", file=sys.stderr)
 
 
 if __name__ == "__main__":
