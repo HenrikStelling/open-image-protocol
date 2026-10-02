@@ -237,3 +237,5 @@ lower (CTR 34 → 24 %, cardiac width 36 → 26 %) while the L0–L2 cells are e
 unpinned model id — a measured instance of the paper's snapshot-drift limitation. Pooled over the eight models the caution's CTR
 contrast is 56 improved / 26 worsened (p = 0.0012, +7.5 pp; images shared across models, so precision is overstated); per model
 5 for, 0 against, 3 ties. Decision (1) stands; no further OEP-002 spend.
+
+**Claude arm completed 2026-10-02 07:10 (resumed from the pinned harness c201602 after the top-up; 1,200 rows, 0 errors; $11.19 list in total for Claude).** claude-sonnet-5: control 50 % (1/100 mirrored caught) · cues 48 % (0) · instruction 50 % (1) · both 50 % (1); left edge 95 → 100 → 95 → 100 %. Every mirrored image is still answered "agree" in every arm. **The ablation is now complete across eleven models (three frontier, seven open, plus the retired qwen3.5's absence recorded): the decision above stands; OEP-003/004 closed, not adopted.** Final ten-model table in `docs/reports/pilot-ollama-report.md` ("Verification ablation").
