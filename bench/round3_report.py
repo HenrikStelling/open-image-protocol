@@ -144,6 +144,8 @@ def main() -> None:
             same = sum(1 for v in full.values() if len(set(v.values())) == 1)
             L.append(f"| {m.split('/', 1)[-1]} | {c} | {len(full)} | {pct(same, len(full))} | " + " / ".join(f"{100 * sum(v[k] for v in full.values()) / len(full):.0f}" for k in range(reps)) + " |")
         L.append("")
+    notes = ROOT / "docs/reports/round3a-readings.md"     # hand-written interpretation, appended so a regeneration keeps it
+    if notes.exists(): L += ["", notes.read_text().rstrip()]
     out = "\n".join(L)
     if a.out: Path(a.out).write_text(out + "\n"); print("wrote", a.out)
     else: print(out)
