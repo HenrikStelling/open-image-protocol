@@ -24,11 +24,13 @@
    (b) The conflict design (four cells) replaces the flip check in round 3: it is the only form in which "checks" is testable.
    (c) The masked render is the right default for anatomy-only orientation items; it costs the comparing models nothing.
    (d) The repeat pass (`--repeats 3`) is still to run; all numbers above are single replies.
-6. **glm-5.3-flash needs a larger output cap than any other model.** With think=false and a 2,400-token cap, 328 of its 1,056
-   round-3 replies were cut off inside the visible reasoning (142 on the canonical, 186 on the masked render, almost all in the
-   three cells where something is off: TM, WN, WM), and the scorer read 'mirrored' out of 95 % of the fragments — the apparent
-   'always mirrored' pattern (18 images) and the 70 % total were artefacts of truncation. Fix (commit of 2026-10-05): a reply the
-   provider cut off before it closed its reasoning is scored wrong and flagged `truncated` (`run.score_row`), the cap for
-   in-content reasoners is 8,000 tokens, the 2,400-cap run is set aside, and glm is rerun with three repeats. On its complete
-   replies glm was right on 155/186 conflict items (83 %), with a clear selection effect (it finishes when the case is easy).
-
+6. **glm-5.3-flash, rerun with an 8,000-token cap (repeat 0 complete 2026-10-05 14:10): the one open model that partly
+   compares, and the one that uses the marker most.** With the 2,400-token cap of the first run 328/1,056 replies were cut off
+   inside the visible reasoning and the scorer read 'mirrored' out of 95 % of the fragments (an apparent 'always mirrored'
+   pattern); that run is set aside, and a reply cut off before it closes its reasoning now counts as no answer
+   (`run.score_row`, flag `truncated`). At 8,000 tokens 149/1,052 replies are still cut off, 88 of them in the WM cell (wrong
+   file and mirrored image, the only cell where both sources are off): glm deliberates for up to 34,000 characters about the
+   burned-in marker, the file and the display convention and never concludes. Complete replies: TN 79 %, TM 99 %, WN 96 %, WM
+   51 % (canonical); all four cells 68 % canonical, 59 % masked. Per image: 12 'compares', 66 mixed. The mask costs 9 points
+   (76/45 discordant, p = 0.006, Holm 0.055), i.e. glm's partial comparison leans on the marker more than gpt's does. Reading
+   labels 100 / 92 %, mark side 95 / 93 %.
