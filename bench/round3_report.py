@@ -27,10 +27,12 @@ POLICY = {("agree", "mirrored", "mirrored", "agree"): "compares file and image",
 POLICIES = ("compares file and image", "text only (always agree)", "pixels only (ignores the file)", "file vs convention (ignores the pixels)", "always mirrored", "other")
 
 
-def verdict(reply: str) -> str | None:
-    """'agree' / 'mirrored' as the scorer reads the reply, None when it reads neither."""
+def verdict(row: dict) -> str | None:
+    """'agree' / 'mirrored' as the scorer reads the reply; None when it reads neither or the reply was cut off (score.truncated)."""
+    if row.get("score", {}).get("truncated"):
+        return None
     for v in ("agree", "mirrored"):
-        if score({"type": "flip_check", "answer": v}, reply).get("correct"):
+        if score({"type": "flip_check", "answer": v}, row["reply"]).get("correct"):
             return v
     return None
 
@@ -80,7 +82,7 @@ def main() -> None:
             if not conf: continue
             k = {x: 0 for x in CELLS}; n = {x: 0 for x in CELLS}; per_img = defaultdict(dict)
             for tid, r in conf.items():
-                t = tasks[tid]; n[t["cell"]] += 1; k[t["cell"]] += bool(r["score"].get("correct")); per_img[t["pkg"]][t["cell"]] = verdict(r["reply"])
+                t = tasks[tid]; n[t["cell"]] += 1; k[t["cell"]] += bool(r["score"].get("correct")); per_img[t["pkg"]][t["cell"]] = verdict(r)
             pol = Counter(POLICY.get(tuple(v.get(x) for x in CELLS), "other") for v in per_img.values() if len(v) == 4)
             pol_rows[(m, c)] = pol; K, N = sum(k.values()), sum(n.values())
             L.append(f"| {m.split('/', 1)[-1]} | {name} | " + " | ".join(pct(k[x], n[x]) for x in CELLS) + f" | {pct(K, N)} | "
@@ -128,10 +130,10 @@ def main() -> None:
     L.append("")
 
     # ---- 5. hygiene: truncation, unparsed verdicts, repeats
-    L += ["## 5. Reply hygiene", "", "| model | rows | cut off at the output cap (done_reason = length) | conflict replies with no verdict | think |", "|---|---|---|---|---|"]
+    L += ["## 5. Reply hygiene", "", "| model | rows | cut off at the output cap (done_reason = length; scored wrong, flagged truncated) | conflict replies with no verdict | think |", "|---|---|---|---|---|"]
     for m in models:
         x = [r for r in r0 if r["model"] == m]; cut = sum(1 for r in x if (r.get("usage") or {}).get("done_reason") == "length")
-        nov = sum(1 for r in x if r["type"] == "orient_conflict" and verdict(r["reply"]) is None); th = {(r.get("usage") or {}).get("think") for r in x}
+        nov = sum(1 for r in x if r["type"] == "orient_conflict" and verdict(r) is None); th = {(r.get("usage") or {}).get("think") for r in x}
         L.append(f"| {m.split('/', 1)[-1]} | {len(x)} | {cut} | {nov} | {', '.join(str(t) for t in sorted(th, key=str))} |")
     L.append("")
     if reps > 1:

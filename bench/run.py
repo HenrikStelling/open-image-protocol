@@ -22,7 +22,7 @@ OLLAMA_THINK_MODE = "off"
 # switches the model into a long deliberation (median 1,600 output tokens on a two-word question, 11 of 20 replies cut off at a
 # 1,600-token cap, ~12 s per call), i.e. a different operating mode, not the paper's mode without the truncation.
 THINK_IN_CONTENT = ("glm-",)
-NUM_PREDICT = {"default": 800, "in_content": 2400, "think": 4000}
+NUM_PREDICT = {"default": 800, "in_content": 8000, "think": 4000}   # in_content: 2,400 still cut 328/1,056 glm conflict replies (round 3a, 2026-10-05)
 _NO_THINK: dict[str, bool] = {}   # models that rejected think=true in 'auto' mode (per process)
 
 
@@ -36,6 +36,15 @@ def _num_predict(model: str, think: bool) -> int:
     if think:
         return NUM_PREDICT["think"]
     return NUM_PREDICT["in_content"] if OLLAMA_THINK_MODE == "auto" and model.startswith(THINK_IN_CONTENT) else NUM_PREDICT["default"]
+
+
+def score_row(task: dict, reply: str, usage: dict) -> dict:
+    """Score a reply, except that a reply the provider cut off at the output cap before it closed its reasoning carries no
+    answer: it is scored wrong and flagged `truncated`, instead of letting the scorer read a verdict out of the fragment
+    (2026-10-05: glm's truncated conflict replies were scored 'mirrored' 95 % of the time from their reasoning text)."""
+    if (usage or {}).get("done_reason") == "length" and "</think>" not in (reply or ""):
+        return {"correct": False, "truncated": True}
+    return score(task, reply)
 
 
 def _compose_reply(content: str, thinking: str) -> tuple[str, str]:
@@ -420,7 +429,7 @@ def main():
                 except Exception as e:
                     reply, err, usage = "", f"{type(e).__name__}: {str(e)[:200]}", {}
                 rows.append({"model": m, "model_id": mid, "provider": prov, "condition": c, "task": t["id"], "type": t["type"], "gating": t["gating"], "rep": rep, "reply": reply, "error": err, "usage": usage,
-                             "score": score(t, reply) if not err else {}, "harness_commit": commit, "scorer": SCORER_VERSION, "tasks_version": TASKS_VERSION,
+                             "score": score_row(t, reply, usage) if not err else {}, "harness_commit": commit, "scorer": SCORER_VERSION, "tasks_version": TASKS_VERSION,
                              "prompt_sha256": psha, "reply_sha256": hashlib.sha256(reply.encode()).hexdigest() if not err else None})
                 # abort policy: deterministic client errors (404/410/401/400) after 5 identical in a row;
                 # transient server errors / timeouts (5xx, timed out, 429) only after 20 in a row (degraded cloud periods)

@@ -162,7 +162,7 @@ def test_think_policy_and_output_caps(monkeypatch):
     monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "auto"); monkeypatch.setattr(run, "_NO_THINK", {})
     # auto: nobody thinks (the paper's setting); models that reason inside content get the larger output cap
     assert not run._think_for("glm-5.3-flash:cloud") and not run._think_for("kimi-k3:cloud")
-    assert run._num_predict("glm-5.3-flash:cloud", False) == 2400 and run._num_predict("kimi-k3:cloud", False) == 800
+    assert run._num_predict("glm-5.3-flash:cloud", False) == 8000 and run._num_predict("kimi-k3:cloud", False) == 800
     monkeypatch.setattr(run, "OLLAMA_THINK_MODE", "on")
     assert run._think_for("kimi-k3:cloud") and run._num_predict("kimi-k3:cloud", True) == 4000
     monkeypatch.setattr(run, "_NO_THINK", {"kimi-k3:cloud": True})
@@ -178,3 +178,11 @@ def test_misleading_label_is_stable_across_processes(tmp_path, monkeypatch):
     code = f"import sys; sys.path.insert(0, {str(ROOT / 'bench')!r}); import tasks, pathlib; print(next(t for t in tasks.tasks_for_package(pathlib.Path({str(pkg)!r}), labels=[]) if t['type'] == 'findings_misled')['misleading_label'])"
     other = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env={"PYTHONHASHSEED": "12345", "PATH": ""}).stdout.strip()
     assert other == here
+
+
+def test_a_reply_cut_off_inside_its_reasoning_carries_no_answer():
+    task = {"type": "flip_check", "answer": "mirrored"}
+    cut = "the apex points right so the image is mirrored, but the label says"           # fragment, no closing tag
+    assert run.score_row(task, cut, {"done_reason": "length"}) == {"correct": False, "truncated": True}
+    assert run.score_row(task, cut, {"done_reason": "stop"})["correct"] is True              # complete reply: scored as before
+    assert run.score_row(task, "<think>long</think>mirrored", {"done_reason": "length"})["correct"] is True   # answer after the tag survives
