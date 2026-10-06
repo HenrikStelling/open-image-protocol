@@ -329,7 +329,12 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
         raise last
     if provider == "anthropic":
         import anthropic
-        c = anthropic.Anthropic()   # credentials: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile
+        # credentials: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile. timeout: on 2026-10-05 two Claude
+        # runs hung for hours inside a request that never returned (open sockets, no read timeout); a bounded request raises
+        # APITimeoutError ("Request timed out"), which the retry wrapper above treats as transient.
+        # 60 s and no SDK-internal retries: the wrapper above already retries five times, and each hung attempt costs the full
+        # timeout (stalls of 36 min were 15 × 120 s during network drops on 2026-10-05).
+        c = anthropic.Anthropic(timeout=60.0, max_retries=0)
         # Prompt caching: the image and the reference file are identical across the ~12 questions per package, so they are
         # marked as cache breakpoints and only the question is billed at full price after the first call (5-min TTL).
         content = [{"type": "image", "source": {"type": "base64", "media_type": mt, "data": base64.standard_b64encode(_downscale(b)).decode("utf-8")}, "cache_control": {"type": "ephemeral"}} for mt, b in images]
@@ -350,7 +355,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
                                                                         "cache_read_input_tokens": getattr(u, "cache_read_input_tokens", None), "cache_creation_input_tokens": getattr(u, "cache_creation_input_tokens", None)}
     if provider == "openai":
         from openai import OpenAI
-        c = OpenAI()
+        c = OpenAI(timeout=60.0, max_retries=0)   # bounded request, retries in the wrapper above; see the Anthropic note
         content = [{"type": "input_image", "image_url": f"data:{mt};base64,{base64.b64encode(_downscale(b)).decode()}"} for mt, b in images] + [{"type": "input_text", "text": text}]
         r = c.responses.create(model=model, instructions=system, input=[{"role": "user", "content": content}], max_output_tokens=600,
                                reasoning={"effort": "low"})   # reasoning tokens bill as output and eat the budget; low suits short factual answers
