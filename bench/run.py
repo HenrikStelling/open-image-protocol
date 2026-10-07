@@ -63,6 +63,18 @@ def system_for(condition: str) -> str:
     return SYSTEM + VERIFY_INSTR if condition.endswith("_instr") else SYSTEM
 
 
+def ollama_version() -> str | None:
+    """Version of the local Ollama daemon (also the proxy for the cloud tags), recorded in run_meta.json; None when it is not running."""
+    import urllib.request
+    base = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
+    if not base.startswith("http"): base = "http://" + base
+    try:
+        with urllib.request.urlopen(base + "/api/version", timeout=5) as r:
+            return json.load(r).get("version")
+    except Exception:   # noqa: BLE001
+        return None
+
+
 def harness_commit() -> str:
     """Short git commit of the harness, recorded in run_meta.json and in every result row (harness provenance, PLAN Phase 3b)."""
     import subprocess
@@ -409,7 +421,7 @@ def main():
             (run / "run_meta.json").write_text(json.dumps({"harness_commit": commit, "scorer": SCORER_VERSION, "dataset": a.dataset, "pkg_dir": a.pkg_dir,
                                                            "n": a.n, "seed": a.seed, "models": models, "model_ids": {m: MODELS.get(m) for m in models}, "conditions": conds,
                                                            "tasks_filter": a.tasks, "system_prompt": SYSTEM, "verify_instruction": VERIFY_INSTR if any(c.endswith("_instr") for c in conds) else None,
-                                                           "ollama_think": OLLAMA_THINK_MODE, "tasks_version": TASKS_VERSION, "thresholds": THRESHOLDS, "repeats": a.repeats, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
+                                                           "ollama_think": OLLAMA_THINK_MODE, "ollama_version": ollama_version(), "tasks_version": TASKS_VERSION, "thresholds": THRESHOLDS, "repeats": a.repeats, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
