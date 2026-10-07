@@ -293,7 +293,7 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
     if provider == "ollama":
         # Local daemon (http://localhost:11434 by default); ':cloud' / '-cloud' tags are routed to Ollama Cloud through the
         # signed-in account, so no API key is needed. Native /api/chat with base64 images. OLLAMA_HOST overrides the base URL.
-        import urllib.request
+        import urllib.request, urllib.error
         base = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
         if not base.startswith("http"): base = "http://" + base
         # Thinking (2026-09-29, OEP-002 readout): with think=false, glm-5.3-flash still reasons inside `content` and closes it
@@ -319,6 +319,13 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
             except Exception as e:                     # noqa: BLE001
                 last = e
                 msg = str(e)
+                if getattr(e, "code", None) == 429:
+                    # the daily / weekly plan limit comes back as 429 with the reason in the body; it lifts after hours, not
+                    # seconds, so it is raised at once (the main loop aborts the model and the lane's health gate waits)
+                    try: body_txt = e.read().decode(errors="replace")[:200]
+                    except Exception: body_txt = ""   # noqa: BLE001
+                    if "usage limit" in body_txt:
+                        raise urllib.error.HTTPError(e.url, 429, f"usage limit: {body_txt}", e.headers, None) from None
                 if think and "400" in msg:
                     # the daemon answers HTTP 400 for models without the thinking capability: remember it and retry without
                     _NO_THINK[model] = True
@@ -441,7 +448,7 @@ def main():
                 recent = [r["error"] for r in rows[-20:] if r["model"] == m]; last5 = recent[-5:]
                 transient = lambda e: any(k in (e or "") for k in ("502", "503", "504", "timed out", "429"))
                 if (len(last5) == 5 and all(last5) and len({e[:60] for e in last5}) == 1 and not transient(last5[-1])) or \
-                   (len(recent) == 20 and all(recent) and all(transient(e) for e in recent)):
+                   (len(recent) == 20 and all(recent) and all(transient(e) for e in recent)) or "usage limit" in (recent[-1] or ""):
                     (run / "results.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
                     sys.exit(f"ABORT {m}: consecutive errors -> {recent[-1][:160]} (retired tag? auth? degraded cloud? see bench/README.md)")
                 if i % 20 == 0: print(f"  {m}/{c}" + (f" rep {rep}" if a.repeats > 1 else "") + f": {i}/{len(tasks)}", flush=True)
