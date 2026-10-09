@@ -175,6 +175,7 @@ Exit criteria: NM packages from real data validate; NM benchmark tasks added; co
 - [ ] Python SDK polish, `pip install oip`
 - [ ] CLI `oip serve`, `oip bench`
 - [ ] Try it from Claude Desktop / Claude Code and one non-Anthropic host
+- [ ] Test host for the Ollama models: `ollmcp` ([jonigl/mcp-client-for-ollama](https://github.com/jonigl/mcp-client-for-ollama), MIT; forwards tool-returned images to vision models, supports resources, hot-reloads the server). Manual smoke test and demo only: pass the OIP server explicitly (it auto-discovers Claude's MCP configs otherwise) and keep tool approval on. The exit criterion itself is measured by a scripted loop in the harness (MCP SDK + Ollama API), since ollmcp is interactive and records no run metadata
 Exit criteria: a model in an MCP host answers the self-check questions correctly on all examples.
 
 ### Phase 6 — Governance, interop, release (weeks 12–16)
