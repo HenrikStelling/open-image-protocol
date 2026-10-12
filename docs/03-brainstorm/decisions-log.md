@@ -239,3 +239,25 @@ contrast is 56 improved / 26 worsened (p = 0.0012, +7.5 pp; images shared across
 5 for, 0 against, 3 ties. Decision (1) stands; no further OEP-002 spend.
 
 **Claude arm completed 2026-10-02 07:10 (resumed from the pinned harness c201602 after the top-up; 1,200 rows, 0 errors; $11.19 list in total for Claude).** claude-sonnet-5: control 50 % (1/100 mirrored caught) · cues 48 % (0) · instruction 50 % (1) · both 50 % (1); left edge 95 → 100 → 95 → 100 %. Every mirrored image is still answered "agree" in every arm. **The ablation is now complete across eleven models (three frontier, seven open, plus the retired qwen3.5's absence recorded): the decision above stands; OEP-003/004 closed, not adopted.** Final ten-model table in `docs/reports/pilot-ollama-report.md` ("Verification ablation").
+
+## D-032 — Round 3a: the four-cell conflict design replaces the flip check; two of ten models compare file and pixels · decided · 2026-10-13
+Round 3a (2026-09-30 → 10-13; `docs/reports/round3a-2026-09-30.md`): VinDr-100, 82 packages with a clear cardiac cue and a
+marker-free masked render (`bench/marker_review.json`), four conflict cells per image (file labels true/swapped × image
+normal/mirrored) on the canonical and the marker-masked render, a label-reading control with balanced truth, mark side with and
+without the region list; ten models (seven Ollama with three replies per cell, gemini-3.8-flash, gpt-5.6-terra, claude-sonnet-5
+with one), 1,056 items per model and reply. Findings: (1) gemini 94 % and gpt 91 % on the four cells with the decisive WN cell
+(wrong file, normal image) at 100 % — they compare the file with the pixels; (2) glm 61–68 % per reply, partial and unstable,
+−9 pp without the burned-in marker (p = 0.005, Holm 0.05); (3) seven models follow a single source on every image: the file
+(claude, mistral, e4b, MedGemma, minimax), the file against the display convention (gemma4:31b, a policy that scored like 'always
+agree' on the paper's flip check), or noise (kimi, 47 % identical verdicts over three replies); (4) the burned-in marker carried
+kimi's and minimax's partial passes (mirrored detections 23 → 12 % and 15 → 2 % without it); (5) printed-label reading 88–100 % for
+eight models (MedGemma inverts, claude answers the convention when labels are swapped), mark side without the region list
+91–99 % for the capable models (mistral alone needs the names, 91 → 80 %). Decisions: (a) the four-cell conflict design is the
+orientation-check endpoint from round 3 on; the flip check is retired because it cannot separate single-source policies from
+comparison; (b) the marker-masked render (`run.mask_box`) is the default image for anatomy-only orientation items; (c) a
+per-image policy is reported only from the majority of ≥ 3 replies; (d) a reply cut off at the output cap carries no answer
+(`run.score_row`, flag `truncated`; glm needs an 8,000-token cap and still loses 14 %); (e) paper: the claim that no model checks
+the file against the image is restricted to the open models — gemini and gpt do check; the frontier replication of the paper's
+flip-check result is therefore confirmed in the stronger design. Open: repeats for gemini and gpt (≈ $21, owner's call),
+the frontier models on the masked render only matter for gpt (−5 pp, n.s.).
+
