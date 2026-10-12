@@ -146,6 +146,26 @@ def main() -> None:
             same = sum(1 for v in full.values() if len(set(v.values())) == 1)
             L.append(f"| {m.split('/', 1)[-1]} | {c} | {len(full)} | {pct(same, len(full))} | " + " / ".join(f"{100 * sum(v[k] for v in full.values()) / len(full):.0f}" for k in range(reps)) + " |")
         L.append("")
+    if reps > 1:
+        # policy per image from the MAJORITY verdict of the repeats (a single sampled flip no longer turns 'compares' into 'other')
+        L += ["## 7. Policy per image from the majority verdict of the repeats", "",
+              "| model | render | compares / text only / pixels only / file vs convention / always mirrored / other | all four cells, majority |", "|---|---|---|---|"]
+        allv = defaultdict(lambda: defaultdict(dict))        # (model, condition) -> task -> rep -> verdict
+        for r in rows:
+            if r["type"] == "orient_conflict": allv[(r["model"], r["condition"])][r["task"]][r.get("rep", 0)] = verdict(r)
+        for (m, c), items in sorted(allv.items()):
+            full = {i: v for i, v in items.items() if len(v) == reps}
+            if len(full) < 4: continue
+            maj = {}
+            for i, v in full.items():
+                cnt = Counter(x for x in v.values() if x)
+                maj[i] = cnt.most_common(1)[0][0] if cnt and cnt.most_common(1)[0][1] * 2 > reps else None
+            per_img = defaultdict(dict)
+            for i, mv in maj.items(): per_img[tasks[i]["pkg"]][tasks[i]["cell"]] = mv
+            pol = Counter(POLICY.get(tuple(v.get(x) for x in CELLS), "other") for v in per_img.values() if len(v) == 4)
+            k = sum(1 for i, mv in maj.items() if mv == tasks[i]["answer"]); n = len(maj)
+            L.append(f"| {m.split('/', 1)[-1]} | {'canonical' if c == 'ctx3' else 'marker-masked'} | " + " / ".join(str(pol.get(q, 0)) for q in POLICIES) + f" (of {sum(pol.values())}) | {pct(k, n)} |")
+        L.append("")
     notes = ROOT / "docs/reports/round3a-readings.md"     # hand-written interpretation, appended so a regeneration keeps it
     if notes.exists(): L += ["", notes.read_text().rstrip()]
     out = "\n".join(L)
