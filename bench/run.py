@@ -294,6 +294,8 @@ def call(provider: str, model: str, text: str, images: list[tuple[str, bytes]], 
             return _call(provider, model, text, images, system)
         except Exception as e:                     # noqa: BLE001
             msg = f"{type(e).__name__}: {e}"
+            if any(k in msg for k in ("insufficient_quota", "credit_balance", "credits are depleted", "no credits", "usage limit", "RESOURCE_EXHAUSTED")):
+                raise   # an exhausted balance or plan limit lifts after a top-up, not after a back-off (2026-10-14: a 429 'credit_balance_exhausted' cost ~8 min per call)
             if not any(k in msg for k in ("503", "502", "504", "429", "500", "overloaded", "Broken pipe", "disconnected", "timed out", "Timeout", "ReadError", "ConnectError", "Connection error", "APIConnectionError")):
                 raise
             last = e; time.sleep([5, 15, 45, 135, 300][min(attempt, 4)])
