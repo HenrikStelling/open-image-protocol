@@ -384,7 +384,8 @@ def _call(provider: str, model: str, text: str, images: list[tuple[str, bytes]],
     if provider == "google":
         from google import genai
         from google.genai import types
-        c = genai.Client(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
+        # bounded request like the Anthropic/OpenAI clients: a Gemini call hung for 10 h on 2026-10-14 without a timeout
+        c = genai.Client(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"), http_options=types.HttpOptions(timeout=60_000))
         parts = [types.Part.from_bytes(data=_downscale(b), mime_type=mt) for mt, b in images] + [text]
         r = c.models.generate_content(model=model, contents=parts, config=types.GenerateContentConfig(system_instruction=system, max_output_tokens=600,
                                                                                             thinking_config=types.ThinkingConfig(thinking_level="low")))   # Gemini 3.x thinks by default; low keeps the answer inside the output budget
