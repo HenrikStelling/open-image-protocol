@@ -44,6 +44,12 @@
    followers (gemma4:31b 76/82 'file vs convention', e4b / MedGemma / mistral 82/82 'always agree', minimax 55 → 76/82
    'always agree' on the masked render) and leaves kimi (43/82 'other') and glm (70/82) where single replies had them: for
    those two the four cells do not combine into any stable policy on most images. gemini and gpt have single replies.
+9a. **Frontier repeats (2026-10-13 → 15, owner's go):** claude 3/3 replies, 100 % identical verdicts on the conflict items
+   (always agree, 50 % in every repeat), labels 74 / 76 / 74 %. gemini 3/3: identical verdicts on 89 % (canonical) and 82 %
+   (masked) of the conflict items, four-cell accuracy 94 → 90 → 88 % (canonical) and 94 → 89 → 86 % (masked) across the three
+   repeats — a stable 'compares' verdict on 59/82 images by majority (92 % of cells), with a drift between repeats that
+   is larger than for any rule-follower and worth a note (same prompts, same model id, 11 days apart: snapshot or sampling).
+   Label reading and mark side 99–100 % in every repeat. gpt: repeats in progress.
 9. **Claude-sonnet-5 (run by the other session, 2026-10-05):** text-only policy on 82/82 images, like mistral and the small
    models; and it reads the printed labels as shipped (100 %) but answers the convention when they are swapped (47 %), i.e. it
    does not read labels at all. mark side 93 / 91 %.
