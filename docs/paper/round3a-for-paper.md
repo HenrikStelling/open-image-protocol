@@ -45,6 +45,13 @@ Ollama models have three replies per cell (stability in table 6, majority polici
 "single source" = text only + pixels only + file vs convention + always mirrored. Chance for the four-cell total is 50 % under
 every single-source policy.
 
+## Repeats (added 2026-10-16)
+All ten models now have three replies per cell. Majority-of-three policies (table 7): gemini 'compares' 59/82, gpt 64/82
+(canonical) and 56/82 (masked), glm 9/82, every other model 0. Stability (identical verdict on all three replies, conflict
+items): claude, mistral, e4b 100 %; gemma4:31b, MedGemma 96 %; gemini 89 %; gpt 82 %; minimax 69 %; glm 56 %; kimi 47 %.
+gpt's marker effect is −5 pp in each of the three repeats (91/89/90 → 86/85/84 %); gemini's accuracy drifts 94 → 90 → 88 %
+across identical repeats (unpinned snapshot caveat for §7).
+
 ## Not for this revision
 The current paper keeps its numbers and its flip-check table; these results are a round-3 addition (v2 or the second paper,
 PLAN Phase 3b "Paper"). What the current revision can take is the one-sentence qualifier in §6 and the title/abstract wording.

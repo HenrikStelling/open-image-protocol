@@ -260,4 +260,11 @@ per-image policy is reported only from the majority of ≥ 3 replies; (d) a repl
 the file against the image is restricted to the open models — gemini and gpt do check; the frontier replication of the paper's
 flip-check result is therefore confirmed in the stronger design. Open: repeats for gemini and gpt (≈ $21, owner's call),
 the frontier models on the masked render only matter for gpt (−5 pp, n.s.).
+**Addendum 2026-10-16 — frontier repeats complete (claude 10-13, gemini 10-15, gpt 10-16; three replies per cell for all ten
+models):** claude 100 % identical ('always agree', 50 % in every repeat); gemini 94 → 90 → 88 % across repeats, 'compares' on 59/82
+images by majority (92 % of cells), mask effect none; gpt 91 / 89 / 90 % canonical vs 86 / 85 / 84 % masked — the −5 pp marker
+effect is the same in every repeat, i.e. real but small; 'compares' 64/82 canonical, 56/82 masked by majority. Verdict (1)–(5)
+unchanged. Spend per the owner's bills: gemini ≈ $5.6 (matched the estimate), gpt ≈ EUR 20 for the second half alone (the
+token-based estimate under-counted 2.5×; `COST_CALIBRATION` added), claude per the Anthropic bill. Gemini's accuracy drift across
+identical repeats (94 → 88) is noted as an unpinned-snapshot caveat.
 

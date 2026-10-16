@@ -1,4 +1,4 @@
-## Readings (final, 2026-10-13: seven Ollama models with three replies per cell, gemini / gpt / claude-sonnet-5 with one; 10 models × 1,056 items; Ollama weekly limits held 10-01→10-05 and 10-07→10-12, the Mac rebooted 10-08)
+## Readings (final, 2026-10-16: all ten models with three replies per cell — seven Ollama by 10-13, claude 10-13, gemini 10-15, gpt 10-16; 10 models × 1,056 items; Ollama weekly limits held 10-01→10-05 and 10-07→10-12, the Mac rebooted 10-08)
 
 1. **Two models compare the file with the image; four never look at the pixels for this question.** gemini-3.8-flash is right on
    94 % of the four cells and classified as "compares" on 64/82 images, gpt-5.6-terra on 91 % and 55/82. The decisive cell is
@@ -49,7 +49,12 @@
    (masked) of the conflict items, four-cell accuracy 94 → 90 → 88 % (canonical) and 94 → 89 → 86 % (masked) across the three
    repeats — a stable 'compares' verdict on 59/82 images by majority (92 % of cells), with a drift between repeats that
    is larger than for any rule-follower and worth a note (same prompts, same model id, 11 days apart: snapshot or sampling).
-   Label reading and mark side 99–100 % in every repeat. gpt: repeats in progress.
+   Label reading and mark side 99–100 % in every repeat. gpt 3/3 (done 2026-10-16): identical verdicts on 82 % (canonical)
+   and 78 % (masked) of the conflict items, four-cell accuracy 91 / 89 / 90 % canonical and 86 / 85 / 84 % masked — the
+   marker effect (−5 pp) is the same in every repeat, so it is not sampling noise; by majority 'compares' on 64/82 images
+   canonical (93 % of cells) and 56/82 masked (89 %), with 11 images drifting to 'file vs convention' without the marker.
+   Labels 96 / 96 / 98 %, mark side without the region list 99 % in every repeat. All ten models now have three replies
+   per cell except none — the round's tables are complete.
 9. **Claude-sonnet-5 (run by the other session, 2026-10-05):** text-only policy on 82/82 images, like mistral and the small
    models; and it reads the printed labels as shipped (100 %) but answers the convention when they are swapped (47 %), i.e. it
    does not read labels at all. mark side 93 / 91 %.
