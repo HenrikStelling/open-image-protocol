@@ -268,3 +268,13 @@ unchanged. Spend per the owner's bills: gemini ≈ $5.6 (matched the estimate), 
 token-based estimate under-counted 2.5×; `COST_CALIBRATION` added), claude per the Anthropic bill. Gemini's accuracy drift across
 identical repeats (94 → 88) is noted as an unpinned-snapshot caveat.
 
+## D-033 — Metal workaround dropped: the Ollama daemon setting does not change benchmark behaviour · decided · 2026-10-16
+Runtime experiment (`docs/reports/runtime-2026-10-16.md`): gemma4 e4b and MedGemma 1.5 4B on the same 50 VinDr packages, raw and
+ctx, five tasks, three replies per cell, under Ollama 0.40.1 with and without `GGML_METAL_TENSOR_DISABLE=1` (the 2026-09-08
+workaround for a Metal tensor-kernel bug on this M5). Every file-bearing cell is identical; image-only cells agree within noise
+once the repeats are pooled (largest gap e4b raw left edge 51 vs 43 %, overlapping intervals; the repeat-0 contrast of 64 vs 38 %
+did not hold); no empty or cut-off replies under either setting; the default is marginally faster. Decision: the variable is
+removed, local runs use the daemon default, `run_meta.json` records `ollama_env` and `ollama_version` so a future kernel change is
+traceable. The local paper cells (September, 0.33.3 with the workaround) stand: the experiment shows the kernel switch did not
+move them. oMLX as a second runtime remains optional (different quantisation, PLAN).
+

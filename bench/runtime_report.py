@@ -77,6 +77,8 @@ def main():
             ver = {r.get("ollama_version") for r in x}
             L.append(f"| {rt} | {len(full)} | {pct(same, len(full))} | {empty} | {cut} | {lat:.1f} | {', '.join(str(v) for v in ver)} |")
         L.append("")
+    notes = ROOT / "docs/reports/runtime-readings.md"     # hand-written interpretation, appended so a regeneration keeps it
+    if notes.exists(): L += ["", notes.read_text().rstrip()]
     out = "\n".join(L)
     if a.out: Path(a.out).write_text(out + "\n"); print("wrote", a.out)
     else: print(out)

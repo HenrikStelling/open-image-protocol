@@ -37,3 +37,11 @@ into each other's back-off (2026-09-27).
 - `--repeats N`: N replies per (model, condition, task); rows carry `rep`; `--resume <dir> --repeats N` adds missing replies. Replies are collected repeat by repeat.
 - Every row: `tasks_version`, `prompt_sha256` (system prompt, user text, image bytes), `reply_sha256`, `harness_commit`, `scorer`. `run_meta.json`: `tasks_version`, `thresholds`, `repeats`, `ollama_think`.
 - Readout: `python bench/round3_report.py --out docs/reports/round3a-<date>.md`.
+
+## Local daemon settings (2026-10-16)
+The Metal workaround `launchctl setenv GGML_METAL_TENSOR_DISABLE 1` (set 2026-09-08 for garbled local output on Ollama 0.33) is no
+longer used: a controlled comparison under Ollama 0.40.1 (`bench/runtime_report.py`, `docs/reports/runtime-2026-10-16.md`) found no
+difference in any benchmark cell and no garbled replies without it. Every run records the daemon's value of that variable
+(`run_meta.json` → `ollama_env`) and the daemon version (`ollama_version`), so a future kernel change is traceable. Note for anyone
+relaunching the menubar app from a shell: `open -a Ollama` hands the shell's environment to the app, so launch it from
+Launchpad/Spotlight (or log in afresh) to get a clean daemon environment.
