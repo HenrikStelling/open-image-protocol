@@ -79,6 +79,17 @@ def ollama_version() -> str | None:
         return None
 
 
+def ollama_env() -> dict:
+    """Launch-agent environment the local Ollama daemon runs with (runtime experiment, PLAN Phase 3b): the Metal tensor-kernel
+    switch set on this Mac on 2026-09-08. Read via launchctl, so it reflects the daemon's environment, not the runner's."""
+    import subprocess
+    out = {}
+    for var in ("GGML_METAL_TENSOR_DISABLE",):
+        try: out[var] = subprocess.run(["launchctl", "getenv", var], capture_output=True, text=True, timeout=5).stdout.strip() or None
+        except Exception: out[var] = "unknown"   # noqa: BLE001
+    return out
+
+
 def harness_commit() -> str:
     """Short git commit of the harness, recorded in run_meta.json and in every result row (harness provenance, PLAN Phase 3b)."""
     import subprocess
@@ -402,6 +413,7 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dataset", default="vindr"); ap.add_argument("--n", type=int, default=50); ap.add_argument("--models", default="claude,gpt,gemini")
     ap.add_argument("--resume", help="existing run dir: reuse tasks.json, skip rows already done"); ap.add_argument("--pkg-dir", help="directory of .oip packages (default data/oip/<dataset>); use a copy outside iCloud-synced folders"); ap.add_argument("--conditions", default=DEFAULT_CONDITIONS, help="; ".join(f"{k} = {v}" for k, v in CONDITIONS.items())); ap.add_argument("--ollama-think", nargs="?", const="on", default="auto", choices=["off", "on", "auto"], help="Ollama thinking: auto (default since round 3: think=false for every model; models that reason inside content, i.e. glm, get a 2,400-token output cap instead of 800), off (the paper runs' setting: think=false, 800 tokens for all), on (think=true with a 4,000-token cap, reasoning stored as <think>…</think>, per-model fallback when the daemon rejects the field)"); ap.add_argument("--repeats", type=int, default=1, help="replies per (model, condition, task); rows carry rep = 0..N-1, and --resume with a larger N adds the missing replies"); ap.add_argument("--gpt-model"); ap.add_argument("--gemini-model"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tasks", help="comma-separated task types to keep (e.g. flip_check,left_edge); default: all built tasks")
+    ap.add_argument("--label", help="free-text label stored in run_meta.json (e.g. the runtime condition of an experiment)")
     ap.add_argument("--no-cloud-lock", action="store_true", help="skip the shared one-cloud-model-at-a-time lock (bench/cloudlock.py); only for diagnostics"); a = ap.parse_args()
     if a.gpt_model: MODELS["gpt"] = ("openai", a.gpt_model)
     if a.gemini_model: MODELS["gemini"] = ("google", a.gemini_model)
@@ -428,7 +440,7 @@ def main():
             (run / "run_meta.json").write_text(json.dumps({"harness_commit": commit, "scorer": SCORER_VERSION, "dataset": a.dataset, "pkg_dir": a.pkg_dir,
                                                            "n": a.n, "seed": a.seed, "models": models, "model_ids": {m: MODELS.get(m) for m in models}, "conditions": conds,
                                                            "tasks_filter": a.tasks, "system_prompt": SYSTEM, "verify_instruction": VERIFY_INSTR if any(c.endswith("_instr") for c in conds) else None,
-                                                           "ollama_think": OLLAMA_THINK_MODE, "ollama_version": ollama_version(), "tasks_version": TASKS_VERSION, "thresholds": THRESHOLDS, "repeats": a.repeats, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
+                                                           "ollama_think": OLLAMA_THINK_MODE, "ollama_version": ollama_version(), "ollama_env": ollama_env(), "label": a.label, "tasks_version": TASKS_VERSION, "thresholds": THRESHOLDS, "repeats": a.repeats, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": sys.argv[1:]}, indent=1))
     if a.dry_run:
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
