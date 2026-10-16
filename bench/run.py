@@ -13,6 +13,10 @@ from score import score, SCORER_VERSION
 MODELS = {"claude": ("anthropic", "claude-sonnet-5"), "gpt": ("openai", "gpt-5.6-terra"), "gemini": ("google", "gemini-3.8-flash")}
 # $ per 1M tokens (input, output) for the cost estimate; Anthropic from the current price table, others approximate.
 PRICES = {"claude": (2.0, 10.0), "gpt": (2.0, 12.0), "gemini": (0.75, 3.75)}   # $/1M tokens (in, out), Sep 2026 price pages
+# Measured correction to the token-based estimate (owner's bills, 2026-10-16): EUR 20 of OpenAI credits bought 997 round-3 calls
+# (image + full reference file), i.e. ~2.5x the table above; Gemini matched the table; Claude's cache-read tokens are not captured,
+# so its estimate is a lower bound. The dry run multiplies by this factor and says so.
+COST_CALIBRATION = {"gpt": 2.5, "claude": 1.5, "gemini": 1.0}
 IMAGE_TOKENS = 1600   # ~1568 px long side image on Claude; comparable order on other providers
 OLLAMA_THINK = False          # set from --ollama-think (off | on | auto); see _call()
 OLLAMA_THINK_MODE = "off"
@@ -429,10 +433,10 @@ def main():
         chars = {c: sum(len(build_prompt(t, c)[0]) for t in tasks if applies(t, c)) for c in conds}
         n_calls = sum(1 for c in conds for t in tasks if applies(t, c))
         in_tok = sum(v // 4 for v in chars.values()) + IMAGE_TOKENS * n_calls; out_tok = 400 * n_calls   # ~400 output incl. thinking
-        cost = {m: (round(in_tok / 1e6 * PRICES[m][0] + out_tok / 1e6 * PRICES[m][1], 2) if m in PRICES else "ollama plan allowance") for m in models}
+        cost = {m: (round((in_tok / 1e6 * PRICES[m][0] + out_tok / 1e6 * PRICES[m][1]) * COST_CALIBRATION.get(m, 1.0), 2) if m in PRICES else "ollama plan allowance") for m in models}
         print(json.dumps({"tasks": len(tasks), "by_type": {t: sum(1 for x in tasks if x["type"] == t) for t in sorted({x["type"] for x in tasks})}, "calls_per_model": n_calls,
                           "approx_text_tokens_per_condition": {c: v // 4 for c, v in chars.items()}, "approx_input_tokens_per_model": in_tok, "approx_output_tokens_per_model": out_tok,
-                          "approx_cost_usd_per_model": cost, "models": {m: (MODELS[m] if m in MODELS else ("ollama", m.split("/", 1)[1])) for m in models}, "run_dir": str(run)}, indent=1)); return
+                          "approx_cost_usd_per_model": cost, "cost_note": "token estimate x measured calibration (gpt 2.5, claude 1.5): a lower bound, check the provider bill", "models": {m: (MODELS[m] if m in MODELS else ("ollama", m.split("/", 1)[1])) for m in models}, "run_dir": str(run)}, indent=1)); return
     rows = [json.loads(l) for l in (run / "results.jsonl").read_text().splitlines() if l.strip()] if (run / "results.jsonl").exists() else []
     rows = [r for r in rows if not r.get("error")]          # failed rows are retried
     done = {(r["model"], r["condition"], r["task"], r.get("rep", 0)) for r in rows if not r.get("error")}   # error rows are retried on resume
