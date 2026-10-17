@@ -84,7 +84,7 @@ def main() -> None:
     t0 = time.time(); found = {}
     with open(Path(a.csv).expanduser(), newline="") as f:
         for row in csv.DictReader(f):
-            sid = Path(row["image_id"]).stem
+            sid = Path(row.get("image_id") or row.get("Image Index") or row.get("Image ID") or "").stem   # VinDr: image_id; ChestX-Ray8: Image Index
             if sid in pkgs: found[sid] = row
             if len(found) == len(pkgs): break
     per = []
