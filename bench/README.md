@@ -45,3 +45,9 @@ difference in any benchmark cell and no garbled replies without it. Every run re
 (`run_meta.json` → `ollama_env`) and the daemon version (`ollama_version`), so a future kernel change is traceable. Note for anyone
 relaunching the menubar app from a shell: `open -a Ollama` hands the shell's environment to the app, so launch it from
 Launchpad/Spotlight (or log in afresh) to get a clean daemon environment.
+
+## Package stores changed on 2026-10-17 (CheXmask cross-check)
+All 150 paper packages (`vindr-paper`, `nih-paper`) carry `validation_status: cross_checked` with a `cross_check` record on `ctr`,
+`heart_width`, `thorax_width`, and their `context.md` was re-rendered with template 0.2.1. Any run with a full reference file made
+after this date sends a measurements table that names CheXmask, n, CCC and bias — a different prompt from the paper runs
+(prompt hashes differ). The paper-era manifests and reference files are in `~/oip-bench/_backup/<store>/<package>/`.

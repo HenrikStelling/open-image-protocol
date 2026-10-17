@@ -55,6 +55,18 @@ def _verification_cues(m: dict, fam: str, el: dict, geo: dict, acq: dict) -> lis
     return out
 
 
+def _validation(x: dict) -> str:
+    """The validation column: a cross-check record is spelled out (source, n, concordance, bias), so the reader sees what the
+    status rests on; `validated` stays reserved for phantom, reference or expert measurements."""
+    cc = x.get("cross_check")
+    if x.get("validation_status") == "cross_checked" and cc:
+        ag = cc.get("aggregate") or {}
+        bias = ag.get("bias"); rel = ag.get("bias_rel_pct"); unit = ag.get("unit", x.get("unit"))
+        bias_txt = f"{bias:+g}" if unit == "1" else f"{bias:+g} {unit}" + (f" ({rel:+.1f} %)" if rel is not None else "")
+        return f"cross-checked against {cc.get('source')} {cc.get('source_version')} (n = {ag.get('n')}, CCC {ag.get('ccc')}, bias {bias_txt}); not a reference measurement"
+    return x["validation_status"]
+
+
 def build_context(m: dict, include_external: bool = False, verification_cues: bool = False, low_confidence_guard: bool = False,
                   estimation_caution: bool | None = None) -> str:
     """include_external=False (default, OEP-001): external labels/report text stay in oip.json and are not rendered.
@@ -174,7 +186,7 @@ def build_context(m: dict, include_external: bool = False, verification_cues: bo
         L.append("| id | name | value | unit | method | confidence | validation |")
         L.append("|---|---|---|---|---|---|---|")
         for x in meas:
-            L.append(f"| {x['id']} | {x['name']} | {_fmt(x['value'])} | {x['unit']} | {x['method']} | {x.get('confidence','–')} | {x['validation_status']} |")
+            L.append(f"| {x['id']} | {x['name']} | {_fmt(x['value'])} | {x['unit']} | {x['method']} | {x.get('confidence','–')} | {_validation(x)} |")
     else:
         L.append("None. (Measurements, when present, are computed by deterministic tools, not by a model.)")
     if fam == "scintigraphy":

@@ -11,6 +11,12 @@ All notable changes to the specification, the reference implementation and the b
 | benchmark scorer | 0.3 | `bench/score.py` `SCORER_VERSION`, recorded per row |
 | harness commit used for the paper runs | 050769a | `run_meta.json` (runs from 2026-09-26), otherwise by run date |
 
+## Unreleased
+
+### Specification and reference file
+- Measurement `validation_status` gains `cross_checked`, with a `cross_check` record (source, version, DOI, date, study-level agreement: n, Lin's CCC, bias, limits of agreement, share within 10 %; the source's value and mask overlap for this image). The reference file spells the record out in the measurements table. Applied to the paper package stores after the CheXmask 1.0.0 comparison (VinDr-100: thorax width CCC 0.99, heart width CCC 0.90 with the package 4 % narrower, CTR CCC 0.76 with the package 0.023 lower; NIH-50: 0.97 / 0.79 / 0.80). `validated` remains reserved for phantom, reference or expert measurements; the lung-union thoracic width is still a definition question that no automatic cross-check settles.
+- Bench round 3a (four-cell orientation conflict design, marker-masked render, label-reading control, three replies per cell; D-032), the runtime experiment (D-033: the Metal workaround is dropped) and the CheXmask validation script `bench/chexmask_validate.py`.
+
 ## 0.2.0 (2026-09-29): the state of the paper, its audits and the first benchmark-driven revisions
 
 Source code of this release: https://doi.org/10.5281/zenodo.23052075 · frozen benchmark replies and packages: https://doi.org/10.5281/zenodo.23040047

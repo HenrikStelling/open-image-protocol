@@ -94,6 +94,8 @@ Implementation status (v0.1 reference): `describe`, `measure`, `validate`, `wind
 | `overlay` | regions / grid / scale | annotated render | — |
 | `validate` | package | schema + package-rule report | — |
 
+Validation status of a measurement: `unvalidated` (default from the converter), `cross_checked` (an independent automatic source agreed within stated limits; the `cross_check` record carries source, n, Lin's concordance, bias and limits of agreement, and the reference file spells it out), `phantom_validated`, `reference_validated`, `expert_validated` (reserved for phantom, reference or expert measurements). A cross-check is not a validation: two automatic segmentations can share a definition error (added 2026-10-17 after the CheXmask comparison, `docs/reports/chexmask-*.md`).
+
 ## 8. Conformance
 A conformant producer: validates every package before writing; fills all MUST
 items; passes the phantom test-suite (`tests/`). A conformant consumer: never
