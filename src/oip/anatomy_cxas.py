@@ -17,22 +17,45 @@ def run_cxas(pkg: Path) -> dict[str, np.ndarray]:
     return {k: np.asarray(Image.open(out / f"{k}.png")) > 127 for k in ("ribs", "heart", "lung_left", "lung_right")}
 
 
-def internal_thoracic_width_px(ribs: np.ndarray, lungs: np.ndarray | None = None) -> dict:
-    """Internal thoracic width = distance between the INNER margins of the lateral chest wall at the widest level.
-    Per row: outermost rib pixel on each side, then walk inward to the end of that contiguous rib run (the inner cortex of the
-    lateral rib segment). Rows are restricted to the lung-bearing region when lung masks are given. Width = max over rows."""
-    H, W = ribs.shape
+def _lateral_runs(ribs: np.ndarray, lungs: np.ndarray | None):
+    """Per lung-bearing row: (row, left outer col, left run length, right outer col, right run length) of the lateral-most rib
+    run on each side of the midline. Rows with ribs on one side only are skipped."""
+    H, W = ribs.shape; mid = W // 2
     rows = range(H)
     if lungs is not None and lungs.any():
-        rr = np.where(lungs.any(axis=1))[0]; rows = range(int(rr.min()), int(rr.max()) + 1)
-    best = (0, None, None, None)
+        rr = np.flatnonzero(lungs.any(axis=1)); rows = range(int(rr.min()), int(rr.max()) + 1)
+    out = []
     for r in rows:
-        idx = np.where(ribs[r])[0]
-        if idx.size < 2: continue
-        l = int(idx.min()); li = l
-        while li + 1 < W and ribs[r, li + 1]: li += 1          # end of the left rib run -> inner margin
-        rt = int(idx.max()); ri = rt
-        while ri - 1 >= 0 and ribs[r, ri - 1]: ri -= 1          # start of the right rib run -> inner margin
-        if ri - li > best[0] and (rt - l) > 0.5 * W * 0.4:      # ignore rows where only one side is segmented
-            best = (int(ri - li), r, li, ri)
-    return {"width_px": best[0], "row": best[1], "left_inner_col": best[2], "right_inner_col": best[3]}
+        row = ribs[r]
+        idx = np.flatnonzero(np.diff(np.concatenate([[0], row.astype(np.int8), [0]])))
+        runs = list(zip(idx[::2], idx[1::2] - 1))
+        left = [x for x in runs if x[1] < mid]; right = [x for x in runs if x[0] > mid]
+        if left and right:
+            lo, ro = left[0], right[-1]
+            out.append((r, int(lo[0]), int(lo[1] - lo[0] + 1), int(ro[1]), int(ro[1] - ro[0] + 1)))
+    return out
+
+
+def internal_thoracic_width_px(ribs: np.ndarray, lungs: np.ndarray | None = None, convention: str = "q25") -> dict:
+    """Internal thoracic width = distance between the inner margins of the lateral chest wall at the widest level, from the
+    union of the CXAS rib masks. The lateral-most rib run on each row marks the outer chest wall; its inner margin is
+    - convention "q25": the outer edge minus the 25th percentile of the lateral run lengths over all rows (the tangential rib
+      cortex; robust to oblique posterior ribs merging with the lateral segment in some rows; always defined), or
+    - convention "v2": the inner end of the run itself, with rows whose lateral run exceeds 3 % of the image width skipped
+      (fails when every row is skipped).
+    Width = maximum over the lung-bearing rows. On 100 VinDr paper images (2026-10-17, `docs/reports/itw-cxas-2026-10-17.md`) the
+    q25 width is 3.4 % and the v2 width 1.5 % narrower than the lung-union width the converter uses, i.e. within the resolution
+    of a 512-px rib mask; the September version of this function walked along the contiguous run into oblique ribs and gave
+    widths down to 74 % of the lung union — it is withdrawn."""
+    lat = _lateral_runs(ribs, lungs)
+    W = ribs.shape[1]
+    if convention == "v2":
+        cand = [(ro - lo_len_end, r, lo_len_end, ro) for (r, lo, ll, ro_out, rl) in lat for lo_len_end, ro in [(lo + ll - 1, ro_out - rl + 1)]
+                if ll <= 0.03 * W and rl <= 0.03 * W and ro - lo_len_end > 0]
+        if not cand: return {"width_px": 0, "rows_used": 0, "convention": "v2"}
+        best = max(cand); return {"width_px": int(best[0]), "row": int(best[1]), "left_inner_col": int(best[2]), "right_inner_col": int(best[3]), "rows_used": len(cand), "convention": "v2"}
+    if len(lat) < 10: return {"width_px": 0, "rows_used": len(lat), "convention": "q25"}
+    tl = float(np.percentile([x[2] for x in lat], 25)); tr = float(np.percentile([x[4] for x in lat], 25))
+    best = max(((x[3] - tr) - (x[1] + tl), x[0], x[1] + tl, x[3] - tr) for x in lat)
+    return {"width_px": int(round(best[0])), "row": int(best[1]), "left_inner_col": int(round(best[2])), "right_inner_col": int(round(best[3])),
+            "rows_used": len(lat), "thickness_px": [round(tl, 1), round(tr, 1)], "convention": "q25"}

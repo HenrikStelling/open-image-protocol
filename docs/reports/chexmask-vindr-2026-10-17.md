@@ -47,8 +47,10 @@ Dice overlap package vs CheXmask: heart median 0.927 (min 0.647), lungs median 0
 3. **CTR: agreement is moderate** (CCC 0.76, r 0.84; package 0.477 vs CheXmask 0.500 on average, 87 % within 10 %), with the
    package systematically lower by 0.023. The sign reverses the September concern: against CheXmask the package CTR is biased
    low, not high. CTR > 0.5 on 33 % (package) and 46 % (CheXmask) of the 100 images, both far above the expected prevalence
-   (~18 %), which confirms that the shared lung-union thoracic width under-estimates the internal thoracic width — a
-   definition problem that this cross-check cannot resolve, because CheXmask has no rib-cage width either.
+   (~18 %), which looked like a definition problem of the shared lung-union thoracic width. **Withdrawn the same day:** on CXAS rib masks
+   the inner rib margin is 1.5–3.4 % narrower than the lung union, the package CTR separates the VinDr cardiomegaly label with
+   AUC 0.95 (22 % of these images carry it), and CXAS corroborates the package heart width (CheXmask's is the wide one) —
+   `docs/reports/itw-cxas-2026-10-17.md`.
 4. **Quality filter is moot here:** all 100 CheXmask rows have Dice RCA (Mean) ≥ 0.7, so the filtered table equals the full one.
 5. **Consequence for the packages:** `validation_status` should move from `unvalidated` to a cross-check statement rather than
    `validated` — e.g. `cross_checked: {source: CheXmask 1.0.0, n: 100, ccc_heart_width: 0.90, ccc_thorax_width: 0.99, ccc_ctr: 0.76,

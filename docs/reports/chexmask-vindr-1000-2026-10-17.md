@@ -42,8 +42,9 @@ Dice overlap package vs CheXmask: heart median 0.929 (min 0.369), lungs median 0
 The 100-image paper subset was representative: on all 1,000 VinDr packages the thorax width agrees (bias +0.3 %, CCC 0.99, 99 %
 within 10 %), the package heart is 3.7 % narrower than CheXmask's (CCC 0.88, 90 % within 10 %; 0.90 after the RCA ≥ 0.7 filter,
 which removes 8 images), and the CTR is 0.021 lower (CCC 0.75 / 0.79 filtered, 89 % within 10 %). CTR > 0.5 on 34 % (package) and
-48 % (CheXmask) of images, both far above the ~18 % population prevalence: the shared lung-union thoracic width is the open
-definition problem, unchanged. Mask overlap: heart Dice median 0.93 (min 0.37), lungs 0.84 (min 0.49) — the worst cases are
+48 % (CheXmask) of images, both far above the ~18 % population prevalence: the lung-union thoracic width was cleared as a definition problem the same
+day on CXAS rib masks (`docs/reports/itw-cxas-2026-10-17.md`): the inner rib margin is 1.5–3.4 % narrower, and the package CTR
+separates the radiologist label with AUC 0.95. Mask overlap: heart Dice median 0.93 (min 0.37), lungs 0.84 (min 0.49) — the worst cases are
 single images where one of the two segmentations failed, visible in the disagreement table. Applied: `validation_status:
 cross_checked` with the `cross_check` record on `ctr` in all 1,000 packages (backups in `~/oip-bench/_backup/vindr/`). The
 300-package NIH store on the external drive has no anatomy masks (never segmented) and was not compared; the 50 NIH paper packages

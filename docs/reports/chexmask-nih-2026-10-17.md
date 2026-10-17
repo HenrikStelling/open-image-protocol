@@ -45,5 +45,5 @@ Same picture as VinDr-100, with wider limits at the 1024-px resolution: thorax w
 spacing, so their agreement with CheXmask is the same as the pixel agreement above; the spacing itself is not tested by this
 cross-check. Two images disagree strongly in opposite directions (00011391_013: package heart 258 px vs 407, Dice 0.62;
 00016607_018: 464 vs 360) — both worth a look by eye before any package is rewritten. Consequence as for VinDr: a cross-check
-statement with these numbers in `validation_status`, not `validated`; the lung-union thoracic width remains the open definition
-problem on both sides.
+statement with these numbers in `validation_status`, not `validated`; the lung-union thoracic width was cleared as a definition problem the same day on CXAS rib masks
+(`docs/reports/itw-cxas-2026-10-17.md`).

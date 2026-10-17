@@ -278,3 +278,16 @@ removed, local runs use the daemon default, `run_meta.json` records `ollama_env`
 traceable. The local paper cells (September, 0.33.3 with the workaround) stand: the experiment shows the kernel switch did not
 move them. oMLX as a second runtime remains optional (different quantisation, PLAN).
 
+## D-034 — CTR denominator: the lung-union width stands; heart width corroborated; the "CTR biased high" concern is closed · decided · 2026-10-17
+Evidence (`docs/reports/itw-cxas-2026-10-17.md`, 100 VinDr paper images with CXAS rib masks): the inner rib margin, measured in two
+conventions, is 1.5 % (end of the lateral rib run) to 3.4 % (outer edge minus the tangential cortex) narrower than the lung-union
+width — within the resolution of a 512-px rib mask — so a rib-based denominator would raise the CTR slightly, not lower it. The
+package CTR separates the radiologist "Cardiomegaly" label with AUC 0.949 (best of five variants; 90 % accuracy at 0.52); 22 % of
+the images carry the label, which explains the share above 0.5 that had been read as bias. Heart width: CXAS +1.0 % vs the
+package, CheXmask +3.1 % (CheXmask cross-check: CCC 0.90, CTR CCC 0.76 with the package 0.02 lower). Decisions: (1) the converter
+keeps heart width / lung-union width; the measurement method text and the spec say that the lung-union width equals the inner rib
+margin within 2–3 % on 100 CXAS-segmented images; (2) `anatomy_cxas.internal_thoracic_width_px` is rewritten (q25 default, v2
+alternative; the September rib-walk is withdrawn); CXAS stays an optional second source; (3) `validation_status: cross_checked`
+stands — the label AUC is a plausibility check, not a reference measurement; an expert-read subset remains the only Tier 3;
+(4) the "CTR biased high" remark in the paper's limitations is replaced by the cross-check numbers.
+
