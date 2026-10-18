@@ -1,3 +1,5 @@
+> **Superseded on 2026-10-18 by `RA-revision-addendum-2026-10-18.md`**, which carries the final numbers (three replies per cell for all ten models) and the paper changes in one place.
+
 # Round 3a → paper: the four-cell orientation check (notes for the RA session, 2026-10-13)
 
 Source: `docs/reports/round3a-2026-09-30.md` (tables 1–7), decision D-032. Numbers are repeat 0 unless stated; the seven

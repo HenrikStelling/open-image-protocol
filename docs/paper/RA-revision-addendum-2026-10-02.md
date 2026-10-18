@@ -1,3 +1,5 @@
+> **Superseded on 2026-10-18 by `RA-revision-addendum-2026-10-18.md`** (round 3a complete with three replies per cell, OEP-002 closed, runtime experiment, CheXmask cross-check, CTR denominator). Kept for the record; apply the 10-18 version.
+
 # Addendum to the RA revision plan — round-3 results into the OIP paper (2026-10-02)
 
 For the Claude session in `/Users/pal/Projects/Research_Automation`. Base: `main` at 0143284, where the revision plan A–F, amendment 11 (scorer-0.3 sensitivity) and the Zenodo DOIs are in and the claim audit reads PASS. Same rules as the plan: change only the sources (`ingest.py`, `analysis_oip.py`, `template_oip.md`, `PROTOCOL_oip.md`, `config_oip.yaml`), never the built manuscript; every number the manuscript quotes comes from `results.json`; rebuild → audit → peer review afterwards. No model is called to produce a number: the new runs below are frozen replies, ingested and scored like the paper's.
