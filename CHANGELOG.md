@@ -7,14 +7,16 @@ All notable changes to the specification, the reference implementation and the b
 | specification | 0.1 draft | `spec/oip-v0.1-draft.md`, `oip.version` in every manifest |
 | manifest schema | 0.1 | `spec/schemas/oip-manifest.schema.json` |
 | reference-file template | 0.2.1 (0.2 + the estimation caution of OEP-002; verification cues of the 0.3 draft remain behind a flag) | `src/oip/context.py` `TEMPLATE_VERSION` |
-| Python package | 0.2.0 | `pyproject.toml`, `provenance.producer_version` in every manifest |
+| Python package | 0.2.1 | `pyproject.toml`, `provenance.producer_version` in every manifest |
 | benchmark scorer | 0.3 | `bench/score.py` `SCORER_VERSION`, recorded per row |
 | harness commit used for the paper runs | 050769a | `run_meta.json` (runs from 2026-09-26), otherwise by run date |
 
-## Unreleased
+## 0.2.1 (2026-10-20): round 3a closed, the measurements cross-checked, the CTR denominator settled
+
+Source code of this release: Zenodo DOI to be added after the GitHub release (concept DOI 10.5281/zenodo.23052074).
 
 ### Specification and reference file
-- Measurement `validation_status` gains `cross_checked`, with a `cross_check` record (source, version, DOI, date, study-level agreement: n, Lin's CCC, bias, limits of agreement, share within 10 %; the source's value and mask overlap for this image). The reference file spells the record out in the measurements table. Applied to the paper package stores after the CheXmask 1.0.0 comparison (VinDr-100: thorax width CCC 0.99, heart width CCC 0.90 with the package 4 % narrower, CTR CCC 0.76 with the package 0.023 lower; NIH-50: 0.97 / 0.79 / 0.80). `validated` remains reserved for phantom, reference or expert measurements; the lung-union thoracic width is still a definition question that no automatic cross-check settles.
+- Measurement `validation_status` gains `cross_checked`, with a `cross_check` record (source, version, DOI, date, study-level agreement: n, Lin's CCC, bias, limits of agreement, share within 10 %; the source's value and mask overlap for this image). The reference file spells the record out in the measurements table. Applied to the paper package stores after the CheXmask 1.0.0 comparison (VinDr-100: thorax width CCC 0.99, heart width CCC 0.90 with the package 4 % narrower, CTR CCC 0.76 with the package 0.023 lower; NIH-50: 0.97 / 0.79 / 0.80). `validated` remains reserved for phantom, reference or expert measurements.
 - CTR denominator settled (D-034): the lung-union thoracic width equals the inner rib margin from CXAS masks within 2–3 % on 100 images; the package CTR separates the VinDr cardiomegaly label with AUC 0.95; `anatomy_cxas.internal_thoracic_width_px` rewritten (q25 / v2 conventions), `bench/itw_cxas_eval.py`.
 - Bench round 3a (four-cell orientation conflict design, marker-masked render, label-reading control, three replies per cell; D-032), the runtime experiment (D-033: the Metal workaround is dropped) and the CheXmask validation script `bench/chexmask_validate.py`.
 
