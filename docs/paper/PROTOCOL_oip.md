@@ -154,6 +154,11 @@ L0–L2 layers alone contribute) and `ctx` vs `ctx_l1` (what regions and compute
    manifest carries the inferred count-recovery extension; and, per benchmark set, the sampling
    rule with the seed that reproduces the set (`tools/verify_sampling.py` →
    `data/raw/sampling_check.json`). Copied reports and manifests only; no benchmark reply is read.
+11. **Scorer-0.3 sensitivity** (amendment 11): every selected paper-set reply re-scored with the OIP
+   project's revised scorer 0.3; primary contrast, layer ablation, full-file flip check, bone-scan
+   aggregate and abstention counts recomputed with the same selection, tests and corrections, and
+   label adoption re-derived with word-boundary matching. Reported alongside; never replaces the
+   primary scorer-0.2 results.
 
 ## 5. Descriptive only (no inferential claims)
 
@@ -164,6 +169,9 @@ L0–L2 layers alone contribute) and `ctx` vs `ctx_l1` (what regions and compute
 - Cost and latency.
 - The CXAS cross-check (§4.9).
 - Converter facts and the sampling record (§4.10).
+- The scorer-0.3 sensitivity analysis (§4.11, amendment 11).
+- The round-3 experiments, the CheXmask cross-check, the CTR-denominator test and the runtime test (amendments
+  12–16): post hoc; their tests are exploratory and are reported apart from the paper's primary and secondary endpoints.
 
 ## 6. Pre-declared limitations
 
@@ -284,4 +292,109 @@ result)*
    matching of finding labels ("ILD" in "mild") and the order-dependent abstention flag in the vendored
    scorer, the uncovered yes/no branch of the strict parser, the hot-side restriction also applying
    to the bone-scan abstention table, and the observed spend quoted from the run log.
+11. **2026-09-28 — sensitivity analysis: revised scorer 0.3 (§4.11).** Added after the paper's eval
+   audit and peer review, once the OIP project had released scorer 0.3 (OIP commit da2c424, copied
+   unchanged to `vendor/score_v03.py`; the harness analysed here is tagged `paper-v1` = 050769a).
+   `scorer_sensitivity.py` re-scores every selected paper-set reply with it (after asserting that the
+   vendored scorer 0.2 reproduces `rows.csv` on the same reply–task pairs) and recomputes, with the
+   same selection, tests and corrections: the primary contrast, the layer ablation, the flip check
+   with the full file, the bone-scan gating aggregate and the abstention counts. Scorer 0.3 still
+   matches finding labels as substrings, so label adoption is also re-derived with word-boundary
+   matching. Results in `results.json` `sensitivity.scorer_v03`. **The primary scoring path stays
+   scorer 0.2**; this is a sensitivity analysis, made after the results were seen. Outcome, reported
+   in §5.9 of the manuscript: 245 correctness changes (222 from glm-5.3-flash, whose replies carry a
+   visible reasoning block); primary contrast unchanged (11/11 on both radiograph sets); flip-check
+   models above chance unchanged; word-boundary matching changes no adoption; the NIH L0–L2 drop stays
+   significant for gpt only (glm-5.3-flash no longer), and the bone-scan aggregate improves
+   significantly for 6 rather than 7 of 11 models. **Added the same day after the round-6 eval audit:**
+   both scorers accept a side (left edge, hotter side, mark side) only in the literal form "patient
+   right/left", so possessive answers ("the patient's right side") are scored wrong. A third variant
+   applies scorer 0.3 to the reply with "patient's" normalised to "patient" (side tasks only;
+   `results.json` `sensitivity.scorer_v03.possessive_side_rule`): 256 side answers change (177
+   medgemma1.5:4b); the primary contrast stays 11/11 on both sets; the manuscript's "below chance"
+   mark-side result for medgemma1.5:4b (28 %, VinDr) becomes 49 % (Holm-adjusted p = 1.0), so §5.4 now
+   reports it as an answer-formatting artefact instead of a mark–region confusion.
+
+The following amendments (12–16) were written on **2026-10-18**, after all runs they describe, from the OIP
+addendum `docs/paper/RA-revision-addendum-2026-10-18.md`. All are **post hoc**. The round-3 data are new frozen
+replies collected after the paper's run; they are ingested on a separate path (`ingest.ingest_round3` →
+`data/rows_round3.csv`), analysed in `results.json` `round3`, and **never change a cell of the paper's original
+analyses** (verified: `results.json` differs from the pre-round-3 build only by the added `round3` block and the
+build date; scoreboard reconciliation unchanged).
+
+12. **2026-09-29 (written 2026-10-18) — glm-5.3-flash output-cap truncation in the paper run; limitation, no cell
+   changed.** glm-5.3-flash is the only paper model that reasons visibly inside the reply and closes with `</think>`.
+   The harness capped Ollama replies at 800 tokens; a reply at the cap with no closing `</think>` was cut off inside
+   its reasoning and the scorer read a number from the fragment. Counted from the frozen replies (`results.json`
+   `round3.truncation_paper`): L0–L2 arm VinDr-CXR CTR 33/100, cardiac width 57/82; NIH CTR 20/50, cardiac width 13/50;
+   image-only 4–7 per cell; full-file and annotated cells 0; categorical tasks 0. On complete replies the L0–L2 drop
+   remains but is smaller (VinDr CTR 52 → 39 %, NIH 59 → 40 %, vendored scorer). Also counted, not described in the OIP
+   readout: 18 replies of two other models reached the cap on the numeric tasks (kimi-k3 5, medgemma1.5:4b 13, 17 of
+   them in L0–L2 cells); those models write no reasoning markup, so whether they were cut off before answering cannot
+   be told from the text. No re-scoring, no re-run for the paper.
+13. **Round-3 experiments (ablation, pixel-check evaluation, round 3a, OEP-002).** Runs (32 directories with the
+   runtime runs of amendment 16; listed in `config_oip.yaml` `round3.runs`, copied verbatim with sha256 in
+   `data/raw/bench_results_round3/MANIFEST.json`):
+   (a) *Verification ablation* (OEP-003/004), 10 models (qwen3.5:cloud retired 2026-09-25, before round 3), 100 VinDr-CXR
+   images, arms `ctx_ctl` (shipped file, same-day control), `ctx_cue`, `ctx_instr`, `ctx_cue_instr`; tasks flip check
+   (two items per image) and left edge; one reply per cell. Runs selected by `run_meta.conditions` containing the four
+   arms, not by the latest-run rule (the render-probe runs reused `ctx_ctl` on 40-image subsets and are excluded).
+   Endpoints: per model × arm flip-check accuracy, mirrored items detected, left-edge accuracy; contrasts arm vs
+   control on paired items (exact McNemar, Holm over the three arms per model). Gate written in the OIP decisions log
+   before the runs (OEP-003/004 entry): +20 pp on the flip check for at least two of three frontier models without a
+   left-edge loss. Claude's arm was resumed on 2026-10-02 from a pinned worktree of c201602 because the working clone's
+   template had moved to 0.2.1; the dry-run text-token counts per arm were identical, so the prompts were the same.
+   (b) *Pixel-check evaluation* (D-029): `oip check` on the 100 VinDr paper packages, shipped / masks mirrored /
+   mirrored and re-segmented; the two-pass verdict recomputed here from the per-package offsets.
+   (c) *Round 3a* (D-032): conflict trials (file labels true/swapped × image normal/mirrored, cells TN TM WN WM) on the
+   canonical and on a marker-masked render (82 images with a reviewed mask), printed-label reading (labels as shipped
+   or swapped, truth balanced), mark side with and without the region list; 10 models, **three replies per cell**
+   (repeats 1–2 added by `--resume`; 0 of 10,560 round-3a items received more than one prompt across repeats). Tests:
+   Wilson CIs; canonical vs masked exact McNemar on paired items, Holm over models; stability = share of items with
+   the same score in all repeats. Per-image policy (compares / file only / pixels only / file vs convention / always
+   mirrored / other) on repeat 0 and **by majority** (a verdict needs at least two of three replies; items with all
+   three repeats only). Gate for "compares": the WN cell. **Truncation rule** (OIP c8f8ece): a reply cut off at the
+   output cap before it closes its reasoning is scored as no answer (`score.truncated`); glm's cap was raised to 8,000
+   tokens, its first round-3a run (2,400-token cap) was set aside and its rows were lost; no number from it is used.
+   (d) *OEP-002* (D-031): NIH-50, seven Ollama models plus a pre-specified gpt repeat; arms `raw_ctl`, `ctx_l1_ctl`,
+   `ctx_l1_oep2` (low-confidence guard), `ctx_l1_oep2e` (guard + estimation caution); tasks CTR, cardiac width, left
+   edge; contrasts against `ctx_l1_ctl` (exact McNemar; Holm over models for the CTR caution contrast). The OIP-side
+   decisions (estimation caution adopted as template 0.2.1; guard, cues, instruction and the render probe not adopted)
+   were taken against gates written before the respective runs (decisions log D-029–D-032).
+   Scoring: the vendored scorer 0.3 (da2c424) with the two round-3 type mappings of OIP a116105 (`orient_conflict` →
+   flip rule, `badge_read` → left-edge rule); the ingest asserts recomputed = stored for every non-error, non-truncated
+   reply (53,803 of 53,803); truncated replies (528) keep their stored score, and the ingest asserts that each of them is a
+   length cut-off without a closing reasoning tag, scored wrong. Harness state: rows produced by a harness with
+   uncommitted changes (commit suffix `-dirty`, recorded per run in the round-3 MANIFEST and counted in
+   `coverage_round3.json`): ablation 8,146 of 12,000, OEP-002 4,800 of 4,800, round 3a 1,123 of 31,680, runtime
+   5,856 of 5,856. Their prompts cannot be rebuilt from a commit alone; for round 3a the stored `prompt_sha256`
+   shows one prompt per item across repeats, for the claude ablation arm the dry-run token counts above. Cost: token-based list-price estimates, with
+   the owner-reported bills quoted from the OIP PLAN (gpt about 2.6 times the estimate: US$22 billed per 1,000 calls
+   against US$8.42 estimated). Reconciliation with the OIP reports was a **manual comparison** on 2026-10-18 (scripts
+   outside the pipeline; no artefact in this tree) against the OIP reports in `~/oip-work/docs/reports/`
+   (`round3a-2026-09-30.md`, `pilot-ollama-report.md`, `oep-002-2026-09-29.md`, `runtime-2026-10-16.md`) and the
+   copied OIP files in `data/raw/round3_files/`: round3a tables 1–7, 130 rows identical; ablation, pixel check, OEP-002, runtime,
+   CheXmask, CTR denominator identical; the ablation's paper-run column agrees when both sides use scorer 0.3.
+14. **CheXmask cross-check (D-034 part 1).** CheXmask 1.0.0 (HybridGNet masks; PhysioNet, DOI 10.13026/3705-zg36,
+   CC BY 4.0) on the 100 VinDr and 50 NIH paper images and the 1,000-package VinDr store; per-image files from OIP
+   `bench/chexmask_validate.py` (copied to `data/raw/round3_files/`). Definitions on both sides: width = maximum
+   horizontal extent of the mask, thorax = union of both lungs, CTR = heart / thorax. Statistics: bias (package −
+   CheXmask) and Bland–Altman limits, relative bias = mean of per-image relative differences, share within 10 %, Lin's
+   CCC, Pearson r, Dice medians, CTR > 0.5 counts; the same restricted to CheXmask Dice RCA (mean) ≥ 0.7. Since
+   2026-10-17 all paper and store packages carry `validation_status: cross_checked` with the agreement record, so the
+   packages' reference files changed from that date (a rerun of the paper's `ctx` cells would send a different
+   measurements table). Reported as a cross-check, never as a validation.
+15. **CTR denominator test (D-034 part 2).** CXAS rib masks on the 100 VinDr paper images; two inner-margin
+   conventions (v2: end of the lateral-most rib run, fails on 5 images; q25: outer edge minus the 25th-percentile run
+   length); the September rib-walk (`internal_thoracic_width_px`, followed oblique ribs into the lung field) withdrawn.
+   The AUC of five CTR variants against the VinDr "Cardiomegaly" label is a plausibility check, not a reference. The
+   paper's limitation that the lung-union thoracic width makes the CTR "probably biased high" is **replaced** (not
+   deleted): the lung union equals the inner rib margin within 1.5–3.4 %, and the cardiac width differs between three
+   automatic segmentations by up to 5.5 % on average.
+16. **Runtime experiment (D-033).** gemma4:e4b-it-qat and medgemma1.5:4b under Ollama 0.40.1 with the Metal tensor
+   kernels disabled (`GGML_METAL_TENSOR_DISABLE=1`, the workaround used since 2026-09-08) and enabled; 50 VinDr items,
+   conditions raw and ctx, three replies per cell. No effect: every file-bearing repeat-0 cell identical except
+   MedGemma's left edge (76 vs 72 %, p = 0.82); image-only differences within noise once pooled. The daemon version
+   changed 0.33.3 → 0.35.1 → 0.40.1 during the study and is recorded per run (`run_meta.ollama_version`) from
+   2026-10-07.
 
