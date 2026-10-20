@@ -13,7 +13,7 @@ All notable changes to the specification, the reference implementation and the b
 
 ## 0.2.1 (2026-10-20): round 3a closed, the measurements cross-checked, the CTR denominator settled
 
-Source code of this release: Zenodo DOI to be added after the GitHub release (concept DOI 10.5281/zenodo.23052074).
+Source code of this release: https://doi.org/10.5281/zenodo.23490342 (GitHub release v0.2.1, archived by Zenodo; concept DOI 10.5281/zenodo.23052074). Frozen benchmark replies: the v0.2.0 bundle (10.5281/zenodo.23040047) still holds the paper runs only; the round-3 replies go into its next version.
 
 ### Specification and reference file
 - Measurement `validation_status` gains `cross_checked`, with a `cross_check` record (source, version, DOI, date, study-level agreement: n, Lin's CCC, bias, limits of agreement, share within 10 %; the source's value and mask overlap for this image). The reference file spells the record out in the measurements table. Applied to the paper package stores after the CheXmask 1.0.0 comparison (VinDr-100: thorax width CCC 0.99, heart width CCC 0.90 with the package 4 % narrower, CTR CCC 0.76 with the package 0.023 lower; NIH-50: 0.97 / 0.79 / 0.80). `validated` remains reserved for phantom, reference or expert measurements.

@@ -6,11 +6,14 @@ authors:
   - family-names: Stelling
     given-names: Henrik
 repository-code: "https://github.com/HenrikStelling/open-image-protocol"
-doi: 10.5281/zenodo.23052075
+doi: 10.5281/zenodo.23490342
 identifiers:
   - type: doi
+    value: 10.5281/zenodo.23490342
+    description: "Source code, release v0.2.1 (Zenodo archive of the GitHub release; concept DOI 10.5281/zenodo.23052074 resolves to the latest version)"
+  - type: doi
     value: 10.5281/zenodo.23052075
-    description: "Source code, release v0.2.0 (Zenodo archive of the GitHub release)"
+    description: "Source code, release v0.2.0 (the state of the paper runs)"
   - type: doi
     value: 10.5281/zenodo.23040047
     description: "OIP-Bench v0.2.0: frozen model replies and benchmark packages (Zenodo)"
