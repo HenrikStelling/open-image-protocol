@@ -1,6 +1,7 @@
 """Build the Zenodo release bundle: the frozen benchmark replies and the benchmark packages, with a sha256 manifest.
 
-Usage: python scripts/export_release_bundle.py --tag v0.2.1 [--until 20260922] [--round3-until 20261016] [--bench-dir $OIP_BENCH_DIR] [--out dist]
+Usage: python scripts/export_release_bundle.py --tag v0.2.1 [--until 20260922] [--round3-until 20261016] [--analysis-dir DIR]
+       [--bench-dir $OIP_BENCH_DIR] [--out dist]
 
 Produces dist/oip-bench-<tag>/ with
   replies/<run>/results.jsonl, tasks.json[, run_meta.json]   every run directory dated <= --until (CONTAMINATED-* runs go to
@@ -12,6 +13,8 @@ Produces dist/oip-bench-<tag>/ with
   packages/vindr-paper-meta/, packages/vindr-pilot-meta/     oip.json, context.md, derived/measurements.json only (Kaggle terms:
                                                              no pixels, renders or masks); full-package hashes in the manifest
   meta/pilot_pkgs.txt, meta/cxas_vs_pspnet_20.json
+  analysis/                                                  the paper's analysis code and results.json (--analysis-dir, assembled
+                                                             by Research_Automation `python -m oipbench.tools.export_analysis`)
   MANIFEST.json                                              sha256 and size of every bundled file; sha256 of every file of every
                                                              full package (including the VinDr files not bundled); run table
   README.md
@@ -69,6 +72,7 @@ def main() -> None:
     ap.add_argument("--round3-until", default="", help="last run date (YYYYMMDD) of post-hoc runs to include under replies-round3/ (empty: none)")
     ap.add_argument("--bench-dir", default=os.environ.get("OIP_BENCH_DIR", str(Path.home() / "oip-bench")))
     ap.add_argument("--out", default=str(ROOT / "dist"))
+    ap.add_argument("--analysis-dir", default="", help="directory with the paper's analysis code + results.json, bundled as analysis/ (empty: none)")
     ap.add_argument("--doi", default="", help="Zenodo DOI of this bundle, written into README.md and MANIFEST.json (reserve it on Zenodo first)")
     a = ap.parse_args()
     bench = Path(a.bench_dir); out = Path(a.out) / f"oip-bench-{a.tag}"
@@ -108,6 +112,11 @@ def main() -> None:
     for name in ("pilot_pkgs.txt", "cxas_vs_pspnet_20.json"):
         if (bench / name).exists():
             (out / "meta").mkdir(exist_ok=True); shutil.copy2(bench / name, out / "meta" / name)
+    if a.analysis_dir:
+        src = Path(a.analysis_dir)
+        if not (src / "README.md").exists():
+            raise SystemExit(f"--analysis-dir has no README.md: {src}")
+        shutil.copytree(src, out / "analysis")
     # 3. manifest
     files = {str(f.relative_to(out)): {"sha256": sha(f), "bytes": f.stat().st_size} for f in sorted(out.rglob("*")) if f.is_file()}
     full_hashes = {DATASETS[s]: package_hashes(bench / s) for s in ("vindr-paper", "vindr", "nih-paper", "bonescan") if (bench / s).exists()}
@@ -131,11 +140,11 @@ How to use them: `REPRODUCE.md` in the repository (level B). Contents and hashes
 - `meta/chexmask/`: CheXmask and CXAS per-image cross-check files (`bench/chexmask_validate.py`, `bench/itw_cxas_eval.py`).
 - `packages/nih-paper`, `packages/bonescan`: full packages (sources CC-BY-4.0 / CC0). `packages/vindr-paper-meta`, `packages/vindr-pilot-meta`: manifests, reference files and measurements only.
 - `meta/`: pilot package list and the CXAS cross-check file.
-
+{'- `analysis/`: the code that computes every number of the paper from these replies, and its `results.json`; see `analysis/README.md`.' + chr(10) if a.analysis_dir else ''}
 Licence: replies and manifests CC-BY-4.0; the NIH and bone-scan packages inherit their sources' licences.
 """)
     # 4. zips
-    for group in ("replies", "replies-round3", "replies-excluded", "packages", "meta"):
+    for group in ("replies", "replies-round3", "replies-excluded", "packages", "meta", "analysis"):
         g = out / group
         if not g.exists():
             continue
