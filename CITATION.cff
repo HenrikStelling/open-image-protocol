@@ -1,10 +1,16 @@
 cff-version: 1.2.0
-message: "If you use the Open Image Protocol, its reference implementation or OIP-Bench, please cite it as below."
+message: >-
+  If you use the Open Image Protocol or its reference implementation, please cite the software release you used
+  (Stelling H. Open Image Protocol (OIP), version 0.2.1. Zenodo; 2026. https://doi.org/10.5281/zenodo.23490342).
+  If you use the OIP-Bench replies, packages or analysis code, please cite the dataset version you used
+  (OIP-Bench v0.2.1, https://doi.org/10.5281/zenodo.23500611). The accompanying paper (preferred citation below)
+  is in preparation.
 type: software
 title: "Open Image Protocol (OIP): self-describing medical image packages for vision-language models"
 authors:
   - family-names: Stelling
     given-names: Henrik
+    orcid: "https://orcid.org/0009-0006-9391-3918"
 repository-code: "https://github.com/HenrikStelling/open-image-protocol"
 doi: 10.5281/zenodo.23490342
 identifiers:
@@ -15,8 +21,11 @@ identifiers:
     value: 10.5281/zenodo.23052075
     description: "Source code, release v0.2.0 (the state of the paper runs)"
   - type: doi
+    value: 10.5281/zenodo.23500611
+    description: "OIP-Bench v0.2.1: frozen model replies (paper run and later experiments), benchmark packages, CheXmask/CXAS cross-check files and the paper's analysis code with its results file (Zenodo)"
+  - type: doi
     value: 10.5281/zenodo.23040047
-    description: "OIP-Bench v0.2.0: frozen model replies and benchmark packages (Zenodo)"
+    description: "OIP-Bench v0.2.0: frozen model replies and the benchmark packages as analysed in the paper run (Zenodo)"
 license: Apache-2.0
 version: 0.2.1
 date-released: "2026-10-20"
@@ -34,9 +43,15 @@ abstract: >-
   and OIP-Bench, a benchmark of image-understanding tasks with frozen replies from eleven models.
 preferred-citation:
   type: article
-  title: "Open Image Protocol: self-describing medical image packages supply the facts vision-language models cannot see in an image, but not the check against the pixels"
+  title: "Self-describing medical image packages supply the facts vision-language models cannot see; only two of ten models check them against the pixels"
   authors:
     - family-names: Stelling
       given-names: Henrik
+      orcid: "https://orcid.org/0009-0006-9391-3918"
+      affiliation: "Praxen für Nuklearmedizin, Berlin, Germany"
+    - family-names: Güler
+      given-names: Ibrahim
+      orcid: "https://orcid.org/0000-0002-6395-6670"
+      affiliation: "Department of Plastic, Aesthetic and Hand Surgery, University Hospital Magdeburg, Otto von Guericke University Magdeburg, Germany"
   year: 2026
-  notes: "arXiv preprint in preparation; identifier to be added. Benchmark replies and package manifests: https://doi.org/10.5281/zenodo.23040047"
+  notes: "Manuscript in preparation; preprint identifier to be added. Data and analysis code: https://doi.org/10.5281/zenodo.23500611"
