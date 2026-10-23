@@ -40,6 +40,13 @@ JSON Schema plus prose, discovery, semantic versioning, a proposal process) and 
 tags, safety enforced in the driver rather than in the model). The full analysis is
 in [docs/01-reference-protocols](docs/01-reference-protocols/).
 
+**What a package is and is not.** One package describes one image: a posteroanterior
+and a lateral radiograph are two packages, and a CT or MR series is reduced to single
+slices (a study-level container is future work). For screenshots or JPEGs without a
+header, as found in teaching collections, there is nothing to recover and the benefit
+is small. Chat interfaces do not accept folders, so the realistic routes are an API
+or an agent that reads the package, or the render and `context.md` sent as two files.
+
 ```
 DICOM / PNG+CSV  ──►  oip convert  ──►  study.oip/
                                           ├── oip.json        machine-readable manifest (JSON Schema)
