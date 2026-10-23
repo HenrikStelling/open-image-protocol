@@ -46,6 +46,26 @@ difference in any benchmark cell and no garbled replies without it. Every run re
 relaunching the menubar app from a shell: `open -a Ollama` hands the shell's environment to the app, so launch it from
 Launchpad/Spotlight (or log in afresh) to get a clean daemon environment.
 
+## Misleading-label draw (B5, 2026-10-23)
+The wrong label of `misled_plain` / `misled_oip` is drawn per image from the labels the image does not carry. In the paper
+run (harness 050769a, replies 2026-09-08 to 2026-09-22) `tasks.py` seeded that draw with Python's per-process string
+`hash()`, which is salted per interpreter: the labels are identical across the two arms within one run (one model), differ
+between models, and cannot be regenerated from the seed. They are not lost: every run directory stores its task set in
+`tasks.json` with the drawn `misleading_label` per item, and the frozen bundle ships those files. Since round 3 (commit
+a116105, 2026-09-30) the draw is seeded with sha256 of the package name (`tasks.py`), so new runs are reproducible across
+processes and models. Adoption is therefore compared within a model only (both arms share the label), never between
+models.
+
+## Model identity and drift (B6, 2026-10-23)
+Cloud and API models are not pinned by their providers. What the harness records so that drift can be read from the data:
+every row carries `model_id` (the exact tag or API model name) and `provider`; `run_meta.json` carries `started` (run start),
+`harness_commit`, `ollama_version`, `ollama_env`, `tasks_version`, `thresholds`, `repeats` and `argv`. Two Ollama cloud tags
+were retired (HTTP 410) during the project: `qwen3-vl:235b-cloud` on 2026-09-08, before the paper run, so it is not in the
+roster; `qwen3.5:cloud` on 2026-09-25, after the paper run and before round 3, so its paper rows stand and round 3 has
+none (10 models). Observed drift under identical prompts: gemini's four-cell conflict accuracy 94 → 90 → 88 % across three
+repeats; gpt's NIH-50 image-only CTR 24 % in a same-protocol repeat against 34 % in the paper run. Report model tags with
+their run dates (`started`) rather than as fixed versions.
+
 ## Package stores changed on 2026-10-17 (CheXmask cross-check)
 All 150 paper packages (`vindr-paper`, `nih-paper`) carry `validation_status: cross_checked` with a `cross_check` record on `ctr`,
 `heart_width`, `thorax_width`, and their `context.md` was re-rendered with template 0.2.1. Any run with a full reference file made

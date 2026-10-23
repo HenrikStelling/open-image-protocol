@@ -11,6 +11,13 @@ All notable changes to the specification, the reference implementation and the b
 | benchmark scorer | 0.3 | `bench/score.py` `SCORER_VERSION`, recorded per row |
 | harness commit used for the paper runs | 050769a | `run_meta.json` (runs from 2026-09-26), otherwise by run date |
 
+## Unreleased
+
+Documentation only, from the co-author review of 2026-10-23 (`docs/paper/coauthor-review-2026-10-23-actions.md`):
+- Vision and specification state the position relative to DICOM (derived from it, not a replacement; input side, findings excluded), that OIP is a protocol and schema with the `.oip` directory as one transport, the one-package-one-image limit, and the planned transports (OIP in DICOM, service response, viewer export), none implemented.
+- Manifest rule 8: layers L3 and L4 carry no detection of their own; every region and measurement names its tool and version, and its assertion level follows from the tool.
+- `bench/README.md`: how the misleading label was drawn in the paper run and where it is stored; what the harness records about model identity, the two retired cloud tags and the observed drift.
+
 ## 0.2.1 (2026-10-20): round 3a closed, the measurements cross-checked, the CTR denominator settled
 
 Source code of this release: https://doi.org/10.5281/zenodo.23490342 (GitHub release v0.2.1, archived by Zenodo; concept DOI 10.5281/zenodo.23052074). Frozen benchmark replies: the v0.2.0 bundle (10.5281/zenodo.23040047) still holds the paper runs only; the round-3 replies go into its next version.

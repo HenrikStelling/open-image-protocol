@@ -9,6 +9,19 @@ training or external documentation: what the image is, how it was acquired,
 what a pixel value means physically, how the image is oriented, what physical
 scale applies, which derived facts exist and how much each can be trusted.
 
+Relation to DICOM: OIP does not replace DICOM. DICOM remains the original
+record; a package is derived from it (or, with reduced fidelity, from an image
+file plus dataset metadata) by a converter that checks plausibility, labels
+every fact with an assertion level and its source, computes measurements with
+deterministic tools and writes the reference file. OIP is the *input* side for
+a model; findings belong to the output side (DICOM SR, IHE AI Results) and are
+not part of a package. The normative core of OIP is this schema and its rules,
+not the directory layout: the `.oip` directory or zip of section 2 is one
+transport, and the same manifest and reference file MAY travel attached to a
+DICOM study or as the response of a service (section 10). A package describes
+one image (or one multi-frame acquisition); a study of several images is
+several packages.
+
 ## 2. Package layout
 ```
 <name>.oip/
@@ -54,6 +67,15 @@ declare `oip.profile` and `oip.layers` and MUST NOT claim a layer it did not fil
 6. UIDs, names, dates and free text from the source MUST be removed or hashed
    (`deid.status`). Age is reduced to a 5-year band.
 7. Absolute timestamps MUST NOT appear; relative timings (uptake time) MAY.
+8. Layers L3 and L4 carry no detection of their own. Every region in
+   `derived.regions` and every measurement in `derived.measurements` MUST name
+   the producing tool and its version (`tool`, `tool_version`), and its
+   `assertion_level` follows from that tool: `computed` for a deterministic
+   algorithm on the pixels or metadata, `inferred` for a machine-learning or
+   heuristic source (for example a segmentation network), `external` for
+   values taken from outside the image. What a package states in these layers
+   comes from the source header, the converter's plausibility rules and the
+   named tools; a consumer MUST NOT read it as a reference reading of the image.
 
 ## 5. Render rules
 1. `renders/canonical.png`: 8-bit greyscale; same rows/columns as the frame; no
@@ -111,3 +133,16 @@ benchmark result (see `docs/02-research-questions/q13-protocol-improvement-loop.
 3D volumes (affine to patient space, multiscale chunks, NIfTI/OME-Zarr alignment);
 DICOM SR TID 1500 / FHIR export; remote OIP servers over Streamable HTTP with OAuth;
 region vocabularies per modality (CXR anatomy, skeletal regions for bone scans).
+
+Other transports of the same manifest and reference file, none implemented
+(co-author review 2026-10-23): (a) **OIP in DICOM** — manifest and reference
+file attached to the study as a DICOM object (an SR-like container), so the
+checked facts travel through any PACS; (b) **OIP as a service response** — an
+MCP or DICOMweb service that returns the checked package when an agent asks
+for an image (`src/oip/mcp_server.py` is a stub; the verb set of section 7 is
+the intended interface); (c) **"export as OIP"** in open viewers and archives
+(Orthanc, Weasis, 3D Slicer) in place of a PNG or screenshot export. A
+study-level container (several projections, CT stacks) and a findings layer
+with several, possibly disagreeing sources (each with tool or person, time and
+place; in `oip.json` only, never in `context.md` by default) are candidate
+extensions for a later version.
