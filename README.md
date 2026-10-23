@@ -1,9 +1,11 @@
 # Open Image Protocol (OIP)
 
-**A self-describing package format, tool set and protocol that turns any medical
-image into something a vision-language model can understand without prior
-training.** Starting with projection radiography (X-ray) and planar
-scintigraphy; CT and MRI follow.
+**A protocol, package format and tool set that gives a vision-language model the
+physical facts of one medical image (pixel spacing, orientation, polarity, units,
+tool-computed measurements), checked by tools and labelled with their certainty.**
+OIP is derived from DICOM and does not replace it: DICOM stays the record, an OIP
+package is the reading of it prepared for a model. Starting with projection
+radiography (X-ray) and planar scintigraphy; CT and MRI follow.
 
 > Status: specification v0.1 draft; reference converter, measurement tools and
 > benchmark harness working. 2,100 real radiographs converted with zero failures;
@@ -27,7 +29,10 @@ measures badly, and tends to trust any text it is given over the pixels it sees.
 ## The idea
 
 OIP turns one image into a small self-describing directory, a `.oip` package, that
-any model can read zero-shot. The design borrows from three protocols that made
+any model can read zero-shot. The core is the checking and translation layer
+(plausibility rules, assertion levels, measurements computed by tools); the
+directory or zip archive is one way to transport it. Findings stay out of the
+package on purpose; they belong on the output side (DICOM SR, IHE AI Results). The design borrows from three protocols that made
 foreign systems readable to models: **LSP** (a neutral abstraction: text and
 positions become image, millimetres and units), **MCP** (self-description through a
 JSON Schema plus prose, discovery, semantic versioning, a proposal process) and the
@@ -138,10 +143,13 @@ OIP 0.1.0 · profile `measured` · layers L0, L1, L2, L3, L4 · de-identificatio
   Guardrails live in the tools: HU presets refuse non-HU images, mm refuses
   uncalibrated images.
 
-## OIP-Bench: does it help models?
+## OIP-Bench: do models use the facts, and do they check them?
 
-The benchmark asks whether a model understands an image better with the package
-than with the raw image, and whether it checks text against pixels.
+The benchmark asks three things: whether models use the facts a package states,
+whether they check those facts against the pixels, and whether they adopt a wrong
+label placed in the package. The reference file states the answer to every main
+question, so the uplift with the file measures uptake of stated facts, not better
+image understanding.
 
 **Data.** Three sets, 190 packages: 100 VinDr-CXR chest radiographs (DICOM, with
 radiologist finding labels), 50 NIH ChestX-ray14 images (PNG, headers stripped) and
@@ -155,52 +163,72 @@ file · annotated render + full reference file · a deliberately wrong finding l
 injected as a bare "prior report note" · the same wrong label delivered through the
 package's external-context template.
 
-**Tasks.** The gating tasks are answerable only by reading the image correctly or by
+**Tasks.** The gating tasks are answerable by reading the image correctly or by
 using the package's facts: which patient side is at the left edge; whether sizes can
 be stated in mm; the cardiothoracic ratio within ±0.05; the cardiac width within
 ±10 %. The annotated render adds localisation: which numbered mark outlines the
 heart, and on which patient side a given mark lies. The **flip check** shows the
 image either normal or mirrored while the reference file states the orientation and
-asks whether they agree; two tasks per image, so "always agree" scores 50 %. The
-misleading-label test measures how often the injected wrong label is adopted. Bone
-scans get the equivalent tasks, including the mirrored posterior view and which side
-is hotter. Modality, view and finding-level F1 are reported but do not gate.
+asks whether they agree; two tasks per image, so "always agree" scores 50 %, and the
+file states nothing that answers it. The misleading-label test measures how often the
+injected wrong label is adopted. Bone scans get the equivalent tasks, including the
+mirrored posterior view and which side is hotter. Modality, view and finding-level
+F1 are reported but do not gate. The truths come from the package itself (see the
+next section); no person reviewed the images.
 
 **Models.** Eleven, one reply per model, condition and question: eight open models
 through Ollama (gemma4 31B and e4b, MedGemma 1.5 4B, glm-5.3-flash, kimi-k3,
 minimax-m3, mistral-large-3, qwen3.5) and three frontier models (Claude Sonnet 5,
-GPT-5.6 Terra, Gemini 3.8 Flash).
+GPT-5.6 Terra, Gemini 3.8 Flash). Later conflict trials ran with three replies per
+cell on the ten models still available (qwen3.5 was retired by its provider).
 
-**Results** (full tables: [docs/reports/pilot-ollama-report.md](docs/reports/pilot-ollama-report.md)):
+**Results** (scorer 0.3; the paper's analysis: [docs/paper/](docs/paper/)):
 
 | Gating accuracy | raw | + L0–L2 file | + full file | + annotated |
 |---|---|---|---|---|
 | VinDr-100, range over 11 models | 36–65 % | 53–87 % | 90–100 % | 92–100 % |
-| NIH-50, range over 11 models | 17–74 % | 26–77 % | 84–100 % | 83–100 % |
-| Spread across models (SD) | 12 pp | 11 pp | 4 pp | 3 pp |
+| NIH-50, range over 11 models | 18–74 % | 26–77 % | 86–100 % | 83–100 % |
 
-- Nine of eleven models reach 99–100 % with the full package; the two weakest reach
-  84–90 %. Roughly half of the uplift comes from the L0–L2 file (geometry,
-  orientation, units), the rest from the computed measurements.
-- Where models still differ is telling. The flip check is passed by Gemini (99 %),
-  GPT (88–97 %) and glm-5.3-flash (80–85 %); every other model, including Claude
-  Sonnet 5, sits at or near chance (50–69 %): most models do not verify text against pixels.
-- Bone scans: the package lifts side identification (chance on mirrored posterior
-  views) from 40–78 % to 80–100 % and modality and scale questions to about 100 %;
-  the hotter-side and flip tasks stay at chance for every model.
-- A reference file costs on the order of 1,000–2,000 input tokens per image.
+- **The facts reach every model.** With the full file every model improves
+  significantly (Holm) on both sets; 9 of 11 reach at least 99.5 % on VinDr-100 and
+  7 of 11 on NIH-50. That ceiling is expected, because the file states the answers:
+  models use the facts, which says nothing about whether they see them. A partial
+  file can hurt: on NIH-50 the L0–L2 file (a low-confidence spacing without the
+  measurements) lowered GPT's accuracy significantly.
+- **The facts are not checked against the pixels.** With the full file the flip check
+  is passed above chance by Gemini (99 %), GPT (88 %), glm-5.3-flash (86 %), qwen3.5
+  (63 %) and kimi-k3 (60 %) on VinDr-100; the others, Claude Sonnet 5 included, sit at
+  chance and mostly confirm the stated orientation whatever the image shows. In
+  conflict trials that cross a true or swapped file with a normal or mirrored image,
+  only Gemini and GPT compare file and image (94 % and 91 % over the four cells,
+  100 % when the file is swapped and the image normal); the others follow the file,
+  the display convention or no consistent rule. Pixel cues in the file and an
+  instruction to verify did not change this and cost small models left-edge
+  accuracy. A check in the tools does: `oip check` compares the segmented heart
+  with each image and its mirror and decided 94 of 100 VinDr images correctly,
+  0 wrongly, 6 indeterminate.
+- **Bone scans:** the package raises side identification on the mirrored posterior
+  views from 0–100 % to 60–100 % across models and improves the gating tasks for 6
+  of 11 models; the hotter-side and flip tasks stay at chance for every model.
+- A reference file costs about 1,400–2,100 extra input tokens per image (median
+  about 1,460 across models).
 
-**A benchmark-driven spec change (OEP-001).** In the pilot, placing a wrong label
-inside a labelled "external" section of an authoritative reference file made it
-*more* credible than the same label pasted as a bare note (gemma4 31B adopted it
-75 % of the time as a note and 100 % inside the file). Revised wording, cautions
-first and an explicit unverified-label statement, lowers adoption for nine of the
-eleven models on the paper sets, in some cases sharply (qwen3.5 42 → 12 %, minimax
-88 → 35 %, GPT 74 → 48 %), but seven models still adopt the wrong label in more
-than half of the cases and Gemini is unaffected. Wording alone is not a safeguard,
-so the reference file renders no external labels or report text by default; they
-stay in `oip.json` and are shown only on explicit request. Details in
+**Wrong labels in the file are adopted; a benchmark-driven spec change (OEP-001).**
+In the pilot, placing a wrong label inside a labelled "external" section of an
+authoritative reference file made it *more* credible than the same label pasted as
+a bare note (gemma4 31B adopted it 75 % of the time as a note and 100 % inside the
+file). Revised wording, cautions first and an explicit unverified-label statement,
+lowers adoption for nine of the eleven models on the paper sets (significantly for
+eight), in some cases sharply (qwen3.5 45 → 14 %, minimax 87 → 42 %, GPT 74 → 48 %),
+but seven models still adopt the wrong label in at least half of the cases and
+Gemini is unaffected (75 → 78 %). Wording alone is not a safeguard, so the reference
+file renders no external labels or report text by default; they stay in `oip.json`
+and are shown only on explicit request. Details in
 [docs/03-brainstorm/decisions-log.md](docs/03-brainstorm/decisions-log.md).
+
+**What follows.** Models do not correct what they are told, so metadata for a model
+has to be checked before it arrives and has to say how certain it is. That is the
+job of the tool layer, not of the prompt.
 
 ## What validates the ground truth
 
@@ -209,16 +237,18 @@ package's facts are.
 
 | Fact | Validation |
 |---|---|
-| Orientation on stripped headers | 1,000-image laterality check on VinDr |
-| CTR, cardiac and thoracic width | Tier 1: plausibility rules on the PSPNet-derived values. Cross-check against an independent segmentation (CXAS) on 20 pilot images: cardiac width agrees (18 of 18 within the benchmark's 10 % tolerance, mean difference +2.6 %); the CTR does not (4 of 20 within 0.05), because the two tools define the thoracic width differently, and the converter's CTR is probably biased high (34 % of 1,000 VinDr images above 0.50 against a label prevalence near 18 %) |
+| Orientation on stripped headers | No source carries an orientation tag; edge sides are inferred from the view and the display convention. The 1,000-image laterality check on VinDr shares that convention; the pixel-side check (`oip check`, two-pass) is independent of it (94 / 0 / 6 of 100) |
+| CTR, cardiac and thoracic width | Tier 1: plausibility rules on the PSPNet-derived values. Cross-check against CheXmask on the 100 VinDr and 50 NIH paper images and 1,000 VinDr packages: thoracic width agrees (Lin's CCC 0.99 / 0.97 / 0.99); the package cardiac width is 4.0 / 5.5 / 3.7 % narrower and the CTR 0.023 / 0.021 / 0.021 lower. The lung-union thoracic width equals the inner rib margin (CXAS rib masks) within 1.5–3.4 %, so the earlier "CTR probably biased high" is withdrawn |
 | Lesion sizes, finding labels | VinDr radiologist boxes and labels |
 | Pneumothorax area | SIIM-ACR radiologist masks |
 | Converter geometry, polarity, units | Synthetic phantoms with exact ground truth ([tests/](tests/)) |
-| Tier 2, pending | Agreement with CheXmask expert-curated lung and heart masks (ICC, Bland–Altman) |
+| Tier 2, cross-check done | CheXmask agreement above; every paper and store package carries `validation_status: cross_checked` with the agreement record. This is agreement between automatic segmentations, not a validation |
 | Tier 3, pending | Expert reading of about 100 radiographs and 50 bone scans |
 
-Nothing in the benchmark uses a model's own output as ground truth, and every
-measurement in a package stays marked `unvalidated` until Tier 2 agreement is measured.
+Nothing in the benchmark uses a model's own output as ground truth. The benchmark's
+truths for side, scale and size are the package's own facts, so OIP-Bench tests
+whether models use what the package states, not whether the package is right;
+`validated` stays reserved for an expert or reference measurement (Tier 3).
 
 ## Repository map
 
@@ -270,7 +300,10 @@ archived on Zenodo as the release bundle built by
 bone-scan packages, manifests and reference files of the VinDr packages (whose images
 are Kaggle competition data and are not redistributed), and a sha256 manifest of every
 file including the ones not bundled, so a rebuild can be verified. Zenodo:
-https://doi.org/10.5281/zenodo.23040047 (v0.2.0 bundle). The source code of the same
+https://doi.org/10.5281/zenodo.23500611 (v0.2.1 bundle: the paper run and the later
+experiments, the packages, the CheXmask/CXAS files and the paper's analysis code with
+its results file); https://doi.org/10.5281/zenodo.23040047 keeps the v0.2.0 bundle with
+the packages as analysed in the paper run. The source code of the same
 release is archived at https://doi.org/10.5281/zenodo.23052075; release 0.2.1 (round 3a, the CheXmask cross-check and the settled CTR
 denominator) at https://doi.org/10.5281/zenodo.23490342, concept DOI https://doi.org/10.5281/zenodo.23052074 for the latest version. The analysis plan and the results file of the paper are in
 [docs/paper/](docs/paper/); the scoring is deterministic and re-runnable
