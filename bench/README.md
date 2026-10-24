@@ -46,6 +46,35 @@ difference in any benchmark cell and no garbled replies without it. Every run re
 relaunching the menubar app from a shell: `open -a Ollama` hands the shell's environment to the app, so launch it from
 Launchpad/Spotlight (or log in afresh) to get a clean daemon environment.
 
+## Repeat subset: run-to-run reliability (B7, 2026-10-24)
+Answer to the reviewer point "one reply per cell in the paper run": the main-result cells were re-run with three replies per
+item on a fixed subset. Design: 20 VinDr paper packages (`--pkg-dir ~/oip-bench/vindr-paper --n 20 --seed 0`, the subset of
+the runtime experiment), conditions `raw, ctx, misled_plain, misled_oip`, tasks `left_edge, scale_available, ctr, heart_mm,
+flip_check, findings_misled`, `--repeats 3 --ollama-think auto --label b7:repeat_subset`; 136 items per repeat (76 in `raw`,
+which has no flip check), 696 replies per model. Seven Ollama models (five cloud, two local) ran on 2026-10-24 in two lanes
+(cloud models one at a time under the cloud lock; one HTTP 500 row refilled with `--resume`); the three API models follow
+when their keys are in place. Readout: `python bench/repeat_report.py` → `docs/reports/repeat-subset-<date>.md` (accuracy
+per repeat, range, share of items with the same verdict in every repeat, Fleiss' kappa, and the paper run's single reply on
+the same items re-scored with the current scorer). Caveat for the paper comparison: the packages carry the CheXmask
+cross-check table and template 0.2.1 since 2026-10-17, so the full-file prompt is not byte-identical to the paper's.
+
+Reading of the 2026-10-24 run (`docs/reports/repeat-subset-2026-10-24.md`, 77 cells, 4,872 replies, 0 errors):
+- The full-file fact cells behind the paper's first result (left edge, scale, CTR, cardiac width) gave the same verdict on
+  every item in every repeat for five of seven models. Exceptions: glm-5.3-flash, whose visible reasoning is cut off, varied
+  on CTR (70–95 %) and cardiac width (75–94 %); medgemma1.5 varied on the left edge (65–85 %).
+- The flip check was stable for the five models that always agree (same verdict on 90–100 % of items, 50 % accuracy in every
+  repeat); glm (72–85 %) and kimi-k3 (48–62 %) varied.
+- The image-only CTR and cardiac-width cells varied by 10–25 pp between repeats for five of seven models (mistral-large-3
+  0 pp, medgemma 6–10 pp), with only 25–75 % of items keeping their verdict: 3–4 of 16–20 items move from one run to the next.
+- Wrong-label adoption was stable (≥ 85 % of items) for gemma4:31b, mistral-large-3 and medgemma; it varied for kimi-k3
+  (misled_oip 75 → 60 → 40 %), gemma4:e4b (35–50 %) and minimax-m3 (40–55 % of items stable).
+- The paper run's single reply lay outside the range of the three repeats in 16 of 77 cells, by more than 10 pp in six, all
+  image-only size or scale cells (glm cardiac width, kimi CTR, minimax CTR, gemma4:e4b scale) or gemma4:e4b's wrong-label
+  cells (misled_oip 80 % in the paper against 35–50 % now; the cell most exposed to the changed full-file prompt).
+Consequence for the manuscript: a single reply is enough for the full-file fact cells and for the flip check of the models
+at chance; image-only size cells and wrong-label adoption of the mid-sized models carry a run-to-run spread of 3–4 items in
+20, which the Limitations should state with these numbers.
+
 ## Misleading-label draw (B5, 2026-10-23)
 The wrong label of `misled_plain` / `misled_oip` is drawn per image from the labels the image does not carry. In the paper
 run (harness 050769a, replies 2026-09-08 to 2026-09-22) `tasks.py` seeded that draw with Python's per-process string

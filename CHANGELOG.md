@@ -17,6 +17,7 @@ Documentation only, from the co-author review of 2026-10-23 (`docs/paper/coautho
 - Vision and specification state the position relative to DICOM (derived from it, not a replacement; input side, findings excluded), that OIP is a protocol and schema with the `.oip` directory as one transport, the one-package-one-image limit, and the planned transports (OIP in DICOM, service response, viewer export), none implemented.
 - Manifest rule 8: layers L3 and L4 carry no detection of their own; every region and measurement names its tool and version, and its assertion level follows from the tool.
 - `bench/README.md`: how the misleading label was drawn in the paper run and where it is stored; what the harness records about model identity, the two retired cloud tags and the observed drift.
+- Bench: `repeat_report.py` and the repeat subset of 2026-10-24 (`docs/reports/repeat-subset-2026-10-24.md`): three replies per item on 20 VinDr paper packages for seven Ollama models; full-file fact cells identical across repeats for five of seven models, image-only size cells and wrong-label adoption move by 3–4 items in 20.
 
 ## 0.2.1 (2026-10-20): round 3a closed, the measurements cross-checked, the CTR denominator settled
 
