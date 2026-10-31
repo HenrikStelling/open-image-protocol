@@ -1,8 +1,24 @@
-# Repeat subset: run-to-run reliability of the main-result cells (2026-10-24)
+# Repeat subset: run-to-run reliability of the main-result cells (2026-10-31)
 
-Runs: `20261024-080342-ollama_gemma4_31b-cloud+ollama_glm-5.3-flash_cloud+ollama_ki-46689`, `20261024-080342-ollama_gemma4_e4b-it-qat+ollama_medgemma1.5_4b-46693`. 20 packages, 3 replies per item, 1624 (model, condition, item) cells, 4872 replies. Items with more than one prompt hash across repeats: 0. Paper comparison: latest run per cell dated up to 20260922 on the `vindr-paper` packages, re-scored with the current scorer (the repeat packages carry the CheXmask cross-check table and template 0.2.1, so the full-file prompt differs from the paper's).
+Runs: `20261024-080342-ollama_gemma4_31b-cloud+ollama_glm-5.3-flash_cloud+ollama_ki-46689`, `20261024-080342-ollama_gemma4_e4b-it-qat+ollama_medgemma1.5_4b-46693`, `20261031-033634-claude-30493`. 20 packages, 3 replies per item, 1856 (model, condition, item) cells, 5568 replies. Items with more than one prompt hash across repeats: 0. Paper comparison: latest run per cell dated up to 20260922 on the `vindr-paper` packages, re-scored with the current scorer (the repeat packages carry the CheXmask cross-check table and template 0.2.1, so the full-file prompt differs from the paper's).
 
-Columns: accuracy (adoption for findings_misled) per repeat; stable = items with the same verdict in every repeat; kappa = Fleiss' kappa of the verdict across repeats; paper = the paper run's single reply on the same items; agrees = share of items where the paper verdict equals the majority verdict of the repeats. Items with an error row in any repeat are dropped from stable/kappa. Kappa is near zero whenever almost every verdict has the same value (prevalence effect, e.g. 95 % wrong in every repeat), so read it together with stable.
+Columns: accuracy (adoption for findings_misled) per repeat; stable = items with the same verdict in every repeat; kappa = Fleiss' kappa of the verdict across repeats; paper = the paper run's single reply on the same items; agrees = share of items where the paper verdict equals the majority verdict of the repeats. Items with an error row in any repeat are dropped from stable/kappa. Kappa is near zero whenever almost every verdict has the same value (prevalence effect, e.g. 95 % wrong in every repeat), so read it together with stable. For findings_misled the paper run drew a different wrong label per image (per-process hash seed), so only the adoption rates are comparable with the paper there, not the per-item agreement.
+
+## claude
+
+| Condition | Task | n | rep 0 | rep 1 | rep 2 | range (pp) | stable | kappa | paper | agrees |
+|---|---|---|---|---|---|---|---|---|---|---|
+| raw | left_edge | 20 | 100 % | 95 % | 100 % | 5 | 95 % (19/20) | -0.02 | 100 % | 100 % |
+| raw | scale_available | 20 | 20 % | 20 % | 20 % | 0 | 100 % (20/20) | 1.00 | 20 % | 100 % |
+| raw | ctr | 20 | 75 % | 75 % | 70 % | 5 | 95 % (19/20) | 0.91 | 65 % | 90 % |
+| raw | heart_mm | 16 | 44 % | 56 % | 50 % | 12 | 75 % (12/16) | 0.67 | 44 % | 81 % |
+| ctx | left_edge | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 95 % | 95 % |
+| ctx | scale_available | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | ctr | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | heart_mm | 16 | 100 % | 100 % | 100 % | 0 | 100 % (16/16) | 1.00 | 100 % | 100 % |
+| ctx | flip_check | 40 | 48 % | 48 % | 48 % | 0 | 100 % (40/40) | 1.00 | 50 % | 98 % |
+| misled_plain | findings_misled | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| misled_oip | findings_misled | 20 | 70 % | 70 % | 65 % | 5 | 95 % (19/20) | 0.92 | 70 % | 50 % |
 
 ## ollama/gemma4:31b-cloud
 
@@ -120,6 +136,7 @@ Columns: accuracy (adoption for findings_misled) per repeat; stable = items with
 
 | Model | cells | largest range (pp) | median stable | median kappa | cells with kappa < 0.6 |
 |---|---|---|---|---|---|
+| claude | 11 | 12 | 100 % | 1.00 | 1 |
 | ollama/gemma4:31b-cloud | 11 | 15 | 100 % | 1.00 | 2 |
 | ollama/glm-5.3-flash:cloud | 11 | 25 | 69 % | 0.19 | 7 |
 | ollama/kimi-k3:cloud | 11 | 35 | 95 % | 0.52 | 6 |

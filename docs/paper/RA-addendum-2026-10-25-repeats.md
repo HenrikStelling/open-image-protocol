@@ -10,7 +10,9 @@ co-author's point A6.3 ("one reply per cell in the paper run") with data instead
 - Conditions `raw`, `ctx` (full file), `misled_plain`, `misled_oip`; tasks left edge, scale, CTR, cardiac width, flip check,
   wrong-label adoption. 136 items per repeat (76 in `raw`, which has no flip check), 696 replies per model.
 - Seven Ollama models on 2026-10-24 (gemma4:31b, glm-5.3-flash, kimi-k3, minimax-m3, mistral-large-3 in the cloud;
-  gemma4:e4b-it-qat and medgemma1.5:4b locally); 4,872 replies, 0 errors. The three API models are pending (keys).
+  gemma4:e4b-it-qat and medgemma1.5:4b locally); 4,872 replies, 0 errors. claude (claude-sonnet-5) on 2026-10-31: 696
+  replies, 0 errors; every full-file cell, the flip check (48 %) and plain-note adoption identical across the three repeats,
+  largest spread image-only cardiac width 44–56 %. gpt and gemini are pending (owner's release).
 - Caveat: since 2026-10-17 the packages carry the CheXmask cross-check table and template 0.2.1, so the full-file prompt is
   not byte-identical to the paper run's. Within the repeat run every item received the same prompt in all three repeats
   (0 items with more than one prompt hash).
@@ -19,29 +21,31 @@ co-author's point A6.3 ("one reply per cell in the paper run") with data instead
 
 | Cell family | Run-to-run behaviour |
 |---|---|
-| Full file: left edge, scale, CTR, cardiac width | same verdict on every item in every repeat for 5 of 7 models; glm varied on CTR (70–95 %) and cardiac width (75–94 %), medgemma on the left edge (65–85 %) |
-| Flip check | the five models that always agree: same verdict on 90–100 % of items, 50 % in every repeat; glm 72–85 %, kimi 48–62 % |
-| Image only: CTR, cardiac width | range 10–25 pp between repeats for 5 of 7 models (mistral 0, medgemma 6–10); 25–75 % of items keep their verdict, i.e. 3–4 of 16–20 items move |
+| Full file: left edge, scale, CTR, cardiac width | same verdict on every item in every repeat for 6 of 8 models (claude included); glm varied on CTR (70–95 %) and cardiac width (75–94 %), medgemma on the left edge (65–85 %) |
+| Flip check | the six models that always agree (claude included): same verdict on 90–100 % of items, 50 % in every repeat; glm 72–85 %, kimi 48–62 % |
+| Image only: CTR, cardiac width | range 10–25 pp between repeats for 5 of 8 models (mistral 0, medgemma 6–10, claude 5–12); 25–75 % of items keep their verdict, i.e. 3–4 of 16–20 items move |
 | Wrong-label adoption | stable (≥ 85 % of items) for gemma4:31b, mistral, medgemma; kimi misled_oip 75 → 60 → 40 %, gemma4:e4b 35–50 %, minimax 40–55 % of items stable |
 | Paper reply vs. the three repeats | outside the repeat range in 16 of 77 cells, by more than 10 pp in 6: image-only size or scale cells (glm cardiac width, kimi CTR, minimax CTR, gemma4:e4b scale) and gemma4:e4b's wrong-label cells (misled_oip paper 80 % vs. 35–50 % now) |
 
 ## Suggested manuscript changes
 
 1. **Methods, Post-hoc experiments** (after the conflict-trial sentence): "On a fixed subset of 20 VinDr-CXR images the
-   four main conditions were repeated three times for the seven Ollama models (4,872 replies, 2026-10-24; Supplementary
-   Table S17)."
+   four main conditions were repeated three times for the seven Ollama models and claude (5,568 replies, 2026-10-24 and
+   2026-10-31; Supplementary Table S17)."
 2. **Limitations**, replace "In the paper run each question was answered once per model and condition, so run-to-run
    reliability was measured only in the conflict trials." with: "In the paper run each question was answered once per model
-   and condition. A three-repeat re-run of the main conditions on 20 images (seven Ollama models) gave identical verdicts on
-   every item for the full-file side, scale and size questions in five of seven models and for the flip check of the models
-   at chance, whereas image-only size estimates and wrong-label adoption changed verdict on 3–4 of 20 images between runs
+   and condition. A three-repeat re-run of the main conditions on 20 images (seven Ollama models and claude) gave identical
+   verdicts on every item for the full-file side, scale and size questions in six of eight models and for the flip check of
+   the models at chance, whereas image-only size estimates and wrong-label adoption changed verdict on 3–4 of 20 images between runs
    (Supplementary Table S17); the single-reply cells of those two kinds should be read with that spread."
 3. **Supplementary Table S17** (new): the per-model overview of `repeat-subset-2026-10-24.md` (cells, largest range, median
    share of stable items, median kappa), plus one sentence that kappa is near zero for near-constant verdicts and that the
    stable share is the primary measure. Optionally the full per-cell table as S17b.
 4. **Supplementary Methods S4** (conflict trials) gains a cross-reference: the identical-verdict shares there and in S17 are
    computed the same way.
-5. If the three API models are re-run before submission, extend S17 and the Limitations sentence; do not wait for them.
+5. If gpt and gemini are re-run before submission, extend S17 and the Limitations sentence; do not wait for them. Note for
+   S17: for the wrong-label cells the paper run drew a different wrong label per image, so only the adoption rates, not the
+   per-item agreement, are comparable with the paper.
 
 ## Pointers
 

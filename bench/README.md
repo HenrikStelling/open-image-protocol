@@ -52,23 +52,27 @@ item on a fixed subset. Design: 20 VinDr paper packages (`--pkg-dir ~/oip-bench/
 the runtime experiment), conditions `raw, ctx, misled_plain, misled_oip`, tasks `left_edge, scale_available, ctr, heart_mm,
 flip_check, findings_misled`, `--repeats 3 --ollama-think auto --label b7:repeat_subset`; 136 items per repeat (76 in `raw`,
 which has no flip check), 696 replies per model. Seven Ollama models (five cloud, two local) ran on 2026-10-24 in two lanes
-(cloud models one at a time under the cloud lock; one HTTP 500 row refilled with `--resume`); the three API models follow
-when their keys are in place. Readout: `python bench/repeat_report.py` → `docs/reports/repeat-subset-<date>.md` (accuracy
+(cloud models one at a time under the cloud lock; one HTTP 500 row refilled with `--resume`); claude (claude-sonnet-5) ran on
+2026-10-31 (696 replies in 18 min, 0 errors; 43k uncached + 2.19M cached input tokens, 4.5k output tokens, about US$0.60 at list
+price thanks to prompt caching of the shared prefix); gpt and gemini follow when released. Readout: `python bench/repeat_report.py` → `docs/reports/repeat-subset-<date>.md` (accuracy
 per repeat, range, share of items with the same verdict in every repeat, Fleiss' kappa, and the paper run's single reply on
 the same items re-scored with the current scorer). Caveat for the paper comparison: the packages carry the CheXmask
 cross-check table and template 0.2.1 since 2026-10-17, so the full-file prompt is not byte-identical to the paper's.
 
-Reading of the 2026-10-24 run (`docs/reports/repeat-subset-2026-10-24.md`, 77 cells, 4,872 replies, 0 errors):
+Reading of the 2026-10-24 run (`docs/reports/repeat-subset-2026-10-24.md`, 77 cells, 4,872 replies, 0 errors; claude added
+2026-10-31, 88 cells, 5,568 replies):
 - The full-file fact cells behind the paper's first result (left edge, scale, CTR, cardiac width) gave the same verdict on
-  every item in every repeat for five of seven models. Exceptions: glm-5.3-flash, whose visible reasoning is cut off, varied
+  every item in every repeat for six of eight models (claude included: every full-file cell, the flip check at 48 % and the
+  plain-note adoption at 100 % identical across repeats; its largest spread is image-only cardiac width, 44–56 %). Exceptions: glm-5.3-flash, whose visible reasoning is cut off, varied
   on CTR (70–95 %) and cardiac width (75–94 %); medgemma1.5 varied on the left edge (65–85 %).
-- The flip check was stable for the five models that always agree (same verdict on 90–100 % of items, 50 % accuracy in every
+- The flip check was stable for the six models that always agree (same verdict on 90–100 % of items, 50 % accuracy in every
   repeat); glm (72–85 %) and kimi-k3 (48–62 %) varied.
-- The image-only CTR and cardiac-width cells varied by 10–25 pp between repeats for five of seven models (mistral-large-3
-  0 pp, medgemma 6–10 pp), with only 25–75 % of items keeping their verdict: 3–4 of 16–20 items move from one run to the next.
+- The image-only CTR and cardiac-width cells varied by 10–25 pp between repeats for five of eight models (mistral-large-3
+  0 pp, medgemma 6–10 pp, claude 5–12 pp), with only 25–75 % of items keeping their verdict: 3–4 of 16–20 items move from one run to the next.
 - Wrong-label adoption was stable (≥ 85 % of items) for gemma4:31b, mistral-large-3 and medgemma; it varied for kimi-k3
   (misled_oip 75 → 60 → 40 %), gemma4:e4b (35–50 %) and minimax-m3 (40–55 % of items stable).
-- The paper run's single reply lay outside the range of the three repeats in 16 of 77 cells, by more than 10 pp in six, all
+- The paper run's single reply lay outside the range of the three repeats in 16 of 77 Ollama cells (claude: 1 of 11, image-only
+  CTR 65 % vs 70–75 %), by more than 10 pp in six, all
   image-only size or scale cells (glm cardiac width, kimi CTR, minimax CTR, gemma4:e4b scale) or gemma4:e4b's wrong-label
   cells (misled_oip 80 % in the paper against 35–50 % now; the cell most exposed to the changed full-file prompt).
 Consequence for the manuscript: a single reply is enough for the full-file fact cells and for the flip check of the models

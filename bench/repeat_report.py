@@ -108,7 +108,9 @@ def main() -> None:
          "Columns: accuracy (adoption for findings_misled) per repeat; stable = items with the same verdict in every repeat; kappa = Fleiss' kappa "
          "of the verdict across repeats; paper = the paper run's single reply on the same items; agrees = share of items where the paper verdict "
          "equals the majority verdict of the repeats. Items with an error row in any repeat are dropped from stable/kappa. Kappa is near zero "
-         "whenever almost every verdict has the same value (prevalence effect, e.g. 95 % wrong in every repeat), so read it together with stable.", ""]
+         "whenever almost every verdict has the same value (prevalence effect, e.g. 95 % wrong in every repeat), so read it together with stable. "
+         "For findings_misled the paper run drew a different wrong label per image (per-process hash seed), so only the adoption rates are "
+         "comparable with the paper there, not the per-item agreement.", ""]
     summary = defaultdict(list)
     for m in models:
         L += [f"## {m}", "", "| Condition | Task | n | " + " | ".join(f"rep {i}" for i in range(n_reps)) + " | range (pp) | stable | kappa | paper | agrees |",
