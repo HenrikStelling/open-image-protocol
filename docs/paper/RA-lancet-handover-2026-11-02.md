@@ -39,8 +39,10 @@ OIP side delivers and in which form, and where the package needs a correction. R
 - After the reading: `docs/reports/reader-readings-<date>.csv` (merged, latest revision per reader and item, `heart_mm`
   added) and `docs/reports/reader-study-<date>.md` (agreement tables, Bland–Altman numbers, the re-scored model
   accuracies against both truths), plus an RA addendum with the sentences to change.
-- Confirmatory round: `docs/paper/preregistration-draft-<date>.md` (hypotheses with the X and Y taken from the exploratory
-  data, image selection rule and seed, sha256 list, models, scorer commit), then the run directory and a report.
+- Confirmatory round: `docs/paper/preregistration-draft-2026-11-02.md` (draft 0.1: six directional statements with the X and Y
+  taken from the exploratory data, image selection rule and seed, models, frozen code; the sha256 list `bench/confirm/confirm_set.json`
+  is written when the external drive is mounted; analysis `bench/confirm/analyze.py`), then the run directories and
+  `docs/reports/confirmatory-<date>.md`.
 - Already there: `docs/reports/repeat-subset-2026-10-24.md` and `docs/paper/RA-addendum-2026-10-25-repeats.md` (all ten
   models, S17), `bench/README.md` sections on model identity and the misleading-label draw.
 
