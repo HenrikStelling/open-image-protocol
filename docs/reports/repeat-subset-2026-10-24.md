@@ -1,6 +1,6 @@
-# Repeat subset: run-to-run reliability of the main-result cells (2026-10-31)
+# Repeat subset: run-to-run reliability of the main-result cells (2026-11-02)
 
-Runs: `20261024-080342-ollama_gemma4_31b-cloud+ollama_glm-5.3-flash_cloud+ollama_ki-46689`, `20261024-080342-ollama_gemma4_e4b-it-qat+ollama_medgemma1.5_4b-46693`, `20261031-033634-claude-30493`. 20 packages, 3 replies per item, 1856 (model, condition, item) cells, 5568 replies. Items with more than one prompt hash across repeats: 0. Paper comparison: latest run per cell dated up to 20260922 on the `vindr-paper` packages, re-scored with the current scorer (the repeat packages carry the CheXmask cross-check table and template 0.2.1, so the full-file prompt differs from the paper's).
+Runs: `20261024-080342-ollama_gemma4_31b-cloud+ollama_glm-5.3-flash_cloud+ollama_ki-46689`, `20261024-080342-ollama_gemma4_e4b-it-qat+ollama_medgemma1.5_4b-46693`, `20261031-033634-claude-30493`, `20261102-063129-gpt-74275`, `20261102-071221-gemini-89051`. 20 packages, 3 replies per item, 2320 (model, condition, item) cells, 6960 replies. Items with more than one prompt hash across repeats: 0. Paper comparison: latest run per cell dated up to 20260922 on the `vindr-paper` packages, re-scored with the current scorer (the repeat packages carry the CheXmask cross-check table and template 0.2.1, so the full-file prompt differs from the paper's).
 
 Columns: accuracy (adoption for findings_misled) per repeat; stable = items with the same verdict in every repeat; kappa = Fleiss' kappa of the verdict across repeats; paper = the paper run's single reply on the same items; agrees = share of items where the paper verdict equals the majority verdict of the repeats. Items with an error row in any repeat are dropped from stable/kappa. Kappa is near zero whenever almost every verdict has the same value (prevalence effect, e.g. 95 % wrong in every repeat), so read it together with stable. For findings_misled the paper run drew a different wrong label per image (per-process hash seed), so only the adoption rates are comparable with the paper there, not the per-item agreement.
 
@@ -19,6 +19,38 @@ Columns: accuracy (adoption for findings_misled) per repeat; stable = items with
 | ctx | flip_check | 40 | 48 % | 48 % | 48 % | 0 | 100 % (40/40) | 1.00 | 50 % | 98 % |
 | misled_plain | findings_misled | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
 | misled_oip | findings_misled | 20 | 70 % | 70 % | 65 % | 5 | 95 % (19/20) | 0.92 | 70 % | 50 % |
+
+## gemini
+
+| Condition | Task | n | rep 0 | rep 1 | rep 2 | range (pp) | stable | kappa | paper | agrees |
+|---|---|---|---|---|---|---|---|---|---|---|
+| raw | left_edge | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| raw | scale_available | 20 | 20 % | 20 % | 20 % | 0 | 100 % (20/20) | 1.00 | 20 % | 100 % |
+| raw | ctr | 20 | 50 % | 55 % | 60 % | 10 | 55 % (11/20) | 0.39 | 65 % | 65 % |
+| raw | heart_mm | 16 | 44 % | 50 % | 44 % | 6 | 88 % (14/16) | 0.83 | 38 % | 75 % |
+| ctx | left_edge | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | scale_available | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | ctr | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | heart_mm | 16 | 100 % | 100 % | 100 % | 0 | 100 % (16/16) | 1.00 | 100 % | 100 % |
+| ctx | flip_check | 40 | 98 % | 98 % | 98 % | 0 | 100 % (40/40) | 1.00 | 98 % | 100 % |
+| misled_plain | findings_misled | 20 | 85 % | 80 % | 80 % | 5 | 85 % (17/20) | 0.67 | 75 % | 75 % |
+| misled_oip | findings_misled | 20 | 85 % | 75 % | 75 % | 10 | 85 % (17/20) | 0.71 | 80 % | 80 % |
+
+## gpt
+
+| Condition | Task | n | rep 0 | rep 1 | rep 2 | range (pp) | stable | kappa | paper | agrees |
+|---|---|---|---|---|---|---|---|---|---|---|
+| raw | left_edge | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| raw | scale_available | 20 | 20 % | 20 % | 20 % | 0 | 100 % (20/20) | 1.00 | 20 % | 100 % |
+| raw | ctr | 20 | 15 % | 35 % | 25 % | 20 | 55 % (11/20) | 0.20 | 25 % | 85 % |
+| raw | heart_mm | 16 | 38 % | 25 % | 38 % | 12 | 25 % (4/16) | -0.13 | 38 % | 62 % |
+| ctx | left_edge | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | scale_available | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | ctr | 20 | 100 % | 100 % | 100 % | 0 | 100 % (20/20) | 1.00 | 100 % | 100 % |
+| ctx | heart_mm | 16 | 100 % | 100 % | 100 % | 0 | 100 % (16/16) | 1.00 | 100 % | 100 % |
+| ctx | flip_check | 40 | 88 % | 88 % | 88 % | 0 | 82 % (33/40) | 0.47 | 88 % | 92 % |
+| misled_plain | findings_misled | 20 | 70 % | 75 % | 70 % | 5 | 75 % (15/20) | 0.59 | 65 % | 65 % |
+| misled_oip | findings_misled | 20 | 45 % | 50 % | 35 % | 15 | 80 % (16/20) | 0.73 | 40 % | 70 % |
 
 ## ollama/gemma4:31b-cloud
 
@@ -137,6 +169,8 @@ Columns: accuracy (adoption for findings_misled) per repeat; stable = items with
 | Model | cells | largest range (pp) | median stable | median kappa | cells with kappa < 0.6 |
 |---|---|---|---|---|---|
 | claude | 11 | 12 | 100 % | 1.00 | 1 |
+| gemini | 11 | 10 | 100 % | 1.00 | 1 |
+| gpt | 11 | 20 | 100 % | 1.00 | 4 |
 | ollama/gemma4:31b-cloud | 11 | 15 | 100 % | 1.00 | 2 |
 | ollama/glm-5.3-flash:cloud | 11 | 25 | 69 % | 0.19 | 7 |
 | ollama/kimi-k3:cloud | 11 | 35 | 95 % | 0.52 | 6 |

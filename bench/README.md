@@ -54,25 +54,31 @@ flip_check, findings_misled`, `--repeats 3 --ollama-think auto --label b7:repeat
 which has no flip check), 696 replies per model. Seven Ollama models (five cloud, two local) ran on 2026-10-24 in two lanes
 (cloud models one at a time under the cloud lock; one HTTP 500 row refilled with `--resume`); claude (claude-sonnet-5) ran on
 2026-10-31 (696 replies in 18 min, 0 errors; 43k uncached + 2.19M cached input tokens, 4.5k output tokens, about US$0.60 at list
-price thanks to prompt caching of the shared prefix); gpt and gemini follow when released. Readout: `python bench/repeat_report.py` → `docs/reports/repeat-subset-<date>.md` (accuracy
+price thanks to prompt caching of the shared prefix); gpt (gpt-5.6-terra) and gemini (gemini-3.8-flash) ran on 2026-11-02
+(696 replies each in 41 and 128 min, 0 errors after three DNS-error rows of gemini were refilled with `--resume`; gpt 2.38M
+input and 58k output tokens, gemini 1.45M input and 2.2k output tokens; the harness records no cache tokens for these two
+providers, so their bills are the cost reference). Readout: `python bench/repeat_report.py` → `docs/reports/repeat-subset-<date>.md` (accuracy
 per repeat, range, share of items with the same verdict in every repeat, Fleiss' kappa, and the paper run's single reply on
 the same items re-scored with the current scorer). Caveat for the paper comparison: the packages carry the CheXmask
 cross-check table and template 0.2.1 since 2026-10-17, so the full-file prompt is not byte-identical to the paper's.
 
 Reading of the 2026-10-24 run (`docs/reports/repeat-subset-2026-10-24.md`, 77 cells, 4,872 replies, 0 errors; claude added
-2026-10-31, 88 cells, 5,568 replies):
+2026-10-31, gpt and gemini 2026-11-02: 110 cells, 6,960 replies):
 - The full-file fact cells behind the paper's first result (left edge, scale, CTR, cardiac width) gave the same verdict on
-  every item in every repeat for six of eight models (claude included: every full-file cell, the flip check at 48 % and the
-  plain-note adoption at 100 % identical across repeats; its largest spread is image-only cardiac width, 44–56 %). Exceptions: glm-5.3-flash, whose visible reasoning is cut off, varied
+  every item in every repeat for eight of ten models (claude, gpt and gemini included: every full-file cell at 100 % in every
+  repeat; claude's flip check at 48 % and plain-note adoption at 100 % identical across repeats, its largest spread image-only
+  cardiac width, 44–56 %). Exceptions: glm-5.3-flash, whose visible reasoning is cut off, varied
   on CTR (70–95 %) and cardiac width (75–94 %); medgemma1.5 varied on the left edge (65–85 %).
 - The flip check was stable for the six models that always agree (same verdict on 90–100 % of items, 50 % accuracy in every
-  repeat); glm (72–85 %) and kimi-k3 (48–62 %) varied.
-- The image-only CTR and cardiac-width cells varied by 10–25 pp between repeats for five of eight models (mistral-large-3
-  0 pp, medgemma 6–10 pp, claude 5–12 pp), with only 25–75 % of items keeping their verdict: 3–4 of 16–20 items move from one run to the next.
-- Wrong-label adoption was stable (≥ 85 % of items) for gemma4:31b, mistral-large-3 and medgemma; it varied for kimi-k3
+  repeat); glm (72–85 %) and kimi-k3 (48–62 %) varied. gpt (88 % in every repeat, 82 % of items stable) and gemini (98 %,
+  every item stable) are the two models above chance on the flip check.
+- The image-only CTR and cardiac-width cells varied by 10–25 pp between repeats for six of ten models (gpt among them,
+  12–20 pp; mistral-large-3 0 pp, medgemma 6–10 pp, claude 5–12 pp, gemini 6–10 pp), with only 25–75 % of items keeping their verdict: 3–4 of 16–20 items move from one run to the next.
+- Wrong-label adoption was stable (≥ 85 % of items) for gemma4:31b, mistral-large-3, medgemma and gemini (75–85 % adoption);
+  gpt sits in between (misled_oip 35–50 %, 80 % of items stable); it varied for kimi-k3
   (misled_oip 75 → 60 → 40 %), gemma4:e4b (35–50 %) and minimax-m3 (40–55 % of items stable).
-- The paper run's single reply lay outside the range of the three repeats in 16 of 77 Ollama cells (claude: 1 of 11, image-only
-  CTR 65 % vs 70–75 %), by more than 10 pp in six, all
+- The paper run's single reply lay outside the range of the three repeats in 16 of 77 Ollama cells (claude 1 of 11, image-only
+  CTR 65 % vs 70–75 %; gpt 1 of 11; gemini 3 of 11, each within 6 pp), by more than 10 pp in six, all
   image-only size or scale cells (glm cardiac width, kimi CTR, minimax CTR, gemma4:e4b scale) or gemma4:e4b's wrong-label
   cells (misled_oip 80 % in the paper against 35–50 % now; the cell most exposed to the changed full-file prompt).
 Consequence for the manuscript: a single reply is enough for the full-file fact cells and for the flip check of the models
