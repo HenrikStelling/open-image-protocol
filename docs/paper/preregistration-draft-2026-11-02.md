@@ -8,6 +8,7 @@
 > Ablauf: Abschnitt 7, Schritte F1–F7. Das Ziehskript braucht die externe SSD "Video Storage"; ohne sie gibt es keine Hash-Liste.
 > Die Dateien `bench/confirm/draw_set.py` und `bench/confirm/analyze.py` sind der eingefrorene Code; ihr Commit-Hash kommt in
 > Abschnitt 4.7, sobald du den Text freigegeben hast (Schritt F3). Englisch, weil der Text auf OSF und als PDF ins Supplement geht.
+> **Stand 02.11.: Schwellen und n = 80 freigegeben (F1 erledigt). Offen: SSD anschließen (F2), OSF (F4), Kostenfreigabe (F5).**
 
 ## 1. Study information
 
@@ -216,7 +217,7 @@ Methods, with the reason and its effect.
 
 | step | what | who | by |
 |---|---|---|---|
-| F1 | approve or amend the statements, thresholds and n in sections 3 and 5 | Henrik | 2026-11-06 |
+| F1 | approve or amend the statements, thresholds and n in sections 3 and 5 — **approved as written on 2026-11-02** (statements H1a–H3b, thresholds and minimum counts of section 3, n = 80 + 10 reserve) | Henrik | done 2026-11-02 |
 | F2 | mount the external SSD, run `draw_set.py` and `draw_set.py --verify`; `confirm_set.json` is written | Henrik (OIP session runs it) | 2026-11-07 |
 | F3 | commit the final text, `confirm_set.json` and the scripts; write the commit hash into 4.7; tag `prereg-confirm-2026-11` | OIP session | 2026-11-07 |
 | F4 | upload this document and `confirm_set.json` to OSF; record the registration DOI and timestamp here and in the manuscript | Henrik | 2026-11-09 |
