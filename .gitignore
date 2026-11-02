@@ -13,3 +13,6 @@ build/
 dist/
 bench/results/
 .context/
+bench/reader/set/
+bench/reader/readings/
+bench/reader/reader.html

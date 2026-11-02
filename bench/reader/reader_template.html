@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesebogen Referenzlesung</title>
+<style>
+:root { --bg:#f5f5f3; --panel:#fff; --ink:#1d1d1b; --muted:#6b6b66; --line:#dcdcd6; --accent:#2f5bd3; --accent-ink:#fff;
+        --done:#2e8b57; --warn:#b36b00; --heart:#e0483f; --thorax:#2f8fd3; --mark:#f0c419; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#151514; --panel:#1e1e1c; --ink:#ececE6; --muted:#9a9a93;
+        --line:#34342f; --accent:#7d9cff; --accent-ink:#0d0d0c; --done:#5cc48a; --warn:#e2a24a; } }
+:root[data-theme="dark"] { --bg:#151514; --panel:#1e1e1c; --ink:#ececE6; --muted:#9a9a93; --line:#34342f; --accent:#7d9cff;
+        --accent-ink:#0d0d0c; --done:#5cc48a; --warn:#e2a24a; }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 -apple-system, system-ui, sans-serif; }
+main { display:grid; grid-template-columns: minmax(0, 1fr) 380px; gap:12px; padding:12px; height:100vh; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; height:auto; } }
+.left { display:flex; flex-direction:column; min-height:0; gap:8px; }
+.right { display:flex; flex-direction:column; gap:10px; overflow:auto; min-height:0; }
+.panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+.muted { color:var(--muted); font-size:13px; }
+.q { font-weight:600; }
+.bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden; margin-top:6px; }
+.bar > div { height:100%; background:var(--done); width:0; }
+.opts { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+button, select, input[type=text] { font:inherit; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:7px 12px; }
+button { cursor:pointer; }
+button.sel { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+button.na.sel { background:var(--warn); border-color:var(--warn); color:var(--accent-ink); }
+button.mode.heart.sel { background:var(--heart); border-color:var(--heart); color:#fff; }
+button.mode.thorax.sel { background:var(--thorax); border-color:var(--thorax); color:#fff; }
+.row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+input[type=text].note { flex:1 1 200px; }
+kbd { font:12px ui-monospace, monospace; border:1px solid var(--line); border-radius:4px; padding:0 4px; color:var(--muted); }
+.toolbar { display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; }
+.toolbar label { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:4px; }
+.toolbar input[type=range] { width:90px; }
+.view { flex:1 1 auto; min-height:300px; overflow:auto; background:#000; border:1px solid var(--line); border-radius:10px; position:relative; }
+.stage { position:relative; margin:0 auto; }
+.stage img { display:block; width:100%; height:auto; user-select:none; -webkit-user-drag:none; }
+.stage svg { position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; }
+.stage.pan svg { cursor:grab; }
+.status { font-size:13px; }
+.ok { color:var(--done); } .bad { color:var(--warn); }
+.meas { font:13px ui-monospace, monospace; }
+.meas b.h { color:var(--heart); } .meas b.t { color:var(--thorax); }
+details summary { cursor:pointer; color:var(--muted); font-size:13px; }
+.rules li { margin-bottom:4px; font-size:14px; }
+h1 { font-size:16px; margin:0; }
+</style>
+</head>
+<body>
+<main>
+<section class="left">
+  <div class="panel toolbar">
+    <h1>Referenzlesung</h1>
+    <span class="muted" id="pos"></span>
+    <span style="flex:1"></span>
+    <label>Zoom <button id="zfit">Fit</button><button id="zminus">−</button><button id="zplus">+</button><span id="zval" class="muted"></span></label>
+    <label>Helligkeit <input type="range" id="bright" min="40" max="200" value="100"></label>
+    <label>Kontrast <input type="range" id="contrast" min="40" max="250" value="100"></label>
+    <label><input type="checkbox" id="invert"> invertiert <kbd>i</kbd></label>
+    <button id="reset" title="Fenster zurücksetzen">↺</button>
+    <button id="theme" title="hell/dunkel">◐</button>
+  </div>
+  <div class="view" id="view"><div class="stage" id="stage"><img id="img" alt=""><svg id="ov" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+  <div class="muted">Linksklick setzt Messpunkte (im Messmodus) oder die Markerposition. Mausrad scrollt, <kbd>⌘</kbd>/<kbd>Strg</kbd>+Mausrad zoomt. Leertaste gedrückt halten und ziehen verschiebt das Bild.</div>
+</section>
+
+<section class="right">
+  <div class="panel">
+    <div class="row" style="margin-top:0">
+      <label class="muted">Leser-ID <input type="text" id="reader" placeholder="z. B. R1" style="width:90px" autocomplete="off"></label>
+      <label class="muted">Rolle <select id="role"><option value="radiology">Radiologie</option><option value="nuclear">Nuklearmedizin</option></select></label>
+    </div>
+    <div class="row"><label class="muted">Block <select id="block"></select></label></div>
+    <div class="row" style="justify-content:space-between"><span id="prog" class="muted"></span><span id="save" class="status"></span></div>
+    <div class="bar"><div id="barfill"></div></div>
+  </div>
+
+  <details class="panel" id="rules">
+    <summary><b>Kurzregeln</b> (die vollständigen Messdefinitionen stehen im Protokoll)</summary>
+    <ol class="rules">
+      <li>Du siehst nur das Bild. Keine Paketwerte, keine Modellantworten, keine Werte des anderen Lesers.</li>
+      <li><b>Seitenorientierung:</b> Welcher Bildrand zeigt die <i>rechte</i> Körperseite des Patienten? Entscheide nach Anatomie; ein sichtbarer Marker darf genutzt werden, dann die Grundlage angeben.</li>
+      <li><b>CTR:</b> Herz = horizontale Distanz zwischen den beiden lateralsten Punkten der Herzsilhouette. Thorax = größte horizontale Innendistanz zwischen den Rippeninnenrändern. Je zwei Klicks; das Werkzeug nimmt die horizontale Komponente.</li>
+      <li><b>Marker:</b> Ist im gezeigten (maskierten) Bild ein Seitenmarker oder eine Seitenbeschriftung sichtbar? Wenn ja oder unsicher: Position anklicken.</li>
+      <li><b>Szintigramme:</b> zuerst die Ansicht (anterior/posterior) erkennen, dann den Bildrand der rechten Patientenseite; bei Block F die Bildhälfte mit mehr Aktivität (ohne Wirbelsäule und Blase).</li>
+      <li><b>Nicht beurteilbar</b> ist immer erlaubt. <b>Unsicher</b> ankreuzen, wenn du gezögert hast; Kommentar kurz.</li>
+      <li>Jede Änderung wird als neue Revision gespeichert. Nichts wird überschrieben.</li>
+    </ol>
+    <p class="muted">Tasten: <kbd>1</kbd>–<kbd>4</kbd> Option · <kbd>n</kbd> nicht beurteilbar · <kbd>u</kbd> unsicher · <kbd>h</kbd> Herz messen · <kbd>t</kbd> Thorax messen · <kbd>←</kbd>/<kbd>→</kbd> Bild · <kbd>j</kbd> nächstes offenes</p>
+  </details>
+
+  <div class="panel" id="task"></div>
+
+  <div class="panel">
+    <div class="row" style="margin-top:0">
+      <button id="prev">← Zurück</button><button id="next">Weiter →</button><button id="jump">Nächstes offenes</button>
+    </div>
+    <div class="row">
+      <button id="export">CSV exportieren</button>
+      <label class="muted"><input type="file" id="import" accept=".csv" hidden><button id="importbtn">CSV importieren</button></label>
+      <span class="status" id="status"></span>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+const DATA = /*ITEMS*/[];
+const ITEMS = DATA.items || [], BLOCKS = DATA.blocks || {}, TOOL = DATA.tool_version || "reader";
+const $ = id => document.getElementById(id);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+                set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const TASKQ = {
+  side:       { q: "Welcher Bildrand zeigt die rechte Körperseite des Patienten?", opts: [["image_left", "Linker Bildrand"], ["image_right", "Rechter Bildrand"]] },
+  ctr:        { q: "Herzbreite und Thoraxbreite messen (je zwei Klicks).", opts: [] },
+  marker:     { q: "Ist in diesem maskierten Bild ein Seitenmarker oder eine Seitenbeschriftung sichtbar?", opts: [["yes", "Ja"], ["no", "Nein"], ["unsure", "Unsicher"]] },
+  scint_view: { q: "Welche Ansicht ist das?", opts: [["anterior", "Anterior"], ["posterior", "Posterior"], ["unsure", "Unsicher"]] },
+  scint_side: { q: "Welcher Bildrand zeigt die rechte Körperseite des Patienten?", opts: [["image_left", "Linker Bildrand"], ["image_right", "Rechter Bildrand"]] },
+  scint_hot:  { q: "Welche Bildhälfte zeigt insgesamt mehr Aktivität (ohne Wirbelsäule und Blase)?", opts: [["image_left", "Linke Bildhälfte"], ["image_right", "Rechte Bildhälfte"], ["none", "Kein klarer Unterschied"]] },
+};
+let reader = store.get("rs.reader") || "", role = store.get("rs.role") || "radiology", block = store.get("rs.block") || "";
+let labels = {}, list = [], idx = 0, mode = null, online = false, opened = 0, zoom = 0, pan = false;
+
+function key(it, task) { return it.item + "|" + task; }
+function load() {
+  try { labels = JSON.parse(store.get("rs.labels." + reader) || "{}"); } catch (e) { labels = {}; }
+  const bsel = $("block"); bsel.textContent = "";
+  Object.entries(BLOCKS).filter(([k, b]) => b.role === role && ITEMS.some(i => i.block === k)).forEach(([k, b]) => { const o = document.createElement("option"); o.value = k; o.textContent = b.label; bsel.appendChild(o); });
+  if (!BLOCKS[block] || BLOCKS[block].role !== role) block = bsel.options[0] ? bsel.options[0].value : "";
+  bsel.value = block; list = ITEMS.filter(i => i.block === block);
+  idx = Math.min(+(store.get("rs.pos." + reader + "." + block) || 0), Math.max(0, list.length - 1));
+  $("reader").value = reader; $("role").value = role;
+}
+function save() { store.set("rs.labels." + reader, JSON.stringify(labels)); store.set("rs.pos." + reader + "." + block, idx); }
+function done(it, task) { const l = labels[key(it, task)]; if (!l) return false; if (l.na) return true;
+  if (task === "ctr") return l.heart && l.heart.length === 2 && l.thorax && l.thorax.length === 2;
+  if (task === "marker") return l.answer === "no" || ((l.answer === "yes" || l.answer === "unsure") && !!l.marker);
+  return !!l.answer; }
+function itemDone(it) { return it.tasks.every(t => done(it, t)); }
+
+// ---- image + overlay
+function fitZoom() { const it = list[idx], v = $("view"); return it ? Math.max(0.02, Math.min((v.clientWidth - 2) / it.w, (v.clientHeight - 2) / it.h)) : 1; }
+function setZoom(z, cx, cy) {
+  const it = list[idx]; if (!it) return; const v = $("view"), old = zoom || fitZoom();
+  const rx = cx === undefined ? 0.5 : (cx - v.getBoundingClientRect().left + v.scrollLeft) / (it.w * old);
+  const ry = cy === undefined ? 0.5 : (cy - v.getBoundingClientRect().top + v.scrollTop) / (it.h * old);
+  zoom = Math.max(fitZoom() * 0.5, Math.min(8, z)); $("stage").style.width = Math.round(it.w * zoom) + "px";
+  v.scrollLeft = rx * it.w * zoom - (cx === undefined ? v.clientWidth / 2 : cx - v.getBoundingClientRect().left);
+  v.scrollTop = ry * it.h * zoom - (cy === undefined ? v.clientHeight / 2 : cy - v.getBoundingClientRect().top);
+  $("zval").textContent = Math.round(zoom * 100) + " %";
+}
+function filters() { $("img").style.filter = `brightness(${$("bright").value / 100}) contrast(${$("contrast").value / 100})` + ($("invert").checked ? " invert(1)" : ""); }
+function toImg(e) { const r = $("ov").getBoundingClientRect(), it = list[idx]; return [Math.round((e.clientX - r.left) * it.w / r.width * 10) / 10, Math.round((e.clientY - r.top) * it.h / r.height * 10) / 10]; }
+function drawOverlay() {
+  const it = list[idx], ov = $("ov"); ov.setAttribute("viewBox", `0 0 ${it.w} ${it.h}`); ov.textContent = "";
+  const sw = Math.max(1.5, it.w / 700), r = Math.max(4, it.w / 250), ns = "http://www.w3.org/2000/svg";
+  const seg = (pts, color) => { if (!pts) return; pts.forEach(p => { const c = document.createElementNS(ns, "circle"); c.setAttribute("cx", p[0]); c.setAttribute("cy", p[1]); c.setAttribute("r", r); c.setAttribute("fill", "none"); c.setAttribute("stroke", color); c.setAttribute("stroke-width", sw); ov.appendChild(c); });
+    if (pts.length === 2) { const l = document.createElementNS(ns, "line"); l.setAttribute("x1", pts[0][0]); l.setAttribute("y1", pts[0][1]); l.setAttribute("x2", pts[1][0]); l.setAttribute("y2", pts[1][1]); l.setAttribute("stroke", color); l.setAttribute("stroke-width", sw); l.setAttribute("stroke-dasharray", `${sw * 4} ${sw * 3}`); ov.appendChild(l);
+      [pts[0], pts[1]].forEach(p => { const v = document.createElementNS(ns, "line"); v.setAttribute("x1", p[0]); v.setAttribute("y1", p[1] - r * 3); v.setAttribute("x2", p[0]); v.setAttribute("y2", p[1] + r * 3); v.setAttribute("stroke", color); v.setAttribute("stroke-width", sw); ov.appendChild(v); }); } };
+  if (it.tasks.includes("ctr")) { const l = labels[key(it, "ctr")] || {}; seg(l.heart, "var(--heart)"); seg(l.thorax, "var(--thorax)"); }
+  if (it.tasks.includes("marker")) { const l = labels[key(it, "marker")] || {}; if (l.marker) { const c = document.createElementNS(ns, "circle"); c.setAttribute("cx", l.marker[0]); c.setAttribute("cy", l.marker[1]); c.setAttribute("r", r * 3); c.setAttribute("fill", "none"); c.setAttribute("stroke", "var(--mark)"); c.setAttribute("stroke-width", sw * 1.5); ov.appendChild(c); } }
+}
+function showImage() {
+  const it = list[idx]; const img = $("img");
+  if (img.dataset.file !== it.file) { img.src = it.file; img.dataset.file = it.file; zoom = 0; img.onload = () => { setZoom(fitZoom()); }; }
+  $("stage").style.width = Math.round(it.w * (zoom || fitZoom())) + "px"; drawOverlay();
+}
+
+// ---- task panel
+function render() {
+  if (!list.length) { $("task").innerHTML = "<span class='muted'>Kein Block gewählt.</span>"; $("pos").textContent = ""; return; }
+  const it = list[idx]; opened = opened || Date.now();
+  $("pos").textContent = `${BLOCKS[block].label}: Bild ${idx + 1} von ${list.length}  (${it.id.slice(0, 12)})`;
+  const n = list.filter(itemDone).length; $("prog").textContent = `${n} von ${list.length} vollständig`; $("barfill").style.width = (100 * n / list.length) + "%";
+  showImage();
+  const T = $("task"); T.textContent = "";
+  it.tasks.forEach(task => {
+    const l = labels[key(it, task)] || {}, def = TASKQ[task];
+    const q = document.createElement("div"); q.className = "q"; q.textContent = def.q; T.appendChild(q);
+    const opts = document.createElement("div"); opts.className = "opts";
+    if (task === "ctr") {
+      const h = document.createElement("button"); h.className = "mode heart" + (mode === "heart" ? " sel" : ""); h.innerHTML = "Herz messen <kbd>h</kbd>"; h.onclick = () => { mode = mode === "heart" ? null : "heart"; set(it, "ctr", { heart: [] }); };
+      const t = document.createElement("button"); t.className = "mode thorax" + (mode === "thorax" ? " sel" : ""); t.innerHTML = "Thorax messen <kbd>t</kbd>"; t.onclick = () => { mode = mode === "thorax" ? null : "thorax"; set(it, "ctr", { thorax: [] }); };
+      opts.append(h, t); T.appendChild(opts);
+      const m = document.createElement("div"); m.className = "meas";
+      const hp = l.heart && l.heart.length === 2 ? Math.abs(l.heart[1][0] - l.heart[0][0]) : null, tp = l.thorax && l.thorax.length === 2 ? Math.abs(l.thorax[1][0] - l.thorax[0][0]) : null;
+      m.innerHTML = `<b class="h">Herz</b> ${hp === null ? (l.heart && l.heart.length === 1 ? "1 Punkt gesetzt…" : "—") : hp.toFixed(0) + " px"} &nbsp; <b class="t">Thorax</b> ${tp === null ? (l.thorax && l.thorax.length === 1 ? "1 Punkt gesetzt…" : "—") : tp.toFixed(0) + " px"} &nbsp; CTR ${hp !== null && tp ? (hp / tp).toFixed(3) : "—"}`;
+      T.appendChild(m);
+      const ap = document.createElement("label"); ap.className = "row"; ap.innerHTML = `<input type="checkbox" ${l.ap ? "checked" : ""}> AP-Projektion (CTR eingeschränkt beurteilbar)`; ap.querySelector("input").onchange = e => set(it, "ctr", { ap: e.target.checked }); T.appendChild(ap);
+    } else {
+      const first = it.tasks.find(t => t !== "ctr" && TASKQ[t].opts.length);   // digit keys answer this task only
+      def.opts.forEach(([v, lab], k) => { const b = document.createElement("button"); b.innerHTML = task === first ? `${lab} <kbd>${k + 1}</kbd>` : lab; b.className = l.answer === v && !l.na ? "sel" : ""; b.onclick = () => set(it, task, { answer: v, na: false }); opts.appendChild(b); });
+      T.appendChild(opts);
+      if (task === "side" || task === "scint_side") {
+        const r = document.createElement("div"); r.className = "row"; r.innerHTML = `<span class="muted">Grundlage</span>`;
+        const s = document.createElement("select"); [["", "…"], ["anatomy", "Anatomie"], ["marker", "Marker/Beschriftung"], ["both", "beides"]].forEach(([v, lab]) => { const o = document.createElement("option"); o.value = v; o.textContent = lab; s.appendChild(o); });
+        s.value = l.basis || ""; s.onchange = e => set(it, task, { basis: e.target.value }); r.appendChild(s); T.appendChild(r);
+      }
+      if (task === "marker") { const m = document.createElement("div"); m.className = "muted"; m.textContent = l.marker ? `Position: ${l.marker[0]}, ${l.marker[1]} (${quadrant(it, l.marker)}); Klick ins Bild verschiebt sie` : (l.answer === "yes" || l.answer === "unsure" ? "Bitte die Position im Bild anklicken." : ""); T.appendChild(m); }
+    }
+    const row = document.createElement("div"); row.className = "row";
+    const na = document.createElement("button"); na.className = "na" + (l.na ? " sel" : ""); na.innerHTML = "Nicht beurteilbar <kbd>n</kbd>"; na.onclick = () => set(it, task, { na: !l.na });
+    const un = document.createElement("label"); un.innerHTML = `<input type="checkbox" ${l.unsure ? "checked" : ""}> unsicher <kbd>u</kbd>`; un.querySelector("input").onchange = e => set(it, task, { unsure: e.target.checked });
+    const note = document.createElement("input"); note.type = "text"; note.className = "note"; note.placeholder = "Kommentar (optional)"; note.value = l.comment || ""; note.addEventListener("change", e => set(it, task, { comment: e.target.value }));
+    row.append(na, un, note); T.appendChild(row);
+    const st = document.createElement("div"); st.className = "status " + (done(it, task) ? "ok" : "muted"); st.textContent = done(it, task) ? `✓ gespeichert (Rev. ${l.rev || 1})` : "offen"; T.appendChild(st);
+    if (it.tasks.length > 1) { T.appendChild(document.createElement("hr")); }
+  });
+}
+function quadrant(it, p) { return (p[1] < it.h / 2 ? "oben" : "unten") + " " + (p[0] < it.w / 2 ? "links" : "rechts"); }
+
+function set(it, task, patch) {
+  if (!reader) { $("status").textContent = "Bitte zuerst eine Leser-ID eintragen."; $("status").className = "status bad"; $("reader").focus(); return; }
+  const k = key(it, task), l = Object.assign({}, labels[k] || {}, patch);
+  l.rev = (labels[k] && labels[k].rev || 0) + 1; l.ts = new Date().toISOString(); l.secs = Math.round((Date.now() - opened) / 1000);
+  labels[k] = l; save(); post(it, task, l); render();
+}
+function row(it, task, l) {
+  const hp = l.heart && l.heart.length === 2 ? Math.abs(l.heart[1][0] - l.heart[0][0]) : "", tp = l.thorax && l.thorax.length === 2 ? Math.abs(l.thorax[1][0] - l.thorax[0][0]) : "";
+  return { ts_utc: l.ts, reader_id: reader, role, block, item_id: it.id, dataset: it.dataset, task, revision: l.rev, answer: l.na ? "na" : (l.answer || ""), basis: l.basis || "",
+    heart_x1: l.heart && l.heart[0] ? l.heart[0][0] : "", heart_y1: l.heart && l.heart[0] ? l.heart[0][1] : "", heart_x2: l.heart && l.heart[1] ? l.heart[1][0] : "", heart_y2: l.heart && l.heart[1] ? l.heart[1][1] : "", heart_px: hp,
+    thorax_x1: l.thorax && l.thorax[0] ? l.thorax[0][0] : "", thorax_y1: l.thorax && l.thorax[0] ? l.thorax[0][1] : "", thorax_x2: l.thorax && l.thorax[1] ? l.thorax[1][0] : "", thorax_y2: l.thorax && l.thorax[1] ? l.thorax[1][1] : "", thorax_px: tp,
+    ctr: hp !== "" && tp ? (hp / tp).toFixed(4) : "", ap_projection: task === "ctr" ? (l.ap ? 1 : 0) : "", marker_x: l.marker ? l.marker[0] : "", marker_y: l.marker ? l.marker[1] : "", marker_quadrant: l.marker ? quadrant(it, l.marker) : "",
+    not_assessable: l.na ? 1 : 0, unsure: l.unsure ? 1 : 0, comment: l.comment || "", secs: l.secs || "", image_w: it.w, image_h: it.h, image_sha256: it.sha256, tool_version: TOOL };
+}
+async function post(it, task, l) {
+  if (!online) { $("save").textContent = "lokal gespeichert (kein Server): regelmäßig CSV exportieren"; $("save").className = "status muted"; return; }
+  try { const r = await fetch("/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(row(it, task, l)) });
+    if (!r.ok) throw new Error(await r.text()); $("save").textContent = "✓ in CSV geschrieben"; $("save").className = "status ok"; }
+  catch (e) { $("save").textContent = "Speichern fehlgeschlagen: " + e.message + " — CSV exportieren"; $("save").className = "status bad"; }
+}
+function go(d) { idx = Math.max(0, Math.min(list.length - 1, idx + d)); mode = null; opened = Date.now(); save(); render(); }
+function jump() { for (let k = 1; k <= list.length; k++) { const j = (idx + k) % list.length; if (!itemDone(list[j])) { idx = j; mode = null; opened = Date.now(); save(); render(); return; } } $("status").textContent = "Alle Bilder dieses Blocks sind vollständig."; $("status").className = "status ok"; }
+
+// ---- clicks on the image
+$("ov").addEventListener("click", e => {
+  if (pan) return; const it = list[idx]; if (!it) return; const p = toImg(e);
+  if (it.tasks.includes("ctr") && mode) { const l = labels[key(it, "ctr")] || {}; const pts = (l[mode] || []).slice(); if (pts.length >= 2) pts.length = 0; pts.push(p);
+    const patch = {}; patch[mode] = pts; set(it, "ctr", patch); if (pts.length === 2) mode = null; render(); return; }
+  if (it.tasks.includes("marker")) { const l = labels[key(it, "marker")] || {}; set(it, "marker", { marker: p, answer: l.answer === "no" || !l.answer ? "yes" : l.answer, na: false }); }
+});
+let panStart = null;
+$("view").addEventListener("mousedown", e => { if (pan) { panStart = [e.clientX, e.clientY, $("view").scrollLeft, $("view").scrollTop]; e.preventDefault(); } });
+window.addEventListener("mousemove", e => { if (panStart) { $("view").scrollLeft = panStart[2] - (e.clientX - panStart[0]); $("view").scrollTop = panStart[3] - (e.clientY - panStart[1]); } });
+window.addEventListener("mouseup", () => { panStart = null; });
+$("view").addEventListener("wheel", e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); setZoom((zoom || fitZoom()) * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX, e.clientY); } }, { passive: false });
+$("zfit").onclick = () => setZoom(fitZoom()); $("zplus").onclick = () => setZoom((zoom || fitZoom()) * 1.25); $("zminus").onclick = () => setZoom((zoom || fitZoom()) / 1.25);
+["bright", "contrast", "invert"].forEach(id => $(id).addEventListener("input", filters));
+$("reset").onclick = () => { $("bright").value = 100; $("contrast").value = 100; $("invert").checked = false; filters(); setZoom(fitZoom()); };
+$("theme").onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; };
+window.addEventListener("resize", () => { if (list[idx]) setZoom(zoom || fitZoom()); });
+
+// ---- navigation and identity
+$("prev").onclick = () => go(-1); $("next").onclick = () => go(1); $("jump").onclick = jump;
+$("reader").addEventListener("change", e => { reader = e.target.value.trim().replace(/[^A-Za-z0-9_-]/g, "").slice(0, 32); e.target.value = reader; store.set("rs.reader", reader); load(); resume(); render(); });
+$("role").onchange = e => { role = e.target.value; store.set("rs.role", role); block = ""; load(); render(); };
+$("block").onchange = e => { block = e.target.value; store.set("rs.block", block); load(); opened = Date.now(); render(); };
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.metaKey || e.ctrlKey) return;
+  const it = list[idx]; if (!it) return;
+  if (e.key === " ") { pan = true; $("stage").classList.add("pan"); e.preventDefault(); return; }
+  const choice = it.tasks.find(t => t !== "ctr" && TASKQ[t].opts.length);   // digits answer the first choice task of the item
+  if (/^[1-4]$/.test(e.key) && choice && TASKQ[choice].opts[+e.key - 1]) set(it, choice, { answer: TASKQ[choice].opts[+e.key - 1][0], na: false });
+  else if (e.key === "n") { const t = it.tasks[0]; set(it, t, { na: !(labels[key(it, t)] || {}).na }); }
+  else if (e.key === "u") { const t = it.tasks[0]; set(it, t, { unsure: !(labels[key(it, t)] || {}).unsure }); }
+  else if (e.key === "h" && it.tasks.includes("ctr")) { mode = mode === "heart" ? null : "heart"; set(it, "ctr", { heart: [] }); }
+  else if (e.key === "t" && it.tasks.includes("ctr")) { mode = mode === "thorax" ? null : "thorax"; set(it, "ctr", { thorax: [] }); }
+  else if (e.key === "i") { $("invert").checked = !$("invert").checked; filters(); }
+  else if (e.key === "+" || e.key === "=") setZoom((zoom || fitZoom()) * 1.25); else if (e.key === "-") setZoom((zoom || fitZoom()) / 1.25); else if (e.key === "0") setZoom(fitZoom());
+  else if (e.key === "ArrowRight" || e.key === "Enter") go(1); else if (e.key === "ArrowLeft") go(-1); else if (e.key === "j") jump();
+  else return;
+  e.preventDefault();
+});
+document.addEventListener("keyup", e => { if (e.key === " ") { pan = false; $("stage").classList.remove("pan"); } });
+
+// ---- CSV export / import (latest revision per item and task)
+const COLS = ["ts_utc", "reader_id", "role", "block", "item_id", "dataset", "task", "revision", "answer", "basis", "heart_x1", "heart_y1", "heart_x2", "heart_y2", "heart_px",
+  "thorax_x1", "thorax_y1", "thorax_x2", "thorax_y2", "thorax_px", "ctr", "ap_projection", "marker_x", "marker_y", "marker_quadrant", "not_assessable", "unsure", "comment", "secs", "image_w", "image_h", "image_sha256", "tool_version"];
+const esc = v => { v = v == null ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+$("export").onclick = () => {
+  const lines = [COLS.join(",")];
+  ITEMS.forEach(it => it.tasks.forEach(t => { const l = labels[key(it, t)]; if (!l) return; const r = row(it, t, l); lines.push(COLS.map(c => esc(r[c])).join(",")); }));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([lines.join("\n") + "\n"], { type: "text/csv" })); a.download = `readings_${reader || "reader"}_export.csv`; a.click();
+  $("status").textContent = `${lines.length - 1} Antworten exportiert`; $("status").className = "status ok";
+};
+function parseCSV(s) { const out = []; let rowv = [], f = "", q = false;
+  for (let i = 0; i < s.length; i++) { const c = s[i];
+    if (q) { if (c === '"' && s[i + 1] === '"') { f += '"'; i++; } else if (c === '"') q = false; else f += c; }
+    else if (c === '"') q = true; else if (c === ",") { rowv.push(f); f = ""; }
+    else if (c === "\n") { rowv.push(f); out.push(rowv); rowv = []; f = ""; } else if (c !== "\r") f += c; }
+  if (f || rowv.length) { rowv.push(f); out.push(rowv); } return out; }
+function ingest(text) {
+  const rows = parseCSV(text), h = rows.shift(); let n = 0; if (!h) return 0;
+  rows.forEach(r => { const o = Object.fromEntries(h.map((k, j) => [k, r[j]])); if (!o.item_id || !o.task) return;
+    const it = ITEMS.find(i => i.id === o.item_id && i.block === o.block); if (!it) return; const k = key(it, o.task);
+    if (labels[k] && +(labels[k].rev || 0) >= +(o.revision || 0)) return;
+    const l = { rev: +o.revision || 1, ts: o.ts_utc, answer: o.answer === "na" ? "" : o.answer, na: o.not_assessable === "1" || o.answer === "na", unsure: o.unsure === "1", comment: o.comment, basis: o.basis, secs: +o.secs || 0, ap: o.ap_projection === "1" };
+    if (o.heart_x1 !== "") { l.heart = [[+o.heart_x1, +o.heart_y1]]; if (o.heart_x2 !== "") l.heart.push([+o.heart_x2, +o.heart_y2]); }
+    if (o.thorax_x1 !== "") { l.thorax = [[+o.thorax_x1, +o.thorax_y1]]; if (o.thorax_x2 !== "") l.thorax.push([+o.thorax_x2, +o.thorax_y2]); }
+    if (o.marker_x !== "") l.marker = [+o.marker_x, +o.marker_y];
+    labels[k] = l; n++; });
+  save(); return n;
+}
+$("importbtn").onclick = () => $("import").click();
+$("import").onchange = async e => { const f = e.target.files[0]; if (!f) return; const n = ingest(await f.text()); render(); $("status").textContent = `${n} Antworten importiert`; $("status").className = "status ok"; e.target.value = ""; };
+async function resume() {   // server mode: pull this reader's CSV so another browser continues where the last one stopped
+  if (!online || !reader) return;
+  try { const r = await fetch(`/readings/${reader}.csv`); if (r.ok) { const n = ingest(await r.text()); if (n) { $("status").textContent = `${n} Antworten vom Server übernommen`; $("status").className = "status ok"; } } } catch (e) {}
+}
+(async () => {
+  try { const r = await fetch("/readings/ping"); online = r.ok && (await r.json()).ok === true; } catch (e) { online = false; }
+  $("save").textContent = online ? "Autosave in CSV aktiv" : "Kein Server: lokal gespeichert, bitte CSV exportieren"; $("save").className = "status " + (online ? "ok" : "muted");
+  load(); await resume(); render(); filters();
+  if (!store.get("rs.seenRules")) { $("rules").open = true; store.set("rs.seenRules", "1"); }
+})();
+</script>
+</body>
+</html>
