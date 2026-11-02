@@ -1,7 +1,7 @@
 """Build the human reading set for the reader study (Lancet revision, protocol in bench/reader/PROTOKOLL.md).
 
 Usage: python bench/reader/build_set.py [--vindr ~/oip-bench/vindr-paper] [--nih ~/oip-bench/nih-paper]
-                                        [--bone ~/oip-bench/bonescan] [--practice ~/oip-bench/_backup/vindr] [--copy]
+                                        [--bone ~/oip-bench/bonescan] [--practice ~/oip-bench/vindr-practice] [--copy]
 
 Writes, next to this file:
   set/<block>/<id>.png   the canonical render of each package exactly as the models saw it (symlink; --copy copies), plus the
@@ -53,7 +53,7 @@ def place(src: Path, dst: Path, copy: bool) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--vindr", default="~/oip-bench/vindr-paper"); ap.add_argument("--nih", default="~/oip-bench/nih-paper")
-    ap.add_argument("--bone", default="~/oip-bench/bonescan"); ap.add_argument("--practice", default="~/oip-bench/_backup/vindr")
+    ap.add_argument("--bone", default="~/oip-bench/bonescan"); ap.add_argument("--practice", default="~/oip-bench/vindr-practice")
     ap.add_argument("--copy", action="store_true", help="copy renders instead of symlinking (portable folder; VinDr stays on this machine)")
     a = ap.parse_args()
     vindr = sorted(Path(os.path.expanduser(a.vindr)).glob("*.oip")); nih = sorted(Path(os.path.expanduser(a.nih)).glob("*.oip"))

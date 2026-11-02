@@ -8,7 +8,7 @@
 > Ablauf: Abschnitt 7, Schritte F1–F7. Das Ziehskript braucht die externe SSD "Video Storage"; ohne sie gibt es keine Hash-Liste.
 > Die Dateien `bench/confirm/draw_set.py` und `bench/confirm/analyze.py` sind der eingefrorene Code; ihr Commit-Hash kommt in
 > Abschnitt 4.7, sobald du den Text freigegeben hast (Schritt F3). Englisch, weil der Text auf OSF und als PDF ins Supplement geht.
-> **Stand 02.11.: Schwellen und n = 80 freigegeben (F1 erledigt). Offen: SSD anschließen (F2), OSF (F4), Kostenfreigabe (F5).**
+> **Stand 02.11.: Schwellen und n = 80 freigegeben (F1), Bildsatz gezogen und verifiziert (F2), Code eingefroren (F3, Hash in 4.7). Offen: OSF (F4), Kostenfreigabe (F5).**
 
 ## 1. Study information
 
@@ -84,7 +84,7 @@ Eligible is every package that
 
 - was never shown to a model in any run of this study (every `bench/results/*/tasks.json`), never in the reader study
   (`bench/reader/set_key.json`) and never in the marker review of round 3a — the excluded names are written into
-  `confirm_set.json` (`excluded_used`), 119 packages as of 2026-11-02 (100 paper packages, 19 pilot and smoke packages);
+  `confirm_set.json` (`excluded_used`), 122 packages as of 2026-11-02 (100 paper packages, 19 pilot and smoke packages, 3 practice packages of the reader study);
 - carries inferred L/R edge labels (`geometry.orientation.edge_labels`);
 - has the stored anatomy masks and passes the pixel-side orientation check with a clear cardiac cue (`bench/tasks.py`
   `clear_cue`: `oip check` consistent, confidence ≥ 0·9, heart offset ≥ 5 % of thoracic width — the same gate as round 3a, so
@@ -146,7 +146,11 @@ injected wrong label appears in the model's finding list (`score.adopted_mislead
 
 ### 4.7 Frozen code
 The run and the analysis use one commit of https://github.com/HenrikStelling/open-image-protocol, named here at registration
-(step F3) and recorded in every row (`harness_commit`) and in `run_meta.json`. The analysis is `bench/confirm/analyze.py` at
+(step F3) and recorded in every row (`harness_commit`) and in `run_meta.json`. **Frozen commit: `FROZEN_COMMIT_PLACEHOLDER`**
+(the commit that contains `bench/confirm/confirm_set.json` and the scripts; tag `prereg-confirm-2026-11` marks the follow-up
+commit that writes this hash into the text). Before the first model call, `git diff prereg-confirm-2026-11 -- bench/ src/`
+must be empty for `bench/confirm/`, `bench/run.py`, `bench/tasks.py`, `bench/score.py`, `bench/cloudlock.py` and `src/oip/`;
+documentation commits after the tag do not touch them. The analysis is `bench/confirm/analyze.py` at
 that commit; it reads the run directories and prints the tables of section 3 with the confirmed / not confirmed verdicts. It was
 dry-run on the exploratory data before registration (round 3a: H1a 5 of 10, H1b 2 of 2; repeat subset: H2a 5 of 10 on 20 images)
 and is not changed afterwards. Exact commands:
@@ -218,7 +222,7 @@ Methods, with the reason and its effect.
 | step | what | who | by |
 |---|---|---|---|
 | F1 | approve or amend the statements, thresholds and n in sections 3 and 5 — **approved as written on 2026-11-02** (statements H1a–H3b, thresholds and minimum counts of section 3, n = 80 + 10 reserve) | Henrik | done 2026-11-02 |
-| F2 | mount the external SSD, run `draw_set.py` and `draw_set.py --verify`; `confirm_set.json` is written | Henrik (OIP session runs it) | 2026-11-07 |
+| F2 | mount the external SSD, run `draw_set.py` and `draw_set.py --verify`; `confirm_set.json` is written — **done 2026-11-02**: store 1,000, 122 excluded as used, 150 without a clear cardiac cue, 728 eligible; 80 + 10 drawn with seed 20261105, 65 of 80 with a header pixel spacing; verify OK; the draw was recomputed once after the reader-study practice block was added to the exclusion list and reproduced the same 90 packages | Henrik (OIP session runs it) | done 2026-11-02 |
 | F3 | commit the final text, `confirm_set.json` and the scripts; write the commit hash into 4.7; tag `prereg-confirm-2026-11` | OIP session | 2026-11-07 |
 | F4 | upload this document and `confirm_set.json` to OSF; record the registration DOI and timestamp here and in the manuscript | Henrik | 2026-11-09 |
 | F5 | release the API cost (section 8) | Henrik | before F6 |

@@ -40,8 +40,9 @@ OIP side delivers and in which form, and where the package needs a correction. R
   added) and `docs/reports/reader-study-<date>.md` (agreement tables, Bland–Altman numbers, the re-scored model
   accuracies against both truths), plus an RA addendum with the sentences to change.
 - Confirmatory round: `docs/paper/preregistration-draft-2026-11-02.md` (draft 0.1: six directional statements with the X and Y
-  taken from the exploratory data, image selection rule and seed, models, frozen code; the sha256 list `bench/confirm/confirm_set.json`
-  is written when the external drive is mounted; analysis `bench/confirm/analyze.py`), then the run directories and
+  taken from the exploratory data, image selection rule and seed, models, frozen code; thresholds and n = 80 approved by Henrik on 2026-11-02; the sha256
+  list `bench/confirm/confirm_set.json` is drawn and verified (80 + 10 reserve of 728 eligible); analysis `bench/confirm/analyze.py`;
+  frozen at tag `prereg-confirm-2026-11`), then the run directories and
   `docs/reports/confirmatory-<date>.md`.
 - Already there: `docs/reports/repeat-subset-2026-10-24.md` and `docs/paper/RA-addendum-2026-10-25-repeats.md` (all ten
   models, S17), `bench/README.md` sections on model identity and the misleading-label draw.

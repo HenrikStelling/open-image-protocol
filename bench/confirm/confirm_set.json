@@ -1,0 +1,2885 @@
+{
+ "seed": 20261105,
+ "n_set": 80,
+ "n_reserve": 10,
+ "drawn_at": "2026-11-02T21:29:06+0100",
+ "harness_commit": "12eaa70",
+ "store": "/Volumes/Video Storage/oip/oip-packages/vindr",
+ "staged_to": "/Users/pal/oip-bench/vindr-confirm",
+ "rule": "Rule, fixed before the draw: from the 1,000-package VinDr-CXR store (the seed-0 sample of the Kaggle training set converted on 2026-09-06), take every package that (a) was never shown to a model in any benchmark run, never in the reader study and never in the marker review, (b) carries inferred L/R edge labels, (c) has the stored anatomy masks and passes the pixel-side orientation check with a clear cardiac cue (bench/tasks.py clear_cue, confidence >= 0.9, offset >= 5 % of thoracic width: the same gate as round 3a), and (d) has a canonical render. Shuffle-sample 90 of them with random.Random(SEED); the first N_SET are the set, the remaining ones are the reserve, used in order only for the technical replacements named in the pre-registration.",
+ "counts": {
+  "store": 1000,
+  "eligible": 728,
+  "by_reason": {
+   "ok": 728,
+   "used before": 122,
+   "no clear cardiac cue": 150
+  }
+ },
+ "excluded_used": {
+  "0187da5fd71c7a2917346bf12a67bbe4.oip": [
+   "benchmark run",
+   "reader study",
+   "store smoke",
+   "store vindr-paper"
+  ],
+  "0339aac16e3dd93ee397315a224147a6.oip": [
+   "benchmark run",
+   "reader study",
+   "store smoke",
+   "store vindr-paper"
+  ],
+  "053700069ddf3c4f1f6c477a48337836.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "056a902e6cae674460ebd4919a607b45.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "061fa33f6ba0028fbbad8caaeac8d145.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "08f84015dd3811451c7a99f3357480be.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "09b85abab0d2b7f151815538100717b2.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "0e5734a5483002be04b734d7c88058be.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "0f81902a673f0d826b55ea9dc9da297b.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "145177b578f321dbf3016984059384d7.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "1785d85092d8f77bff9800dad4216a21.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "1ade7a51f9d900b3e27ca251ace667ad.oip": [
+   "benchmark run"
+  ],
+  "1f9d093a5760dd389a6a22e41f89263e.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "1fec2347206230bc4721f66d8e90971a.oip": [
+   "benchmark run"
+  ],
+  "22672ab82c290c20b86863291e25ef6c.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "2271647c6cb51cd088392c184f8be135.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "228d41a874a5536d83b62b9161da1d61.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "237ce92f123e9d628f2e466906201256.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "23fcdb51ca6f2495a08911d8bd8f19e8.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "28013e33c4791e3046b3bc78b6cc7338.oip": [
+   "benchmark run"
+  ],
+  "2b8d23b406077cd35596765abe6930c8.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "2be0cff9073424bcaf946885d1c1adf5.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "2cf24e4b4380252c4dc94a0e63bed062.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "2d6c36cb32352b891ef90fb11f3215f7.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3033cf4aadc4811b5e714fb3fe295a4e.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3091912bc947841085f33e214d077348.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3190c4c94c3bb08564c4632041686c96.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "33d8ae7467ce9d541f67f240f3a99f0e.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "34ebf9174995582aae86b99f54087647.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "36aa5a0fb93d7567d803b9dc624f2739.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "36d2e5e9bae8dfe964f905328a4ab11f.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "378c7f385c547e5e7dc632510939a551.oip": [
+   "benchmark run"
+  ],
+  "389526ec796c3955a9a89a66f04bc247.oip": [
+   "benchmark run"
+  ],
+  "395a89a6041167d0254dc826ddfe7110.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3c9223e97cf5d2b13f54c6efbb4ad0be.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3e0e43fa2de366a0ac10e036f92a888d.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3e6e72072389875f30042b041fc837de.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "3e8719d1ba69b36c24ad3e39a8dd83ed.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "43d6a61fac5fb77bbf83e0070b914c82.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "44915a5a80fe7dc3731da239292a0084.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "476d64deaa4b32e9de9a508d3541f5a9.oip": [
+   "benchmark run"
+  ],
+  "49d5b90070caab91081e5e3b26b1a0f5.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "4aaec6ad1732f8814fc6f37918bac314.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "4ac18595c02ca0c74e4dcabf41245b02.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "4f3f5460ae80ab6ec1bf00b33087a828.oip": [
+   "reader study"
+  ],
+  "5386660b78d301f69d170f83885aafe6.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "566150c4fe08a31a5a17d9d9f6c5f21f.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "57c7edc9eb729f36ed89fc83a54aa2a0.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "58ac0fe8d8c2cf736216f42a31e89e85.oip": [
+   "benchmark run"
+  ],
+  "5f009092caee3729873a324a96749949.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "6033bb673b3d8c6fa47e2f10f3092b81.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "614b0af08224c7163278ff78abc8bad7.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "61a02fd2f3c838c3e5daf2786bb6e54a.oip": [
+   "benchmark run"
+  ],
+  "628617afb4cb12b12043d3d3a3789268.oip": [
+   "benchmark run"
+  ],
+  "67d9c7b038acb7d128552e08d9b94558.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "6818b9a73dbaf129b63a2848ac1e576f.oip": [
+   "benchmark run",
+   "marker review",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "6e9e267d562814554eca67e91814408e.oip": [
+   "benchmark run"
+  ],
+  "70328941c11c28b63f934a2a0591c95b.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "71b4cd8dc9b24b340b1a518b37ae6751.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "7400b2fabd02ad5d59195da5002f929e.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "757508700b40b6498c67a396db7b869c.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "78d29d74150c136dc30a3edaf5815d04.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "7c42de6dd248ce53880debab2567b521.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "7daa7e5ce05f09404b845efb87f3ea20.oip": [
+   "benchmark run"
+  ],
+  "7f9362b6d6a6c2e7651ff63b576bd635.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "80566ec123fa2c9bbb6483c7d9ed9643.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "81e1bdd75db3ed8260cd2a8a206107a4.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "822c4cfa6ccc027318abacda96617282.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "83bf2acb96d1e39c553401a9c994eff1.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "83fbff8c7d3d607f2d3bdf88e7548e77.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "8801bd9d1f5e318eb79124c7b2438ac5.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "8ac12a69ad57ca73535e04b6cfba5edb.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "8ae8a13afdf7047c078ff6781a6b9e4a.oip": [
+   "benchmark run"
+  ],
+  "8b2f17204ac0f4050004397e9bb76557.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "8b32bb8de86a0f89db7241a3de5eb5c2.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "9273f6cc0056a7385b498153a1f2371e.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "942d83991819c4e1c9f10261e7e740cf.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "997fca43b97287e53c551c3d4753edcb.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "9b76f5ad4a5fb378274c64230db6ff30.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "9ceb798e9c24ff82e3aa0d6160d4f5ca.oip": [
+   "benchmark run"
+  ],
+  "9ef084b09e407e4f8f00932602d1a88d.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "a19f61e07dea95985126f5b8d030145c.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "a4eb3a3daac654b501ab4dffb3d371dd.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "a5bc9fa0a8b25993a08b1874156a170a.oip": [
+   "benchmark run"
+  ],
+  "a5c5bca04df42e9949aa48cee3ad67c7.oip": [
+   "benchmark run"
+  ],
+  "a66524d3706dae7e6bb8f669cbea99d6.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "a7c0ab62b8c68897140a919aad35714b.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "a87dc1505bcdb64c00c84b096799bdab.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "a884203c4c785bb95580fbd3982de324.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "ae93342f946e59b019b3554610c6f760.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "b08d54426c6af35ea469ecb63d047fbc.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "b2df8e7f5070e86f339c3750a6568887.oip": [
+   "benchmark run"
+  ],
+  "b59dc05efd7fe99cc96902b2c04ad8c3.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "b9374768fadad510f514c5b81b048881.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "c0440c09698f89df168dc146af067fe7.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "c13c09522fae5a8b5483664786a74758.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "c4ccbba58e672de865d0543105512101.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "c4f7b110380be6bee542f5c26c78f36d.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "c8f9493ed65b68adb82000cb7ca7baf3.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "cf3f071a229e2d4433abcb38c4b35cac.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "d6fb22a067e4c9d6380ad86b5d99383f.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "d7163e05dad88864eb0111956c16eb66.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "d79068eb77a5aa51eb57904fbfce1720.oip": [
+   "benchmark run",
+   "marker review",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "d92309c6e0911811e2ba3c122cd31090.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "ddff143851d1399b550480a41b4c6fe2.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "df8f1b15783b1b4b934231d944cc30e1.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "e0fef8abb9723fb69de08f3cd3eff2b8.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "e42a2c25f8b84164c39ff77328ed5bb2.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "e4980f36744d9a8e0dbb26bb97ccbda9.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "e583b6c45b5622f1e714f57521a22a30.oip": [
+   "reader study"
+  ],
+  "e5c83f02dfe7265bb10020c2fc7b487a.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "e81c764da47fe50a69d9eee322441a8b.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "e9278ee61a8a275650baf02c600c382e.oip": [
+   "benchmark run"
+  ],
+  "e9af0316eb1e082f0b2fac36ecf9a6c6.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "f04b3db35749d0bb959a9dbb8e5858c9.oip": [
+   "benchmark run",
+   "marker review",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "f25ec631ffb49b8bff836ba317dad42a.oip": [
+   "reader study"
+  ],
+  "f4785c48c9a8c1b99ca378ac2b8d88dd.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "f69a67703fe0e5e5bd9535025fbff414.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "f89143595274fa6016f6eec550442af9.oip": [
+   "benchmark run"
+  ],
+  "f911342fabc994606ca8b6deffd8cc0f.oip": [
+   "benchmark run"
+  ],
+  "f9e9858e9b2a21957259da02b2f542bf.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ],
+  "fc47195078badf33f2575c3f0db648ab.oip": [
+   "benchmark run",
+   "reader study",
+   "store vindr-paper"
+  ]
+ },
+ "set": [
+  {
+   "package": "2fbe962f706e0588dd4799b75be0d99e.oip",
+   "image_id": "2fbe962f706e0588dd4799b75be0d99e",
+   "source_dicom_sha256": "8f70da03ee53bd398380e94c7d09fb57f1fbbecff74be49e7896cc987c39c086",
+   "rows": 2836,
+   "columns": 2336,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "d643795dd4a5ff504d76c9b583aa331855f4a0fd1838c4d0391c9a9ad1abd5a1",
+    "renders/canonical.png": "14e7d3df251a0b74e1331c560d6c2f41524ecb4e0a718ff3b24f8018e71ec1c8",
+    "derived/masks/heart.png": "f2f4eed94a15fb7ad4e60dfd11d4383bc81927c873e0344172a832f022cc0137",
+    "derived/masks/lung_left.png": "1f6224f8d9e967c05c2be644a28edfbbffeeeddfdf723c9a8be5cb7b2cf018a4",
+    "derived/masks/lung_right.png": "f8f6f2b6eff509c1010c45fd668d755d1229fee4ba0814b660aa44648a9cd360"
+   }
+  },
+  {
+   "package": "f3bdfeef73cd67f5583466d3df2829df.oip",
+   "image_id": "f3bdfeef73cd67f5583466d3df2829df",
+   "source_dicom_sha256": "163140bad6c27d80ace66742066c851636ca734742342ebff3f9cce8ce7e0a0f",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "c0638637c5d05fe992171651ae0065f7eb73d5b4ebd6f82cdd44e954e0765421",
+    "renders/canonical.png": "0bd5d3775361f21660c30468172b7b2932b1aef1b734e07e944192795d587ab5",
+    "derived/masks/heart.png": "d6058f4049054a0592ccdb634d1af1d79c5ed18caffa8d356dc0fc04f31210dd",
+    "derived/masks/lung_left.png": "e05dcd0d8d408c279460d399dd5a670a7dc2a504b579ef8c0e5d919662b20d36",
+    "derived/masks/lung_right.png": "b5720814a1f454a80b50f86945158fb46ed399e18bbd1c32e953e4026f8d8a5c"
+   }
+  },
+  {
+   "package": "37c55613c78c7775df0514fb0c804f4a.oip",
+   "image_id": "37c55613c78c7775df0514fb0c804f4a",
+   "source_dicom_sha256": "c37db9fa4f03c486daf83b03147b201d8a4362a5ffcb6ddec09ebcf9f5ab34c1",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "6ba1b1c517730c93d79038c9eb063f1dcd21cea5a114780e96107effea1b000d",
+    "renders/canonical.png": "30b734dcdb8efca5a964b6c2a74fbfdda520698d958004acb667d8ebbf207d7b",
+    "derived/masks/heart.png": "db4c1cc0bfed355294971be6af6f74fe6150d5024b5d3913f632f9d10d73aa61",
+    "derived/masks/lung_left.png": "dc84c4c8a915523d3775c93d1b0fff9546fab9ed70890b033b7118f0ba0fdc73",
+    "derived/masks/lung_right.png": "d976a67466bf4cf8a2a704d0c3957c472c5f0793fe2fd334f21f2ef0c3bcf859"
+   }
+  },
+  {
+   "package": "d571f85ab9434bcb8bc11bd175453c96.oip",
+   "image_id": "d571f85ab9434bcb8bc11bd175453c96",
+   "source_dicom_sha256": "2c2718972dead63b3f7f23b45ec5dd42f3c8e1554050f8145205235c18f961a8",
+   "rows": 3072,
+   "columns": 2674,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "169bddcb932294dd9ca8526ca494dd5eda35255fe539168e5be692d38b67b199",
+    "renders/canonical.png": "e5eda0e0dfcbe9676053f81102329ce270b31f9ebea5ea9bd2b4a90a60ba1883",
+    "derived/masks/heart.png": "74b44021add3f3167435fee8f2ff3f0c8546754a842f539132fde133ad6da83f",
+    "derived/masks/lung_left.png": "37b67ccf785d1ff7faa116fe9981fe5be919442fd2aa4d7bedaa5778276f1613",
+    "derived/masks/lung_right.png": "91ed3458d32fdde55930c85732cc992c6db404990003c3c8c7d596046847c38a"
+   }
+  },
+  {
+   "package": "26be9cde1a3d1a38f19c6753cc9ed40d.oip",
+   "image_id": "26be9cde1a3d1a38f19c6753cc9ed40d",
+   "source_dicom_sha256": "5e77ce00ee54bd3d12d07ddba2296c66787c8eec9ae0d2ddb0b8612d35f72b78",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "f9d477272836fd30a04629a6e2386b9ffa56b7e3faf6f3b93b5a480100d423ad",
+    "renders/canonical.png": "de0415be4170c1c0f58057bd9b1cef44afe914b6eec9d86bfddbf5f2f4618926",
+    "derived/masks/heart.png": "1609e75267a20e8b9444f04aac65372a4d56acc839a80c7ac333b2a0ae324ad0",
+    "derived/masks/lung_left.png": "4a774cfea9609e886a3912db028676182ab679af970905da5186840efd5304e6",
+    "derived/masks/lung_right.png": "f95c6187bf354a9a1e8bed2ff311813ed3db102260101e9277ff46582e2d22ee"
+   }
+  },
+  {
+   "package": "954984f75efe6890cfa45d0784a3a1e6.oip",
+   "image_id": "954984f75efe6890cfa45d0784a3a1e6",
+   "source_dicom_sha256": "e4ca80d7d4abf27008ce4290680c68c62b3f924f7e72ac796b820d8b52bc14fa",
+   "rows": 3072,
+   "columns": 2540,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "c64f4834c0d16a1e6a3a602eddb8210105b74f0ff42b552a399562196c31a3b0",
+    "renders/canonical.png": "b19fc12b9c5fab456e910475386e356f5736c320322e6bc33fa04d1eb69d3196",
+    "derived/masks/heart.png": "f7b9de63c8e462edff12ae09a023fb0fe0bf719529f5be7c03f069d7403efc3b",
+    "derived/masks/lung_left.png": "e77a45f4df8c344816755531e002fc5977750131bf037d41044f84054f9cdbcf",
+    "derived/masks/lung_right.png": "716ec775f4b51e1befd373515bf65d2bfc5e7c5120440f72943e61a349f2240d"
+   }
+  },
+  {
+   "package": "d922f26c687373f71735de49dda7c9a5.oip",
+   "image_id": "d922f26c687373f71735de49dda7c9a5",
+   "source_dicom_sha256": "a8d1361bcfabf8beba61810f8af35f4668a94c54a50b39e702f0c6ffccbeb021",
+   "rows": 2930,
+   "columns": 2504,
+   "pixel_spacing_mm": [
+    0.143,
+    0.143
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "4c3497e0d181122187c33d7f359d1da41f85b62cfef0608b7c14b1b20eb986ca",
+    "renders/canonical.png": "d6f6fc1700a68f48ccc801355da540c4b0dc1fd78fdacf382bf3e78978b513fa",
+    "derived/masks/heart.png": "7ed38969472d4e42a36805e66531132d11530ff6d01ac2140d64d1c45c39349c",
+    "derived/masks/lung_left.png": "e1c21bade6059689088ac2f9a30630c66e7e5f0431afc6b83a815e7e8fab694b",
+    "derived/masks/lung_right.png": "cd4906e87c0c86e7fc6cd53a8dda87235105e1a380c3ee2d8d76afcba9f76ca3"
+   }
+  },
+  {
+   "package": "e0a868625cea9a6ebbec8788070ae098.oip",
+   "image_id": "e0a868625cea9a6ebbec8788070ae098",
+   "source_dicom_sha256": "d9bb00b49ddcfe0f6cbc74a66ddd20bead5ee6efc0b77496535665f6ad8294ac",
+   "rows": 3069,
+   "columns": 2615,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "6a6d4f1cc3ace0530ce148363e12501fbecddbcc70e62d99861714663291e490",
+    "renders/canonical.png": "be68de2c1e1b4b9d16d07508e744509b6063a5209238b231f877479f2bd9cceb",
+    "derived/masks/heart.png": "f35b696ef97fb266dd2f52c9699ef1b1e139924772b7458f0e16a671cfca2cd7",
+    "derived/masks/lung_left.png": "c53900f43f8fbd316ad21f67140bff714308c5a72af41425ef314af293abcc94",
+    "derived/masks/lung_right.png": "d533bc86a68abad82afdd6a8e9f0849bfa54b2dbd232c7c2dd4e2dc73b711d81"
+   }
+  },
+  {
+   "package": "3e02670c9c691dbbd7f9aaa851bb70ae.oip",
+   "image_id": "3e02670c9c691dbbd7f9aaa851bb70ae",
+   "source_dicom_sha256": "83bf5494854461ebba274cf6d9146d6e0a19d16224d49ea20e39894cfa07bb69",
+   "rows": 3056,
+   "columns": 2931,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "f6e2253fffbfc7509c099a9f1bbcedec284da39f0ef35e79e6d404ef536c693e",
+    "renders/canonical.png": "e93ed46192bfcb9f9d9b309b93bafcc84464533f421d6b9a623e98397aa00f0c",
+    "derived/masks/heart.png": "8bd783de4d3360b7ba5f45ec563f4a4ff8eeb01ab1e8b10e48a8ebcf07730bcb",
+    "derived/masks/lung_left.png": "6ff43eefc28b5219d93934e575d075e37a1c37c23dc0f063980523dde3f6f783",
+    "derived/masks/lung_right.png": "6bd2f9da46b2ab07b0782ccba4157947d41c012338acfc1263b1d5aab5ceff0c"
+   }
+  },
+  {
+   "package": "99e04176b7c2678ccc878cf81c12f9d4.oip",
+   "image_id": "99e04176b7c2678ccc878cf81c12f9d4",
+   "source_dicom_sha256": "cab2882fd2981947a10dd88a0c191fe3f43fcd972eb91bc5e099560e95bae0e6",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "9163654b3b980968b0415e54429139b2fbdddf94e066499aa5f027bbe0b6c3fb",
+    "renders/canonical.png": "b29033a28472ad07791fb7bf9ff0df9864a291238d25548b051e388dc78a4e0f",
+    "derived/masks/heart.png": "18f7f2714ff646654e5202c9639d296cbe9779ede29bc2c032efc8c3c41ceff2",
+    "derived/masks/lung_left.png": "8cda5001a360d01564cb8ad7ad14cbc4ab19060f175e8b5c5bdb03161188db6b",
+    "derived/masks/lung_right.png": "1d41e3ebd0d50c158945080543465bf37456fdef9e8b6d1a521114e5fb163520"
+   }
+  },
+  {
+   "package": "6b8bb3a6cc110df0f2e182c1db0b4b21.oip",
+   "image_id": "6b8bb3a6cc110df0f2e182c1db0b4b21",
+   "source_dicom_sha256": "8f3933848e124212deb66a972611958fb10f7c52fe3c42e8094098c8614402f2",
+   "rows": 3264,
+   "columns": 2620,
+   "pixel_spacing_mm": [
+    0.127,
+    0.127
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "078a092441397d91d232b2d05084fc62e4929704ed264fe7d334e43473c343a7",
+    "renders/canonical.png": "56b9f106b5a45c71fa62fbda7fe632512e28f871d49f48ac12bf86ad055b2811",
+    "derived/masks/heart.png": "1e0864166299edd722822c518454e11d8381c2124008dc1f660ff71e0157ddbd",
+    "derived/masks/lung_left.png": "51e1ecbf483b889cdc617b0f99150916e859a8e79425c18e9452b724349a8bbc",
+    "derived/masks/lung_right.png": "1e15a50b4e82c04f3cdd91b38701ce05af867fbca3d35a4e05a1f0ba2aea08ae"
+   }
+  },
+  {
+   "package": "3e6dc1696e378ed55ea60091c620af4d.oip",
+   "image_id": "3e6dc1696e378ed55ea60091c620af4d",
+   "source_dicom_sha256": "55c884aa77f41e067daf304c46b10dd454667f93094b2034d085dcc7ce1d7be9",
+   "rows": 2788,
+   "columns": 2420,
+   "pixel_spacing_mm": [
+    0.127,
+    0.127
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "9afc685947a06150af36875f90f84a7d900124f59cdbd25eabf20f087cd4ff24",
+    "renders/canonical.png": "86866087813049560db288ec8e8a2a93a6513c1d4a6e5ed90e78585fdb2a3480",
+    "derived/masks/heart.png": "c5cb5e7d923da16b245392976bb499927c3104aa863240d9d9cac95e88480ccc",
+    "derived/masks/lung_left.png": "a86fd62a2041f449fd53c41f552c1f2656d30cb611423093255d52f343523d97",
+    "derived/masks/lung_right.png": "2cf8f5c6129da1c638aefcd059eca29965da8e150aa838f44e402f4d5e72b8b9"
+   }
+  },
+  {
+   "package": "eca7220a8cd65a158ecebc9c1a153c36.oip",
+   "image_id": "eca7220a8cd65a158ecebc9c1a153c36",
+   "source_dicom_sha256": "be2f758a6f7ca472201e9da433a5b3605741558c99d9c317491581e8a904b766",
+   "rows": 3072,
+   "columns": 2540,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "4daae9eb88c32264f746a89ac4e6ab9f96bc615d7f52bccc50ecc814861a9a37",
+    "renders/canonical.png": "0bc11a7e14def00bef297714c068c1e494056bab19d0ea0d456626ff478284e3",
+    "derived/masks/heart.png": "f61e007a5fe9795546292e30e86d704b38fadb83991d1264b0aab38bfd5a2497",
+    "derived/masks/lung_left.png": "7eccfc2cc7cc6e41a754af01dbf7dffac56971fc7d296d24749af89247d7f275",
+    "derived/masks/lung_right.png": "15af5ce718c27b74367b12b9b2d937319e13678cf03cd4d603cc92c54a292d08"
+   }
+  },
+  {
+   "package": "a3008ac0538678bc6ea3453fb0880bd2.oip",
+   "image_id": "a3008ac0538678bc6ea3453fb0880bd2",
+   "source_dicom_sha256": "a2b9cd4b26600c3c4a32e530f1fcff60c5a7a16fd9ab1459ebb9f008a95d6c0d",
+   "rows": 3000,
+   "columns": 2935,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "646cd8c9f709032e5a2deff73b41ebb32d8be86baabb299de4ca654d62dbb30e",
+    "renders/canonical.png": "913326f3506f7cc302807e6a03191182548d60e258576cf0ed95689a81ce88e9",
+    "derived/masks/heart.png": "d3495eae6d26eeef116782b4b0c1492fd128bfb1bcfab27d97f848bf0f89f260",
+    "derived/masks/lung_left.png": "fc855a530e057a11f3bc9a532366efb8e842d97553a68e4edcc9908d9e66d07e",
+    "derived/masks/lung_right.png": "0c676e8082dff46b16aace491f07d6bcf247c6675eeb895300ddc0f1ccb6ce2d"
+   }
+  },
+  {
+   "package": "fbbdbad74f5fef4d17a139e8ac4a7864.oip",
+   "image_id": "fbbdbad74f5fef4d17a139e8ac4a7864",
+   "source_dicom_sha256": "6c622044094ebff11e8aa2aab59bc6a55b2484142841ec77cb34187f80ed689b",
+   "rows": 3072,
+   "columns": 2540,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "32dfdf21a12b07e10246a5e2bad48afffd40931ef6b3fe2712aa985dddae7e3d",
+    "renders/canonical.png": "60bc255a0fe0cd41f7f00e76c0d365bb0f9c18b4c0259dab2cdcff713e9ed2c9",
+    "derived/masks/heart.png": "041a647a484bc85d8a4a6d7ae23055ca10f1ef6024272d7fb9b6aa323c31e611",
+    "derived/masks/lung_left.png": "3ec59256cb5728e3187365996ef03c710a47c0b66077b2abb504caaebf55b16f",
+    "derived/masks/lung_right.png": "4ddb1306cecb39c5069aba0c1cce73f0d7adf003e750fa26157f402c4c4697f0"
+   }
+  },
+  {
+   "package": "72bce8eed8324b1544f1698f56a2b0ba.oip",
+   "image_id": "72bce8eed8324b1544f1698f56a2b0ba",
+   "source_dicom_sha256": "29b2d1a43f6edf165bcc39fab6bb92d9fcac8105e50d5e9791b7a638bef8a3d8",
+   "rows": 3033,
+   "columns": 2680,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "3bc80f36b176e66a348d45844afa7a6bc40680f01d147947f611780ef243f5a5",
+    "renders/canonical.png": "70a965dae615448f1e21ccb556fe3ace844fc341840f760bbd2f3cce963be029",
+    "derived/masks/heart.png": "1ef843eeb6f958691dd9c6ea5078cd35b99e085a75b267d06060e83fca895e9d",
+    "derived/masks/lung_left.png": "b221bac0a3a718c9d65e1271f544de4e36e6d51f5aebf7bf40c7355176f3ecc8",
+    "derived/masks/lung_right.png": "f410d5faa18a8b3e8ec3e2e341a81dfed294969558ed9ad9b2606745d206bd8d"
+   }
+  },
+  {
+   "package": "45775fb80faeb8145ac5878c05b2f05c.oip",
+   "image_id": "45775fb80faeb8145ac5878c05b2f05c",
+   "source_dicom_sha256": "d50ba1ff6783cd9c9956e2ee8772f4cd2b6c732512850f284b677ce950ef67be",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "e0ee2f6b7dffce6a067bfa976f42d8cb9cb350a7e3938ebc553383b076dadbaa",
+    "renders/canonical.png": "4fe6bf45f7005d7357807d8e25d2656d58b048649bf2ed3e64b1a3683c291717",
+    "derived/masks/heart.png": "1ed356b0c7ab48dddce37f45b66e03793bd5c69cb93646adcbad39e042dd6e9a",
+    "derived/masks/lung_left.png": "5144821bac7a452def0ebd3a2f8085cdd1a31b37b4ddcb8615a1ea38f0ceda3c",
+    "derived/masks/lung_right.png": "e5b4148487ee69ed2a0cc978d905fcad594dac48948c2bc14e0d2ae334779893"
+   }
+  },
+  {
+   "package": "fa035c7decfbece103717b4664dcebea.oip",
+   "image_id": "fa035c7decfbece103717b4664dcebea",
+   "source_dicom_sha256": "0e8376a9c8f9bbf3407d74831a13c8c2eef021c1e213b3350a0aeb7bdd567977",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "48dac81e32efe4fd4df0b935ec81643f3a5a03fd675f2d5da204c1bac41b56a0",
+    "renders/canonical.png": "37d65aee58baf4ffe810947606093305098dd857d2d139bf42a73b161cca3d05",
+    "derived/masks/heart.png": "aa2d1f3e20c69909eddf4aacc7b3928edd58153f11a8ea196d2512248f5d2695",
+    "derived/masks/lung_left.png": "98155aeb0bb2fc80e074743ad8127f9b09a8b80ddf58816bba00be383170b988",
+    "derived/masks/lung_right.png": "afaa4730c8d56fa214dadf3c519cd9c673d34872d5b853f0281e5efe85349c14"
+   }
+  },
+  {
+   "package": "0a50d4ee79163edbf6f2d5c3082c2f51.oip",
+   "image_id": "0a50d4ee79163edbf6f2d5c3082c2f51",
+   "source_dicom_sha256": "ebb069d2e71f60d90318d5ae523ee3535f56c77c763cacc21eccfb26e13068c7",
+   "rows": 3072,
+   "columns": 2540,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "32841cfc842696c8aa5f08711fadb6e74da75bfb2b3e81c5f70763ecfb55a3a9",
+    "renders/canonical.png": "049fbec1f87190adb50c50637944ca78d8f6d03c8b51030fac9faaaa3f019d09",
+    "derived/masks/heart.png": "834a0b63224ba65accb3b723d8d38153dfbba1e5b71b48072e30ed0f4b564575",
+    "derived/masks/lung_left.png": "a2e68e66e6e7eb0ba98f34b714d34a47a1c4fdccf5cdff380ec11c5b7e710696",
+    "derived/masks/lung_right.png": "4e922d20a6f46eb01e2589fefa75056991db9e10e8be5b9d516e4740bd9683d2"
+   }
+  },
+  {
+   "package": "703a96532637528e3aafb5f5668186cb.oip",
+   "image_id": "703a96532637528e3aafb5f5668186cb",
+   "source_dicom_sha256": "5e2246e35ed33e75c0bf5bc0e2aea278641102680241ece96dad6ecd6639bc5f",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "18da200337640cc51bd9611d9576a1e51fc10029989aec4a1987c7590163a209",
+    "renders/canonical.png": "ebba6fedabb1ec82b49dc35d5fb79ea01f3f0c2e498fb5642ad1e642b89d79f9",
+    "derived/masks/heart.png": "f074121dc6e1f0e611aa495d5b4e6b3fc2eb631d60799f3fe7209d6491e7d054",
+    "derived/masks/lung_left.png": "c0c03c6aab08963b476cee4ac440d4ed8a01b9c16d72c41e2ae901d812db7122",
+    "derived/masks/lung_right.png": "0800456d9a015ec6eea2de93a0113f69c0485d75c46188b519d942a4e422197e"
+   }
+  },
+  {
+   "package": "6314692e3a4f5fc017e052dbd1cd683e.oip",
+   "image_id": "6314692e3a4f5fc017e052dbd1cd683e",
+   "source_dicom_sha256": "d598425a92bd742cef4b4a34304b70f098d17f0acb7c79bb5e296cf7c560bc1c",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "11f020f0bc10899e1529f701e45d42c0d2dde02c56bde5ab2eda09b0a39687e0",
+    "renders/canonical.png": "08388ef2ab710858709df31baa57cfe498c95196b91cd5412086d2b7161ae446",
+    "derived/masks/heart.png": "1d929b35b0e92e15f16b2e22d09a912327c2b4f7cce63f922b878a48ff8f1240",
+    "derived/masks/lung_left.png": "ef097318af399c6c9ab6dc5e5822eca3decea2ab1ca8057aceb8ee50ca2e198e",
+    "derived/masks/lung_right.png": "414d67a26edd97a0b30cb9af6a4c75848c4b305b73b800b2bbce618f690f4cba"
+   }
+  },
+  {
+   "package": "78d237a2c0fe8f82956cec48132c0b1e.oip",
+   "image_id": "78d237a2c0fe8f82956cec48132c0b1e",
+   "source_dicom_sha256": "3576d62fde595d21bdab722f754e7fe6ffd978ea5f044f3f1bb400fe0ff201a7",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "f6bd23294a2aa7f53f5d26138a6c8337f8ddea990e8d57db422fb0b144e19a0d",
+    "renders/canonical.png": "120d5ba144772c202b85db0a4fd8b42cdc3d4d4722b6d04a52ac5365ba666a75",
+    "derived/masks/heart.png": "cded3a36406aa3930d1badc45d93775a59ecf7f8dfb948ae3f7f2f22aaefcca4",
+    "derived/masks/lung_left.png": "22cfd45529a3dbf26ee57a35147585908f97d6cd41cdc92e9fc16c50c8f637f7",
+    "derived/masks/lung_right.png": "8f652b00ba5b053487f61fb062ed27a3f94bb5d35e7f22b75490e5776e48f958"
+   }
+  },
+  {
+   "package": "11e41fba7056177c8654b7b7408a4ed3.oip",
+   "image_id": "11e41fba7056177c8654b7b7408a4ed3",
+   "source_dicom_sha256": "6e7bae71b0da63888629f8fc42b5b627d86e0a77159cfb4a0b9aa0edbbb053e2",
+   "rows": 3056,
+   "columns": 2487,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "60f532d33be2f047230af41f3d14ec7601b3cce19d836445e50150a8ac6896bb",
+    "renders/canonical.png": "19c0d9ffebf1cf106853e1c39f44525a85e5805ed270d9c587251e476867a4b5",
+    "derived/masks/heart.png": "a570f27f7649ad50f4ef563ff18305fcf4a1a5c9a023597e28aad2968302ffca",
+    "derived/masks/lung_left.png": "cc09601f11d813806b12999c87f8ce4de5d61deaf2f2f9152752f188f11eddb8",
+    "derived/masks/lung_right.png": "8a31f583c6c8d0e0d5fdd5f8b0505c7b2ef17d3cfaa236c2ee2a7b9d7f5324be"
+   }
+  },
+  {
+   "package": "ac0d5180cbac66eead6195728563d5e2.oip",
+   "image_id": "ac0d5180cbac66eead6195728563d5e2",
+   "source_dicom_sha256": "fa41fde57e4318005bb49b862200392cda36887a69356bf30535298d06ccf389",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "2cc9162ae5e5009a42b02fe74a89b6209be004bccc7ce98f789263c526998ab9",
+    "renders/canonical.png": "06706d9c0ffedee45c186b58344a714e4198af21fde42ee2f7607654d0d859ec",
+    "derived/masks/heart.png": "5da3099281d85f9faf7cd06514b5509314ca9f9bd13a62bf330b6e96506ea5cc",
+    "derived/masks/lung_left.png": "0b4323d59959b923766c56e3302897c16c1a7a447a3063995d7ec429ab8ba06b",
+    "derived/masks/lung_right.png": "2f472450f1955b4b6e1bc4c60340a42dfc2be57539d74832cb6ab04082eda4af"
+   }
+  },
+  {
+   "package": "1ad1420c6bf26f67e1f0d1140e938efd.oip",
+   "image_id": "1ad1420c6bf26f67e1f0d1140e938efd",
+   "source_dicom_sha256": "8f8a98bf04828a556fefe5f93c5f981ba69a024e8e5027d130e23f43bb1dedea",
+   "rows": 3072,
+   "columns": 2540,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "7355e9c497420e697e71d36f36abaa38750c5ef43b5b875eddb73485455aba40",
+    "renders/canonical.png": "c061ae68d2fc0cbf803f4090164c35bab016431e28f2837e9d1df9cb94a715af",
+    "derived/masks/heart.png": "7669e560bde1747996176a0d6315b0b72a43e48ddabb64771b6d9492bff47542",
+    "derived/masks/lung_left.png": "45433ce220e0237ef5bce91cd4d94bf886ecac24c464c13081f231e9fa5d6f57",
+    "derived/masks/lung_right.png": "009514acc1d47d7290c135f6adc2ac4faaf3fe02bf7b1750e23f05e6014e1871"
+   }
+  },
+  {
+   "package": "aa89a83d50a147e44d6dc72893f01fef.oip",
+   "image_id": "aa89a83d50a147e44d6dc72893f01fef",
+   "source_dicom_sha256": "258afd4a6e7645f09c64948a9cd949d1921881af769f37e6f17336ef93d0e5e6",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "da630d833bce87e27b4beb1d84990ae19b65f276ba17192f6ec8797117fc9436",
+    "renders/canonical.png": "fd05e1462948be55ad718d73f05af960052602687c5658b428edf3247c83e8e7",
+    "derived/masks/heart.png": "32e48c699f196ede1f48a4914905a9ad463e3ef5186620bdf489ba451b9b9eae",
+    "derived/masks/lung_left.png": "572ec7707d8c5a43b3891fbe4d686c4aec9b57d9f44d0a66cbd58803d3aa32f4",
+    "derived/masks/lung_right.png": "9a3baee72e952fd5aa8f665e1f40f7e14dd6fb7f2fd71af6a7a60db70eaeada7"
+   }
+  },
+  {
+   "package": "c723c6ffb2f746dff02c9538c6c593f4.oip",
+   "image_id": "c723c6ffb2f746dff02c9538c6c593f4",
+   "source_dicom_sha256": "5f37acd2a0a7b86bd04b164099711bfc7898fcf89325c3b42d34d765fe56d621",
+   "rows": 3072,
+   "columns": 2384,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "e6ff9bea1f8451788a0b1c669eef541c2cfa0468dc3f23f2b1d5ee624dd159e9",
+    "renders/canonical.png": "ee6c0b41d834c0754f9bb5f6f4cfbd4be24489ddb9dabb4f808b403669ffb40b",
+    "derived/masks/heart.png": "7726517676874af59fab2eaf033cc4ec6c68934ae487ba18569d0b0319853545",
+    "derived/masks/lung_left.png": "a1ec5a672d9a2fc301d6f2e3e3bee3a7d5309c1572da2b18bc2fe58b567b8fcb",
+    "derived/masks/lung_right.png": "7a9515f8d7d896351260f7258644122072eab7d29632c8d72b72be0ba065f7c0"
+   }
+  },
+  {
+   "package": "45ebeb3af9b9bb5193da7b77150c19fc.oip",
+   "image_id": "45ebeb3af9b9bb5193da7b77150c19fc",
+   "source_dicom_sha256": "9f3866eff36569e63259700e0e6286b910bc454d4adfb79f8750475a91316e3c",
+   "rows": 2836,
+   "columns": 2336,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "7607ea3f4314f08f2369d49d8b57e53642bc79af3b0a32afcf99f754acd0a220",
+    "renders/canonical.png": "72e336c92638147c58814e7d5202047f3cb6f8b40166eacc320d9d35629ab687",
+    "derived/masks/heart.png": "2979ecc391855a2abc235545e28f5ec6a0707611db81fb9176eb4cfdee58e508",
+    "derived/masks/lung_left.png": "920dde28d48bd8dad61988894c09122037c81fece31e652e78be8894117b0601",
+    "derived/masks/lung_right.png": "aae7a6297df2dcca7d1642c3a55dc5188a17775233844e110f3f14d96fea0cb6"
+   }
+  },
+  {
+   "package": "aabc4acd6a8f6c27828a11701675a6e7.oip",
+   "image_id": "aabc4acd6a8f6c27828a11701675a6e7",
+   "source_dicom_sha256": "bc158b0c8d3b494f902b4068d07e3dea3ec9ed2fab1c4ee3a3b1e19c7db27e51",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "b8760a0898bc1ed2786f87472e6d9b73ec2daf867805cf383b563d476819380b",
+    "renders/canonical.png": "633c81a4e3723d41a89d29548fccefba90f71e864bd10e102782ec77db8a60d6",
+    "derived/masks/heart.png": "a21490a4b1e03ca2512341aafcec0addecc00982955f13448566f5fc6d3555a3",
+    "derived/masks/lung_left.png": "ede8c26b1c79ad284bc24ea21c6e3e855a3a3dbae10db8bc935de9a257609ea7",
+    "derived/masks/lung_right.png": "ff38f87fb566bb31a766152d7a566d9694aa2b648c5526fc9f732126a9a35e89"
+   }
+  },
+  {
+   "package": "3b0daa93bd5fce03d9ad97e01a3847f3.oip",
+   "image_id": "3b0daa93bd5fce03d9ad97e01a3847f3",
+   "source_dicom_sha256": "999805a0e17200d898f0a5e8895790a18d1a7e48b5eabeae066ea658de4fb6e9",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "b217c145d9aa239df5fc3d51fc71a2a6c76fdb39b56a073489f6d99c0a33e93b",
+    "renders/canonical.png": "e37fd45875b0347b0e2e7ffbc0d3c21cd69b75d55e2f4fd2eb66899eb89edff1",
+    "derived/masks/heart.png": "585120ff9f0784a48807063578a3fc3fe68387c3121f867785de12083375b02f",
+    "derived/masks/lung_left.png": "70480598162b1fe35d7ebb024a22be1ab796ae34454bd4deca74544cf8471d5d",
+    "derived/masks/lung_right.png": "e138e62dc045d56a78991a5bcef306c9cd5b512110d8e43465df99bce8f4d67c"
+   }
+  },
+  {
+   "package": "c5f612ff593f8d5568d3b5d5594d96d4.oip",
+   "image_id": "c5f612ff593f8d5568d3b5d5594d96d4",
+   "source_dicom_sha256": "5820704abf673cef2ee325e3947f88d7c4db37209fb0448980d3b01215cf16ca",
+   "rows": 2248,
+   "columns": 1944,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "18f0d5b35923707c3818e283a324c932f4cb69af891957fdec3c10b921b7a2ee",
+    "renders/canonical.png": "d90d273c6dbf889b4edfa23391b867be1b84faa5afe421c55bfcfd209c2ba70b",
+    "derived/masks/heart.png": "e30a2df3036079f4a492feca2c2ab55d4692305d2817fa289eb66791250ac0ce",
+    "derived/masks/lung_left.png": "3d4742890d46eb66ee0280f3695e70bfca64fb3225530ed2088682ea967fb799",
+    "derived/masks/lung_right.png": "652aef13ef2db00bd34c0e53e656dd6b771d73e51aa84905b92f55f76420cc1e"
+   }
+  },
+  {
+   "package": "8a9b4de41d7072d9bb36cb21150dcc1d.oip",
+   "image_id": "8a9b4de41d7072d9bb36cb21150dcc1d",
+   "source_dicom_sha256": "c3a1f8ba0e85bf265e3c9aa8fa12ca67f2247bbb7806acbe5a5fdd455b6cbd6e",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.139,
+    0.139
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "3894b1a0a34f0672c6b01b299e053e3fe4d3fb5d8979683075696d8f6c49da49",
+    "renders/canonical.png": "564326bc64b6d8c421af3e0cc7f574e20c4753d23bf69c09794ef270a13871cb",
+    "derived/masks/heart.png": "98ad88234a9d1bd3fdae6ca89ff0457184bdf74e7884592242579ba26d0dca94",
+    "derived/masks/lung_left.png": "a4244815c842cedc14eb4f5cff9b207febaa7b7b54ef6cb54df2220e957f7a57",
+    "derived/masks/lung_right.png": "ee267cef7c04506c0269dfc0294494a49bed628f2a9bbc854f33b1a69aa92eba"
+   }
+  },
+  {
+   "package": "2b0f82148f786f6634ac9e3e4954af9c.oip",
+   "image_id": "2b0f82148f786f6634ac9e3e4954af9c",
+   "source_dicom_sha256": "25197f6afd6e9d982276753409eb9a94f25f1b8c377534fa29266b6d282cd91f",
+   "rows": 3000,
+   "columns": 3000,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "60f346a4e3afd61185d88c3d48d6061e23df9792ca7501bea8f7d1fb5a4276e9",
+    "renders/canonical.png": "d21ebeba458d275d53cc38b190d33de286a55f387e187f301dede7781b78b3bf",
+    "derived/masks/heart.png": "e3beadc3460cd520a1bc01bf289517c16198e8f9bdc494d9a693895f0e735db4",
+    "derived/masks/lung_left.png": "7efc63d5173c9ac18d74ce1d1c0c6c34a62c9ad83cba9611899191933a046788",
+    "derived/masks/lung_right.png": "27c10e9a685b3adf1326ef90e9476ed8c82d0b29aa9da76eed4fdcb653d59bb2"
+   }
+  },
+  {
+   "package": "af3c3d9f70164856281f8f3444483100.oip",
+   "image_id": "af3c3d9f70164856281f8f3444483100",
+   "source_dicom_sha256": "a757c25bc0fca1dce9c190637959bf149cd27313cfc450699510eb6a71dc167e",
+   "rows": 2504,
+   "columns": 2008,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "eaf6f9d361df49325f43d84c42e829f55351df378502c29852f16702f5571e81",
+    "renders/canonical.png": "3d7def780486f1d6d436edff63ff60b793f01dd85352cc95b2ce471e79265b23",
+    "derived/masks/heart.png": "36f3ff6100929b79fda3a54dca6edce447470a5bbe09966f3deccdaab1b4d222",
+    "derived/masks/lung_left.png": "fa39de1ec6af8f41273bc33a2f1dc2c2aafb387d51d1c29c30c9ece9537711bc",
+    "derived/masks/lung_right.png": "613317293a32848066a7af8e2bbbdb13f635b577df3576092da71d0e6854cef6"
+   }
+  },
+  {
+   "package": "f853be3a4ec02063d6e9c0279c8cb559.oip",
+   "image_id": "f853be3a4ec02063d6e9c0279c8cb559",
+   "source_dicom_sha256": "82cfd2f8cb43fe07ff6810dfcb0a2c36f6a99a56a220e86e3d1e87079a4f8a8a",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "377c2f54636e9f5dad69e89bc526ee9b0fa27704f6fbceb360599e97ea4547b7",
+    "renders/canonical.png": "156b17d7e0519ac71daadb497337838f96a3b6cb7d49da81301c60611bc49b58",
+    "derived/masks/heart.png": "30cdb1550247684bb42dd18ad17c8d3142ff3f8e96b21e6cff9884c3c6c56c04",
+    "derived/masks/lung_left.png": "976f896b0375745a2d2bea92569901f7f632a67373061e1e391f6e5167aa45b7",
+    "derived/masks/lung_right.png": "d162cea075f478aed4854de499460bffbbfe4c06b1299092238770dcc9fec6f1"
+   }
+  },
+  {
+   "package": "c1bd31b447f1a8cecf0ed0cb1ae5f978.oip",
+   "image_id": "c1bd31b447f1a8cecf0ed0cb1ae5f978",
+   "source_dicom_sha256": "aba5df4e15c723130d90dbf3026c1b788e4d0bc04b23b8078bf11647098415e6",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "51490774df5a041a4ef1b29017aea0077d2f26a3054804d32273745a5a9de2a3",
+    "renders/canonical.png": "028fe4dfee7b2dd96a7670bf36954333998de95b5df795c9c8f1b808a92ade97",
+    "derived/masks/heart.png": "7f9d64045444542335f2c1298eb46f69381c2fa23756f4a9d549187b403257b9",
+    "derived/masks/lung_left.png": "11956d22db24eb43ca7fc003664299ded8734ea4c6429ce4b62d2328a35764e6",
+    "derived/masks/lung_right.png": "69d31936f458991a637e042697b4095d773e47d186ec1929eb3787369f07743a"
+   }
+  },
+  {
+   "package": "9bb5a1c72d2c871377e730d74d5b9425.oip",
+   "image_id": "9bb5a1c72d2c871377e730d74d5b9425",
+   "source_dicom_sha256": "576ed9d80d62b7b4b9bd2b4e83df1790bd64d486d7320fc72b5bc8fd88f70360",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "ba49c8b70584310482a985ae95e86daade64a80894cba41c09676af72e54adb6",
+    "renders/canonical.png": "faee08f568e2ce1ea0cb90b1fd1f5b87aad3bca41d876aa70547bbf031508ad6",
+    "derived/masks/heart.png": "bb3eaa1d7723d26f3eb48d22a37cff4e277ccfd44a3a29fbb1979bc36f748622",
+    "derived/masks/lung_left.png": "85dd43a78a5153f54bf34252fd4af3caf52a76bb828bf02838a3643ab2274150",
+    "derived/masks/lung_right.png": "f7c23b5baa26c5574629b549552f91bd943bad5eadec9f0e3ac328dd4bc306d6"
+   }
+  },
+  {
+   "package": "11cc75f11d95fb1ca9bfff79b119a47e.oip",
+   "image_id": "11cc75f11d95fb1ca9bfff79b119a47e",
+   "source_dicom_sha256": "1bd386a10acb128da0ac3a81f0ae86469ccc4339c1e8e41f94e5a7873748930b",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "44c3977b2c291c683707ea3bc4cef680e21648a9787b0671e6d69110d8b318d6",
+    "renders/canonical.png": "58dacf152c96334d94e26345915c9588a34e7387b3eb8b7d837c861a6e2cc7c6",
+    "derived/masks/heart.png": "6516ef45fb047272be302f63cdec6498269e3a27816d407acd8fd82a4b91a7fc",
+    "derived/masks/lung_left.png": "03b596a036afbda183cc6f44cb4e5a493809c1add71535d83b30e6869a1c6c6e",
+    "derived/masks/lung_right.png": "8bfc965a4788884d20c626c59ce24c4c77bb5ae0d08474a317fd1c986ec9f4a0"
+   }
+  },
+  {
+   "package": "b5fa2fc3b3e2a3bbf93884481fb08b74.oip",
+   "image_id": "b5fa2fc3b3e2a3bbf93884481fb08b74",
+   "source_dicom_sha256": "68f886b98d999d8866eee18f924f2deec92d709a4d38d232b973aba37a82a437",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "9f7f40e9299dec3c2846c910ff02f180172f1925c0aba12b164c76481da54a9c",
+    "renders/canonical.png": "b3b7c4c88ebe4d463a35cab63c4950b132e98422afdf3576a59e59279ed0af30",
+    "derived/masks/heart.png": "483a03c160ea5fc7a6dda68bd35ad33161e4d81972dc37c9a52a58a6358cad1c",
+    "derived/masks/lung_left.png": "9acfd8afe04c148558137d4ea6de4c2da9eea8b721544b2a41e9cfc7f48d0ac0",
+    "derived/masks/lung_right.png": "84bccfae763efa564b18b42a4cc6d6af26a892c94f5addcd5868971ba897eeaf"
+   }
+  },
+  {
+   "package": "c89fdbd26b69a96edbef96f88a4004a5.oip",
+   "image_id": "c89fdbd26b69a96edbef96f88a4004a5",
+   "source_dicom_sha256": "7234a0d2332a106b26f718396c867925c041aa9b1d4dbcaa7876a9ced8b12f7c",
+   "rows": 2836,
+   "columns": 2336,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "4204328ff18b02ef09d4de13924885ded14a55b1d6ab4a8017889f005443a72a",
+    "renders/canonical.png": "7c0e272ad96532f10b7f23bc7e6e455dcdc11ea17a08c54442dbf3d8e425d44e",
+    "derived/masks/heart.png": "d72e6952b463278d41f36c12a51f93ffa94378b0f2734f01e0e8266152df994a",
+    "derived/masks/lung_left.png": "1c133bd8dd4ce0bc6fea833285a080583808a29db5c0602101f64408970615b5",
+    "derived/masks/lung_right.png": "ef8e889bf0de0fe5988a78433571ecbc0c4e40e9917d6c23adae66b40f984891"
+   }
+  },
+  {
+   "package": "a81a7e1e47c037dd48b99840567e79e6.oip",
+   "image_id": "a81a7e1e47c037dd48b99840567e79e6",
+   "source_dicom_sha256": "371184863549aac82766866c7c7a4d6dc47a68d96cda7c7b499ec5ecd98db85b",
+   "rows": 3290,
+   "columns": 2857,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "aecb81598aedc37224f7cf2ab826c1da880da0cfbd6b10e5128969afe86e2149",
+    "renders/canonical.png": "6ea701f6c8f3d05319fdd9dd5807401fb7a4f110a87487dc50d6b6acdcfc1946",
+    "derived/masks/heart.png": "ec27e23f8e54bdaee08056689345360a291670d7d2fa8bf0d217a41850640a08",
+    "derived/masks/lung_left.png": "c46ed6eafa3da682e0468d18969b435f132832c4b4125ed24848f386ad5d290c",
+    "derived/masks/lung_right.png": "fa32bdcaafcd2a2f5087421caf1048e4496d43956f48630f6e45f4de3bd0bab6"
+   }
+  },
+  {
+   "package": "eb384402d0dee9dc9818a0b65681bf67.oip",
+   "image_id": "eb384402d0dee9dc9818a0b65681bf67",
+   "source_dicom_sha256": "4cee2fd0cd33826d2cadc4031a32c1583550ef28fcab1c491f39ba110ab678f4",
+   "rows": 3000,
+   "columns": 3000,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "5d9f892344f640e768b2eda645932c5cc2911096d8980cefc1fd96b3c93150c7",
+    "renders/canonical.png": "74f79fe4db52b4759748f4816f6d42621f1ddeb1aef29794383aee34ec36368b",
+    "derived/masks/heart.png": "5f0afc5230cf4807fc18f5d31b0a2fb6a05c944810cbf33fa0ee033f4a74e96a",
+    "derived/masks/lung_left.png": "b897cc6d36cff3901867fffeff4e0383c496cf6398c5a7ca849bb22e105f6bf9",
+    "derived/masks/lung_right.png": "e784431173c11463043a04dff2fef787b4292bd160a1ab427f35e2e71450ada7"
+   }
+  },
+  {
+   "package": "13088cbf40717bace59ef0961554c08f.oip",
+   "image_id": "13088cbf40717bace59ef0961554c08f",
+   "source_dicom_sha256": "8f25c60727d93c809a1d3ab9b29e5acf0e1e3daf17a965a5e87872c81dc16248",
+   "rows": 3043,
+   "columns": 2876,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "0113eb9da226a1fc8690465f860cad04bd9cf911b7be1edafb99d4740e33f676",
+    "renders/canonical.png": "2b3d3d06ac332c95e5f936a6140aa8c40f58f99440bcc5fe250efb9e2a87201a",
+    "derived/masks/heart.png": "bbe16a38e5b5524ea8384a1db120f8e948976bf064b6ce915195ae7a991ba3df",
+    "derived/masks/lung_left.png": "d483e4c8526301ff8f9ac2b9003c65f50f52ffe9f74fb908b367c8858d697ea2",
+    "derived/masks/lung_right.png": "996781ccf64c3a8298c88dde413fb6edf72cca037a3c65463cacff4055850c5e"
+   }
+  },
+  {
+   "package": "a9029c62f52fcd875b4e40d85b0d3b2a.oip",
+   "image_id": "a9029c62f52fcd875b4e40d85b0d3b2a",
+   "source_dicom_sha256": "9ef3ecbb558aaf065ddb7d91e6683096793e9ec0b9f952155c42d689c97212d9",
+   "rows": 2736,
+   "columns": 2752,
+   "pixel_spacing_mm": [
+    0.127,
+    0.127
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "f05bc7a9bcd417939f53d0e9d24df0cf870e65d11533c1cf50b40007421e3255",
+    "renders/canonical.png": "0cc4fb35890729304126d7a2ffe608946ed34e7ccbcd2f3c4300d9dd1ee54af7",
+    "derived/masks/heart.png": "a68f2356114163d872602626875b20d0ab07eaa178ca60e89a4dde08e8eb763a",
+    "derived/masks/lung_left.png": "eadea3e8c485806ebdcc9759475613183a6ffa7546bfdb313116db05d2754029",
+    "derived/masks/lung_right.png": "bbe8a0a13f3be0541929ba2250d6f33eba1e2ac63eb3d9edaa7ccdc66ef99ddc"
+   }
+  },
+  {
+   "package": "a0e08352d5127c4654a6f563899fd901.oip",
+   "image_id": "a0e08352d5127c4654a6f563899fd901",
+   "source_dicom_sha256": "b0f4618b460f59f768f1e7ff06e234323c1377c07f048b6c3a8dfb07a598f1b4",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "ce77681eefeefa77ec332be0910076fa5d37ef832a88ccb74760dad4e21f02b7",
+    "renders/canonical.png": "7c58e5b8aacab3ebe6823e193957db06b493054e870ea6e5fd700fcf4fc8086d",
+    "derived/masks/heart.png": "946c85445298081439d3b957381b0bdf1480d50167bb02d8163fad9ddd7a932c",
+    "derived/masks/lung_left.png": "0318274eff03e4736876e5f694e24aa44b9057a43af55ada6ffb462160ae903d",
+    "derived/masks/lung_right.png": "3e5229d4ad7d71ecfae55b27e764af0d5338b67e39f7267dfeb872d9286efa4e"
+   }
+  },
+  {
+   "package": "9dc791ac7b918c75988d4398396d55af.oip",
+   "image_id": "9dc791ac7b918c75988d4398396d55af",
+   "source_dicom_sha256": "c15bafbe37e25e54db3cbe57c79b6f46155b69a862dbf73cefea4b1c9f22ccf7",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "4237ec6bb72b5267c6e355533f96b571fd8102c830cd874a537c732db304b1f3",
+    "renders/canonical.png": "dd150edad5c9cab1a9847b7622ce4882adb4c419f5a11c38b9d89832d943d279",
+    "derived/masks/heart.png": "736d72385f7f0af3f3e3f0c13d190979534bcdcdc4e08716aa6991a58d10d911",
+    "derived/masks/lung_left.png": "42e7fd6c12fc91de856c3c0a3365021d6a403b6e85ab67fe3777789ccbd13e0f",
+    "derived/masks/lung_right.png": "f41598a45d4db99a462f4279cf59a6b8c117569a522ac68f0f2294706477f216"
+   }
+  },
+  {
+   "package": "db8c3f6b46f4c83a11e95da6fbe8330c.oip",
+   "image_id": "db8c3f6b46f4c83a11e95da6fbe8330c",
+   "source_dicom_sha256": "68c7b47c9a2ff47223378536d89ffbf1a180e52c4314933141980e8ea932bf25",
+   "rows": 2786,
+   "columns": 2504,
+   "pixel_spacing_mm": [
+    0.143,
+    0.143
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "40f7dc031ad0709fa9f067dc6aff74644d2a625810530b50edb8d273c3d2ccee",
+    "renders/canonical.png": "0afb91d7e7b817d2fabcee80b5d92e1edad02f809708efd9a43d472b0591ca43",
+    "derived/masks/heart.png": "161d6ee4b6fe4f917722ed6ef02d6c1a0e2ef8bfbad88071820cddc6f2fff8f1",
+    "derived/masks/lung_left.png": "b9f387a575e43b5921b70493e0effe4d1ace449223d14fa5e84339fca49d33fd",
+    "derived/masks/lung_right.png": "0334f6934586018ebd044cb49dbe47eeae0e5224b483e2c1aba89989c0efff6e"
+   }
+  },
+  {
+   "package": "7c22cee85ef4ace76782964772819043.oip",
+   "image_id": "7c22cee85ef4ace76782964772819043",
+   "source_dicom_sha256": "c0222b86b3333e319c7c813536915c6bc3822167b3507d4c8ff19bc0aad2f2a0",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "0677da19318c462c77a19692c0af93349f8f632d05319d3aaa0407ae42b0f155",
+    "renders/canonical.png": "ee0ae66d8b1afbd32bf5fb04ef3389457668d8cdc49dc204eca581502142b547",
+    "derived/masks/heart.png": "54b5c767aaacee7395224efaa7d2626c7342b2978628d9400aa7f5cab36e9e4c",
+    "derived/masks/lung_left.png": "c9fdd2c4559bb744faf79e6f1da211506b4c2d0e6ae3ce1374d1e4dc666a07e9",
+    "derived/masks/lung_right.png": "a54e758927a8c6aa199633e97bfa593a5174d007a65d8c791bba5390b6ab3e7a"
+   }
+  },
+  {
+   "package": "d2ea9560a23b1508c5bf080a9cce1ccd.oip",
+   "image_id": "d2ea9560a23b1508c5bf080a9cce1ccd",
+   "source_dicom_sha256": "c8da286e74cd210155c6af31438525c570d2e013aad59a49a68f89eb422ffaf7",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "89927fc0477d17dab8f875cf2ec7e6ad1b90986341ed17c94345984fad8405f9",
+    "renders/canonical.png": "a7b5ee9c15b504a8c47b0d80961b8facbfbde95d91dcbaa4b8a6be625f1403f4",
+    "derived/masks/heart.png": "7c72d2264b8bdb48513baa44adc27b92752323c5880b0f44fe17db81644cf598",
+    "derived/masks/lung_left.png": "26c011afaaf4a002b679454b819ab6a2ffaddf9891366b300cc6342f23210a46",
+    "derived/masks/lung_right.png": "4d1ddb0e17e84e9a895beea1298df51289f9abda931fcdb5810af055b6febd1b"
+   }
+  },
+  {
+   "package": "2fb662b114bdc030aa82c395ad6acd12.oip",
+   "image_id": "2fb662b114bdc030aa82c395ad6acd12",
+   "source_dicom_sha256": "505240cedd6bf6a14163b2e67994653b17eb5d56c1ced1c177b7e5caf992ea8f",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.139,
+    0.139
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "63365ebf2f19317179150c283c21b9ec4047ad94b6a9606e53f73e1b4314be05",
+    "renders/canonical.png": "3a8071545c3a73d6d72acefc703e3fbc0646ad93ca3d3a5e0a95beae195b481f",
+    "derived/masks/heart.png": "161962aa2dee04a48d3c60863b2c87a07542abbe87106e9817e4b6a5821249f9",
+    "derived/masks/lung_left.png": "b0cda8a92855f5e96ea3f204844c78438a7ed6ccddff75e0b242024726979594",
+    "derived/masks/lung_right.png": "390b79368fe010e52c48abcff5bee63cfc9c6427c9fb7544ce24df0005e70642"
+   }
+  },
+  {
+   "package": "570f86fa3c8923ee5476ac1b1e7485e0.oip",
+   "image_id": "570f86fa3c8923ee5476ac1b1e7485e0",
+   "source_dicom_sha256": "4e43d1fad21db2d34d20b22643052debaf2ba13e607da59edd3da0ee47fac4a1",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "35888d1b8d069acc7984fcefab70a0bc518f1154a8bde37e9581903e24acf478",
+    "renders/canonical.png": "afb8ebe7240db07fcd3b4f94fbada8f68b5deaa9d14889ae4d74b4cfc269f43a",
+    "derived/masks/heart.png": "d5dba377d4ab415f1c9a6d22808314b1a663943ba6a087ad566e55e01bf63204",
+    "derived/masks/lung_left.png": "2a31ef8fd50ba25a8c7034ed6912dc8a16cb110b43e1968ccf69348dbac6a639",
+    "derived/masks/lung_right.png": "6dab882987bb3893e5d5bf225f0970f27c5b9952d5ed8e5c0c34cbb12dd8fbd7"
+   }
+  },
+  {
+   "package": "2a180035c17769657f1d89651ff4babd.oip",
+   "image_id": "2a180035c17769657f1d89651ff4babd",
+   "source_dicom_sha256": "7a764783432aeb5bd1fc493d9b26a43457d5625efc296f92d6bd38b04c42fdfd",
+   "rows": 2520,
+   "columns": 2792,
+   "pixel_spacing_mm": [
+    0.127,
+    0.127
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "82d4e0fcf82b4e7b0035f45fa833332e44493ad978937084f5ccc19c11ce1614",
+    "renders/canonical.png": "e5bce04914ff41edab1cda245e6c3f2b40f525c4f28c0c55cfdff0dc3ae28751",
+    "derived/masks/heart.png": "4e780cd89b393ea4e223c8de7a2afce9dd71e0c5b630135f92d3e8bccde7b54e",
+    "derived/masks/lung_left.png": "03198f48a21d4373ec97d3adfc15f00295c1b0b0af537f80dd55c7d987904e71",
+    "derived/masks/lung_right.png": "5e18b5b50c9695d5e84ecfc0967d4bceb0c688dc33fffb8b0c304d6db9ad960e"
+   }
+  },
+  {
+   "package": "5b2566a6a2d1339b37a1553f21fc5b41.oip",
+   "image_id": "5b2566a6a2d1339b37a1553f21fc5b41",
+   "source_dicom_sha256": "9b66571a1f7bb684535bf0f2a278f2a624a628b8c70149e66c8269b0a695287a",
+   "rows": 2836,
+   "columns": 2336,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "65f1d596c8b8b8070d9f6771546acd4e5301a19405aa7b341176e6a296a95d22",
+    "renders/canonical.png": "48bcabf23cc763c5384caee0210306ef99eb15d788383f0712b97ff483f98c23",
+    "derived/masks/heart.png": "db9d2dd09b45d37f0c2d3dce688156d33e05dbf271cd9331bd1947da8092347c",
+    "derived/masks/lung_left.png": "7e792e59dd52dd4d9db112fdd24cd67aa0a78d3243f49dc99679224c3d0c3ec4",
+    "derived/masks/lung_right.png": "98561321a629c2911a00d2c89b49f1f406d3026801c12d9aa4242641c2472865"
+   }
+  },
+  {
+   "package": "0b5d222662dfa80d7ba8b101bb88e20c.oip",
+   "image_id": "0b5d222662dfa80d7ba8b101bb88e20c",
+   "source_dicom_sha256": "e0c00f436b1c848fcccf53b211714e89f365797cb5e01155e23f5464d8441125",
+   "rows": 3006,
+   "columns": 2847,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "bda7709e09ba33af451a4ee4319527fc61073ae13a885641d0e87e3a92a07bc6",
+    "renders/canonical.png": "768a5bf10eb14276473a10790910fc412cedd830dc1b61beecfcc930d744348f",
+    "derived/masks/heart.png": "c224b7e316ac209094b0931e18656d45cf8e76ba1f22867e4d897762d535edd6",
+    "derived/masks/lung_left.png": "b494b833777410269c4977d165dbbbdbd364270ce60efc68c150fcb8d2d1d6b8",
+    "derived/masks/lung_right.png": "e561ad94a42a94d0b06d9d2a0dbff15f4ed5763abde77afa89a4d529a9521c26"
+   }
+  },
+  {
+   "package": "d6b38dc0d4cb99ead6ff30cc999f17ca.oip",
+   "image_id": "d6b38dc0d4cb99ead6ff30cc999f17ca",
+   "source_dicom_sha256": "f1958bf1fa0acbe1c8c376c0d8ad03afd8e58329a18ce7ad32b87be13c2509e7",
+   "rows": 2392,
+   "columns": 2080,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "d1bf0a69054ffb051f76a0c51572ce14d5b91f9b864453e6a285a8a72f786e87",
+    "renders/canonical.png": "b3d7bbf7c7c182761229a20e980ce1681d358d2c03eac42d59d4b0dfb09a3580",
+    "derived/masks/heart.png": "4d289c0b5105a9ac6ad4f01edae799335039f952a9d957b99e162233201fb6cb",
+    "derived/masks/lung_left.png": "80e9206f1f429600e29e4ebb8d394dbfbbdbffe005107fec6df39b30f0296e4a",
+    "derived/masks/lung_right.png": "462253ad23edb9783670a4d1c30bd52d7f9672d56674689ecbcc91a31b7f1ee9"
+   }
+  },
+  {
+   "package": "b455fc9e6409f1cae08fe6d89e0be5fe.oip",
+   "image_id": "b455fc9e6409f1cae08fe6d89e0be5fe",
+   "source_dicom_sha256": "6adb53ee18182da52f0b8f24b3bbd7fb6b0c152c424102ae5bc0d8058ea111c0",
+   "rows": 3016,
+   "columns": 2731,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "3fafde7dfdb0369ddd82fb43c32edbaaebdecdee256ab2e556dbbd5d75230f60",
+    "renders/canonical.png": "09ef975b5dafd6f0c37ae9d98df4013f16b4008fda90f6c050222c6b00374ca1",
+    "derived/masks/heart.png": "559b0edd1f97e6c5f94946a25d9f2a7e41e1c91cee9eb4d2b9da271b3b224add",
+    "derived/masks/lung_left.png": "a36ed3dc2ff05ed579c4e97b5018b739da6dcf8963883f712fefcb2ad3e3da41",
+    "derived/masks/lung_right.png": "facdacdb25bc2a5f8a0961509809eb64bf63da7240af5906e1fa6e98222a9e23"
+   }
+  },
+  {
+   "package": "1328284b51e2183f749bff5df8eb2e6c.oip",
+   "image_id": "1328284b51e2183f749bff5df8eb2e6c",
+   "source_dicom_sha256": "354101906355f2440dfe2e353455ab1c0733efe3f5f0ad442fc7328d2e570653",
+   "rows": 3408,
+   "columns": 3320,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "944585b6515fafd94a5941dae545fb2487e2ce6ed2688a9ac03be2a03cdd40c9",
+    "renders/canonical.png": "80cc5d263a0834d1787cf56062a0c0bce48f9ddb2f416159958f19926ab3bd62",
+    "derived/masks/heart.png": "55a9b88af7ce5562c58ef2ddd78ff5bc3bf013f52fa84bad5cc361cfa4e511d0",
+    "derived/masks/lung_left.png": "5b73d5b28efa5dd0cd755076ac98f63ee2737e3bd8dfea90b34ee69b86cd81ae",
+    "derived/masks/lung_right.png": "3d30b9362a2cfd4f37633cb8fa587630401b8d136c4ef60c9558a9911bc83612"
+   }
+  },
+  {
+   "package": "4b91d54f3170a9c8a757e6acd6c25588.oip",
+   "image_id": "4b91d54f3170a9c8a757e6acd6c25588",
+   "source_dicom_sha256": "36b4ab5c14d88c0e3b6d0b92f0c0475bbcbe5e0d400d75247fc577f91fccfc56",
+   "rows": 3072,
+   "columns": 2540,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "a129100bae8878c0ca98e23b7746c0683f9514b293c6f5f359bed1d299f99f2e",
+    "renders/canonical.png": "e01f99c5bad43bbfb2ef865fe61164844dc4a901752efee77839e7959fdd6fb3",
+    "derived/masks/heart.png": "ed1fc9bc48b3033c934ea7c8bb2424b9970c53c517b6260c987c7d26bec8e982",
+    "derived/masks/lung_left.png": "04e5e1ba2e60cc0cf1de0c7b17427db40d23a382ca50d39e451728f308ae6816",
+    "derived/masks/lung_right.png": "c7dbede572ea2a08fd4d63a7224a30d0ebb62341c98178c03d3368bb73f29bb9"
+   }
+  },
+  {
+   "package": "b22bd21cfb3258bad7d934f036c34b5b.oip",
+   "image_id": "b22bd21cfb3258bad7d934f036c34b5b",
+   "source_dicom_sha256": "92567f9ac907f07665970d73a10d93c4b1a54218556b0add7cba667b13e6995a",
+   "rows": 2929,
+   "columns": 2838,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "19a3d647e658db1ec269c52b8ba330180ecf147d7879f11321c37211e7880ba1",
+    "renders/canonical.png": "2a9402fc964efd2b5698f03749ce42b238ed5e61cb03b488a1fadaf61668e598",
+    "derived/masks/heart.png": "265b8392537948eca4f8ed0186b7acbd08764abb116c6628a256c55fab7cad9d",
+    "derived/masks/lung_left.png": "83eb787ce12e52ba7308cb505e1109b010cb0f7fd30392cb76298ec75cdc94b8",
+    "derived/masks/lung_right.png": "82fe20222961b8cdba0a894daefdebca26ab8b4227fa809b9091fed3213951fc"
+   }
+  },
+  {
+   "package": "1cd5b8ded8ace5645bb43e735915ff0b.oip",
+   "image_id": "1cd5b8ded8ace5645bb43e735915ff0b",
+   "source_dicom_sha256": "175752dc968cb8367e02da43b8465457fbb77e5a3d29b4d8f6a21ff8371e665d",
+   "rows": 2739,
+   "columns": 2462,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "1c2db8351326368cb6b38ae9424aacc5b67d657fe655ae32cc16f642c1d1ae95",
+    "renders/canonical.png": "2b2f8ae038abd07e35d3ff59ddf08fcad1f509b51f4b601026a687a5e83ff205",
+    "derived/masks/heart.png": "f4b0c7d2fc37eff8bfd927fde258a55afa8e755afd4d90604262a67390d57d19",
+    "derived/masks/lung_left.png": "9c177d4601d754837181bded5dac89a391bfba6700f966df5d1ebb691ce787c8",
+    "derived/masks/lung_right.png": "2ed789125c7df327b7efaefee6c48c4222def217893776a41a82a34cedcaa2bb"
+   }
+  },
+  {
+   "package": "91332530b9a18caa74a32c5f57a7b55b.oip",
+   "image_id": "91332530b9a18caa74a32c5f57a7b55b",
+   "source_dicom_sha256": "f5987e4c04c62f87177258adbf502dbb1559e0dc6d38fd41dd65d9d207597568",
+   "rows": 2776,
+   "columns": 2336,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "8d6b09dcec7be68b16655f17cba2c5648c96e612630ee4ef8c06886475a6c857",
+    "renders/canonical.png": "3193c47e0fca8f5e1f487d276b78ed4eec71521d8f1b667c22637404ece74e4f",
+    "derived/masks/heart.png": "941602e4c1cff96641e72319c93c7f74a3f09631976845ac874fa46aa2bdbea7",
+    "derived/masks/lung_left.png": "1f7128eb2e7b205d5a6f417a45dd553ec61289299559a4265f370ac218dafad0",
+    "derived/masks/lung_right.png": "d3ecdf2e64a93fe7b9b0fb63901fbca18aa9101693b144221b30c6e7c633b984"
+   }
+  },
+  {
+   "package": "6af6cd896e3df39227560af1123a9402.oip",
+   "image_id": "6af6cd896e3df39227560af1123a9402",
+   "source_dicom_sha256": "e5e700ced306880f89e5b6d5622b2faf5148266750fd18fa7197f692129290fe",
+   "rows": 2971,
+   "columns": 2524,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "ca3cfcab994761f1e6aa02f742ba1cc4e63fe75fec087d13796122db72779a98",
+    "renders/canonical.png": "e09656a7d6131d1feff190606dc1091f0750115b187dca7b5d9e70947c5b2bf8",
+    "derived/masks/heart.png": "c2ebe37842ea78b83b0a6eb074c051653060002e381f3746c5d61014d798942c",
+    "derived/masks/lung_left.png": "78d31fe0049f0222a988e16affba5e3ce27169d96c10dc7da84597b6b175fe64",
+    "derived/masks/lung_right.png": "0804b8ba72eeeeda38f0949d72f488948828afd3bcb98b3244cd691dac659908"
+   }
+  },
+  {
+   "package": "8e4fbd703dcadb5ea09f09bbc7108e11.oip",
+   "image_id": "8e4fbd703dcadb5ea09f09bbc7108e11",
+   "source_dicom_sha256": "3dd061baffccc264e154a09d60166eb403ea5d3b5d26c1d429cad8b05b95be5f",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "989f05a964f54a5d364507ff3a3c11a9ef080e370b09aecbb94fd95916223345",
+    "renders/canonical.png": "2758b77b9f3ccd793a409d87e45f2ef5ddaf39af06025cae48a203f558b6fb0b",
+    "derived/masks/heart.png": "5e6db5686936d7b69b9758fa7bc600ba13fb867979964578ed5ce47e8608cf28",
+    "derived/masks/lung_left.png": "ea21ea937fbd38147cef84a11a0ac8244d9351d920b659e7d3d5c7884164a589",
+    "derived/masks/lung_right.png": "2fc2e468f089aadf5d7af4ef5cfa3f7d62177f25bb44462ee347b04a16a268bd"
+   }
+  },
+  {
+   "package": "1085585ceaf60941fd14db7ad3bb2f49.oip",
+   "image_id": "1085585ceaf60941fd14db7ad3bb2f49",
+   "source_dicom_sha256": "d318c3f7b2d1be4275e2dbf2f0da6171ad32bce02cf38f97b061350b6fb6cd44",
+   "rows": 2844,
+   "columns": 2232,
+   "pixel_spacing_mm": [
+    0.127,
+    0.127
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "171f38aad04267cf76ea4ae76119091b11f8dd891364e075b3d73c685d866f6d",
+    "renders/canonical.png": "7c1d0662e14236b21bd7ac3a03431e7d6a746118b3c767a43884270351c61bbd",
+    "derived/masks/heart.png": "236c780fb24bd5418339ce98cdb51f145de41207053b77b33c26a9a97e0ef1a6",
+    "derived/masks/lung_left.png": "116f8f0a0e66cef54fdd7eeb2234e2fc169b1c5646b5f76d6beb6a93f6d2dab7",
+    "derived/masks/lung_right.png": "e58b5fd45b2153d867f21a8dbae68465bf145de73e7d464a1632fbd7ebd60101"
+   }
+  },
+  {
+   "package": "38d665e8c7e8cc518e6a640da3bd7147.oip",
+   "image_id": "38d665e8c7e8cc518e6a640da3bd7147",
+   "source_dicom_sha256": "934c2667158415bd8339f9450ee4bffe781b4efb149b7ba75854c8cda61c6716",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "7e0ff67802b9ef204a1b9cfcab910a91da2faa8c93d5f4b37be22764c02b8d71",
+    "renders/canonical.png": "8ab446982bc3e497dadfd50c293eb13e318eb69a45ce1039fb05196a770aeff3",
+    "derived/masks/heart.png": "c7b7e42b940011f16bf9a9973ed4de95c4a194cc2ee3b8b8b65a612f00ec8368",
+    "derived/masks/lung_left.png": "821aa42025461ea17b22a7484e570c40c34acd3d7de6f366e3f28a70367c2c80",
+    "derived/masks/lung_right.png": "536c79b161e61fc9bf20544d84d5609f4285920f43c6b6755336af879bded4e8"
+   }
+  },
+  {
+   "package": "a040343977edb13d15604e5e3c125e59.oip",
+   "image_id": "a040343977edb13d15604e5e3c125e59",
+   "source_dicom_sha256": "3f254e717f12e900340a636503f76184edc90bdbb91975d20e155faa820e2ee2",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "09dd6a50d77306488427b5f5703c1562aaba13aa14b7b0da8052ffce4611ab19",
+    "renders/canonical.png": "f5c969eb8eff422f86352c8fe8f6d362a76d7c98a2c008a5e5075ae1fa9231cd",
+    "derived/masks/heart.png": "a4f39ac44ffcce359d3bca1b8602ca4cda74ddbd9a39a5415d3167542032ffb1",
+    "derived/masks/lung_left.png": "ab22614a48c3298b54fe94f102bd4210c5a2cf11c29d3b8ad715467c6487e6a3",
+    "derived/masks/lung_right.png": "c48e3305b4fcfd89d3e6c023fea047b7e8df9582bdf49dfec3deba91f4f224fb"
+   }
+  },
+  {
+   "package": "bcfe72dc85490721c3c39870e6eea3f6.oip",
+   "image_id": "bcfe72dc85490721c3c39870e6eea3f6",
+   "source_dicom_sha256": "535299fa55b08148ce1d08c452eab93ccb44c7698191125caf63c1d20675e8eb",
+   "rows": 2868,
+   "columns": 2684,
+   "pixel_spacing_mm": [
+    0.127,
+    0.127
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "bcbea9c08540928ab5d634aa4f401237a5e78064c2551d1ac446af9910ac0334",
+    "renders/canonical.png": "682801d45d4106d6d724448d995dbbfad1db1a215097722052ab46e59a1a7ddc",
+    "derived/masks/heart.png": "b2f4aaabcbca25965fd0a6a07766247aa5841cc02a90963eb082f2d02c5e3075",
+    "derived/masks/lung_left.png": "926dad5f00e9b0629eaaa39498092caa5c55dd0f65aa8ba6617dee7703d9cc31",
+    "derived/masks/lung_right.png": "03a63aa2c54b401ae252d3621dc23d81a331bc9417195dfbd758f2cf0893d9f5"
+   }
+  },
+  {
+   "package": "5cb94a5da13b66604c0f15bcb1e5c740.oip",
+   "image_id": "5cb94a5da13b66604c0f15bcb1e5c740",
+   "source_dicom_sha256": "b3b0d3ad0c4141cff628f3e5021aedb6bcc917bd0c7f179daf416a0c2149f969",
+   "rows": 2918,
+   "columns": 2399,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "39e451481b6b534fe049816a0b32aa4daed876b85a3fc73394748f6ff9ea8ebc",
+    "renders/canonical.png": "353bef5748ffec7bf3b203345b60f3fc0da9a2bd5c40bafa09b56fb882965035",
+    "derived/masks/heart.png": "403a98d8cbb0269b3c782445ac1e32c8afa102c7bdbd9d0b9f3d8ccd7c5b6883",
+    "derived/masks/lung_left.png": "411460a2d29207ca24ce3f96a377f5d7c83ff2ebeaec3cac5fa831f272b07aaf",
+    "derived/masks/lung_right.png": "b3393cbfde9475c8e954fec172a46294cc8a26a50818cc5ae25c08856d649c89"
+   }
+  },
+  {
+   "package": "b685d041e15fd6b5ffbac258f0673518.oip",
+   "image_id": "b685d041e15fd6b5ffbac258f0673518",
+   "source_dicom_sha256": "984f3d2fd217277bfc8403e2739f3509a4e677c6b24ed2f00756cd0d5b4565d6",
+   "rows": 2666,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "44604dd2721c0b09e4bf5b61df1528c3b5ba0de8070e9ebacff3d0f77d148610",
+    "renders/canonical.png": "2816a5ddfe1e02760448304dcf1ab203096b594009b194ef9f7b386e694d72e7",
+    "derived/masks/heart.png": "7a86bbe7fe65c6fd4353dfb6c559ad0fd838b4c8deb9ca1a3db87ab64c4b1392",
+    "derived/masks/lung_left.png": "6106ee91a5d8dcfad3d8cfe1d54540624a75c997048a1f08b5e08168ffe19a45",
+    "derived/masks/lung_right.png": "6045998283d657870641567efbdd8ac5b5fa0f51f3996737409e7f10bdae2820"
+   }
+  },
+  {
+   "package": "64395316b507236056e6cf7bde367792.oip",
+   "image_id": "64395316b507236056e6cf7bde367792",
+   "source_dicom_sha256": "615ab9bb87da56b062962a8a2a6cdb973b92f3a07d6860054c99a27de699beab",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "f1b7d2a283dd94f996cc0404134d1ac00c09e5262c4bbf641c6d7a778c2aea19",
+    "renders/canonical.png": "f62807628ce088f71b917ffb845aa411f89901ff4715cec6af0bde92bf3bfe70",
+    "derived/masks/heart.png": "436b8f3cbf627261d4ecf4defbe6b1153fb8715e52929096ea7b8b02da57477b",
+    "derived/masks/lung_left.png": "61ea702122b6c40c72dac4a09310610021f41c6f278bc5fff7f96bc2ccd8642d",
+    "derived/masks/lung_right.png": "c557225f2c490471c67826bd4cf0519feee5cdd64f289ceefa78e494d8c32d36"
+   }
+  },
+  {
+   "package": "75de97fbdf15aa3e1927a97ff9479327.oip",
+   "image_id": "75de97fbdf15aa3e1927a97ff9479327",
+   "source_dicom_sha256": "65caf4bf51b7e85ef47012a414a15ab1370a504b336fe04b4db9e8b8a8c1696c",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "7b1b0490b3d064bc67792d0ea412b1e18933864c4e801d36e4796183e6ba3d29",
+    "renders/canonical.png": "132ec8f112ff16266166f1bce765a7380bc6dee795d7b144bf717140b54166c6",
+    "derived/masks/heart.png": "b7363f76ffaf64325b30ef1b2dfe5544dd22a82b03b90dcd84eb7ce0f16ee94a",
+    "derived/masks/lung_left.png": "cc20300634b987a3f5dbd3d0f59c2c550bc4ac585157dc49c6820e98955cf554",
+    "derived/masks/lung_right.png": "096ced24477873cb705f797b61f20257b8f435f6e08f1d3ef4aa787e1d275348"
+   }
+  },
+  {
+   "package": "da1f25221a05f7b1852b8191f89aca1f.oip",
+   "image_id": "da1f25221a05f7b1852b8191f89aca1f",
+   "source_dicom_sha256": "f21c3137019a5f0d282d8408631dc27046761565ea0f1aa55743928ad5a2f3d1",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "e67497d30c9ed36c5a3b8a14573215074529612ee9d973871d4529bf72a64556",
+    "renders/canonical.png": "c28568a43370a515adfa20793ae4968462e38566faac20c8a92480f1b11d05aa",
+    "derived/masks/heart.png": "3b9da8fd64ebbc9bcbc4a57900a32348e1a1aa6aeee85f0ab98db3563b53d527",
+    "derived/masks/lung_left.png": "26e87f98d2eb614a25f3167e65d2945b4f41a2c1e1c3df3648f61400db5687d6",
+    "derived/masks/lung_right.png": "4a7593e9cbfea2097b67cd8e87f8d603b18dfac82e76713c2214174ac3bef4bd"
+   }
+  },
+  {
+   "package": "5d915a93afa7a4d47aeb206eefba2465.oip",
+   "image_id": "5d915a93afa7a4d47aeb206eefba2465",
+   "source_dicom_sha256": "17ae75748cc96125d239a2ab6c1e2b8249740540e4873d1435eb9ae21618f6d7",
+   "rows": 3408,
+   "columns": 3320,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "95c1e930b5732163b700590b9e339231ad2658b177573230450869d14c9bb0d9",
+    "renders/canonical.png": "dcde73e6a731fc39e6fb34c23d75b52ba6e11e44aeae298ac4571769e3d1907c",
+    "derived/masks/heart.png": "d482f2a62266eb69f2fef5606ceb2a33790f6f9ba3717771c38ce52641f7d0b8",
+    "derived/masks/lung_left.png": "7daca21c89f6c773cac36ff749944c48a8097ae893c2168032a469e5372f150e",
+    "derived/masks/lung_right.png": "f368625ebe725b3e5ee98ad2a2a3151780d31112aa7da0515a2def10676747be"
+   }
+  },
+  {
+   "package": "e82cedee4afa9651a7bd0d57a23280f2.oip",
+   "image_id": "e82cedee4afa9651a7bd0d57a23280f2",
+   "source_dicom_sha256": "f1ad85a69b0c8432f78e944760a7f49052a1f125ff95b8fbfdb127ada7594f9b",
+   "rows": 2840,
+   "columns": 2808,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "bb02f9ccc21fdef445ea06a9eaf7707db32880ee3955b0a377f030232d33c557",
+    "renders/canonical.png": "f669a5a7aee3ab9f8a2e19b16c8b637e75a3aa30c44bdbfec0aa4f9423778955",
+    "derived/masks/heart.png": "4cdf7af120d73bbb9991d3b892e85737d6e79cdc1a1a55ac54be2e09744156a3",
+    "derived/masks/lung_left.png": "1682a1831f95b2e80fa5e367cd3275259d51b15232b3d653d1cd0090c981374d",
+    "derived/masks/lung_right.png": "6ef3cf2d7fac73691f9a3b1f7b0baa3cf93fb4095bb7b3f930db7b20e8e1ffc9"
+   }
+  },
+  {
+   "package": "f0e57f67e93b238f6d0034b49a8bd39c.oip",
+   "image_id": "f0e57f67e93b238f6d0034b49a8bd39c",
+   "source_dicom_sha256": "e9d0b122cc0b944f7ea6a510bc631796ceb04e6fe477d2ef177faa4611531887",
+   "rows": 2688,
+   "columns": 2208,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "351dc03389978f4e5fb05bff6c70da1320faf7609a84ad46fe226994085e11f2",
+    "renders/canonical.png": "4850876b6fa4799c40a9cb824fc9cb8edf7d0ba151cd5e77488d48a5a045067f",
+    "derived/masks/heart.png": "b5f1fd5a6591342529776694f3feafaf7113534125533510c2c565ebb300101a",
+    "derived/masks/lung_left.png": "5bfabe3af1ba96b77595119922a6371b20822c5410d30e3d84971f96277da4f0",
+    "derived/masks/lung_right.png": "b68d05ac1f8ca3b61f67f46db7453b27dd5bd528fd95e10ff3d8ed0efc2d675d"
+   }
+  },
+  {
+   "package": "2254df0c59c659c6eec67a73327bc857.oip",
+   "image_id": "2254df0c59c659c6eec67a73327bc857",
+   "source_dicom_sha256": "c79c38764a272ec63ae362679ad7f311ae8748f4e2b9df62f8a1371add810d8d",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "da0ebbb734dbdef3b5c20a34b4b20c50f8b65c7c4fe7cf4a590449e045b747be",
+    "renders/canonical.png": "d127be436b46989c3659a8dd8adb1051d804abe1f7036e131ca48967d2e55039",
+    "derived/masks/heart.png": "60d697625a6558393f83b1bd34525b19c7150139f21c346b14f2cd9dc662d3a1",
+    "derived/masks/lung_left.png": "e1f313d1771c48fd3d5898f68ed3a13104160a05aa2104643f05e3b3ba480440",
+    "derived/masks/lung_right.png": "fb8d16c8587a01fd95d6e7b1893756b122fb953095b10c622a2aab9c39043471"
+   }
+  },
+  {
+   "package": "e11a0cf421fc6e4ca67a6dc1bddc3980.oip",
+   "image_id": "e11a0cf421fc6e4ca67a6dc1bddc3980",
+   "source_dicom_sha256": "d55adc5cebdb48158b9fb11e4ed41c456948e37608258a725a5a544e22a978c0",
+   "rows": 2090,
+   "columns": 2034,
+   "pixel_spacing_mm": [
+    0.143,
+    0.143
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "dd028f24e0220f1d12aafe5bcfad8e4b17ba7cd56fd779f9fdd26da4876ca8a2",
+    "renders/canonical.png": "5dcf4b5742a372567a911f11c4523f5a58219cbe141c9e52563c3650d1f8e1f3",
+    "derived/masks/heart.png": "e3441d8b6b541cd671d9eb1ba0ed0b276a45a3dfba2d5bf19ff960572af87999",
+    "derived/masks/lung_left.png": "5246cf1bbbef9b7760561406866297f1fa25ead4087e9fbbcf172af1f4cafffd",
+    "derived/masks/lung_right.png": "ad3e5b3ddfc3afbf46e29687032805e1f0441a71eaf10e4396d5aa943829ff35"
+   }
+  },
+  {
+   "package": "db1c95177df286e4868ce31b8ce53a5b.oip",
+   "image_id": "db1c95177df286e4868ce31b8ce53a5b",
+   "source_dicom_sha256": "54ef9e4ec823f2e3462c09b391b127e4cf8347571a976f017794364389e7c705",
+   "rows": 2430,
+   "columns": 1994,
+   "pixel_spacing_mm": [
+    0.175,
+    0.175
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "b31958933d661d57ae3d3032201036cff1c5e3663319bdd7444fe8b0c4ad3c3b",
+    "renders/canonical.png": "7cbc1b3b964c9b4338d3a97a412153ad6abbc59304579d9df155670c4b8564bc",
+    "derived/masks/heart.png": "7a31eb856442edaf57371d879bbf19951232cb239c92a5098a5b1b3091806f8b",
+    "derived/masks/lung_left.png": "a58c87d58d8e3ba657b8ca4c38080cba1d6e992b76eebbee43eda6a6d9fb3d14",
+    "derived/masks/lung_right.png": "f46082427bcd30a342a71ffe526f271323e1400c33d3f5e8ddcb1188455ead5e"
+   }
+  },
+  {
+   "package": "d45c88116610fd72a56688d29bf2771d.oip",
+   "image_id": "d45c88116610fd72a56688d29bf2771d",
+   "source_dicom_sha256": "ef775626ce82461c8c0a9e98aebe4d831afd9f1040bb80cbe70d8915e6d1ee50",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "be038b1ccf916794553ca3f823d32604720da3ed8a3dfecd3c74913165860b23",
+    "renders/canonical.png": "0d61828d92e9de384c546b212f649d268e7ab6619f321aea2fcb824c033d1094",
+    "derived/masks/heart.png": "df883a924e09a6ea77a896454fdc186263787e634f5d5fa74ab18943427b1242",
+    "derived/masks/lung_left.png": "008831b428269392eaaa89f1b074975d129397cc069f967f1cb6c05e13663155",
+    "derived/masks/lung_right.png": "65343624ddcb3449468af64d8d797d327022852a38b43fbfbdef5d9b8c252123"
+   }
+  },
+  {
+   "package": "4b4502be77b11e64bf31e62dc098da41.oip",
+   "image_id": "4b4502be77b11e64bf31e62dc098da41",
+   "source_dicom_sha256": "6192877cb1cdd3a92daf6b38b417e40c3248267f367c8b0cd1c19fae465733c0",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "3de533606c502aeadd5a1662bd841f037057d4f138352ba811fa534834a79e19",
+    "renders/canonical.png": "4f172d31c7ce751e1b68481f870a0be5d4724991cc588b30e514c71f85e54eee",
+    "derived/masks/heart.png": "f882015440a5e9f7dcf2a03aa875d6cf18fb80368018e84f9e993164b4e30294",
+    "derived/masks/lung_left.png": "7f86b5b897666d07378f4d171dd77801562eed2a064f9286ed6a482fe6ddaa01",
+    "derived/masks/lung_right.png": "7de36b42f30237d1326434b88e366f7118f67307a906306ac7e02d5d37779bd7"
+   }
+  }
+ ],
+ "reserve": [
+  {
+   "package": "1df9d68d3a8352f4fecbc3895ebd80fa.oip",
+   "image_id": "1df9d68d3a8352f4fecbc3895ebd80fa",
+   "source_dicom_sha256": "900af54ddf64d8c8a69ba940e2321a51606691984a4bb0081af23cf3f7c88126",
+   "rows": 3170,
+   "columns": 2642,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "647a31018c56218a6109e936933f4a324daf2e86620f2667149d28e7cfb9c514",
+    "renders/canonical.png": "94dbdd3d78e17c138193fa2ab5276f3691e391e3896bbb1332afc238a2c9b387",
+    "derived/masks/heart.png": "0a0b55c07f0663757184b8a14689dd06caac72bb8434fe77895084bc055d1dce",
+    "derived/masks/lung_left.png": "76be87c21e1a08979dad9f37903c9defab4e478b362ed3e7d816d2e49a27a290",
+    "derived/masks/lung_right.png": "e242a775481cd5147f435b495c8dc9149d4a3547c5d25f425322542dc085131e"
+   }
+  },
+  {
+   "package": "237095c28234faf85068b1cd130f5841.oip",
+   "image_id": "237095c28234faf85068b1cd130f5841",
+   "source_dicom_sha256": "6c5654323e10693ece4d59b4355794e0cf733c4e72866b11b3daa82bd422abee",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "cbf3cd675036ca59ad4ae3e73ac7a60d989835232dd5ef9221b1e3a8b6a3bc13",
+    "renders/canonical.png": "c4a4bc04e5e432b75d223a68d93cb43a72428c80d966ec9ffbead6c772410054",
+    "derived/masks/heart.png": "99a4df133781de82d7d47c19d3fbfa3c953a7bba76ed60241a0cf482665c3427",
+    "derived/masks/lung_left.png": "3ee35c7e9ba66502b782810f66ac47a0773358c6e4ea3085011dd30a81884f30",
+    "derived/masks/lung_right.png": "97b2027303b40708dc209064b1450dad5a09bd1df810143e63a359f7c7ce6796"
+   }
+  },
+  {
+   "package": "9bf6aeddf47073ba9f3fb8bbddd67b5a.oip",
+   "image_id": "9bf6aeddf47073ba9f3fb8bbddd67b5a",
+   "source_dicom_sha256": "6a545f083dde3009f57bfc068178b02bf032859424d2b36db58b47df5f3867f6",
+   "rows": 2699,
+   "columns": 2666,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "fb966afead533ac4cb5d0d633c66ce56e8ce31f59617b738967a140c6c7d12b5",
+    "renders/canonical.png": "f00bd7e5b09577e4221cd609b8701f64f62851b46b445b4539d9796e69693216",
+    "derived/masks/heart.png": "0c34c4a7e8a7d2b22c9ab42b9f03afeed22ef0a77482086ce01da1090643ba27",
+    "derived/masks/lung_left.png": "57086559d5c546ab08e93a5d27389a263578cfb628ec0ede90d69e1fadc42877",
+    "derived/masks/lung_right.png": "4f525d38e8ef62ddee909d5b25d48b6251cfefb6b2e099ab9b92a4256250e268"
+   }
+  },
+  {
+   "package": "1125f1da5766f0392d45630133c7bed6.oip",
+   "image_id": "1125f1da5766f0392d45630133c7bed6",
+   "source_dicom_sha256": "021035e609d53b95a736d73ace1288ab4709494d858db341d70c5911cb117a3f",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.14,
+    0.14
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "af2115c60bdab5d29cd51d3cde1717ab27f6935f37248cf01fb706ff4e9394ff",
+    "renders/canonical.png": "342f44b431d350f134f39988d979ad539db14bcec30864ad532cc168643ded9f",
+    "derived/masks/heart.png": "d9ae5619e6cdbf768d1aae28a30d5b2d313d0641b5b9d1745c9f47dcf0f2a676",
+    "derived/masks/lung_left.png": "ce1d6a8b809d12519f10b54221ac4eef57dad7938fb187e245d0516a5788b578",
+    "derived/masks/lung_right.png": "051f3116d49bcf5d7ba3ea674235933e76e6963c0e47112f0b04cac13d7f16d7"
+   }
+  },
+  {
+   "package": "5a41618b987898b085e2411532f7b9f7.oip",
+   "image_id": "5a41618b987898b085e2411532f7b9f7",
+   "source_dicom_sha256": "8b839f69454107a3707a2d061dd3bb2247c36b8eb6a07c3c1fa7cdd3aa05757a",
+   "rows": 2880,
+   "columns": 2304,
+   "pixel_spacing_mm": [
+    0.15,
+    0.15
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "f0c0b587351c4182b9a87c06d2ba6c6fd0cc1fa41a3e40a3d4be3dbc4f44397e",
+    "renders/canonical.png": "73d6843880165562977e40b46f6a4a1ebd168b7a52e6d328bbb9c22b4a02fbed",
+    "derived/masks/heart.png": "ec8556d10065924fee7a94b600a18f25f493fc5fad1a369a9e10184cf6c88d85",
+    "derived/masks/lung_left.png": "c46ab709ebcc67617d01a77fa36662c0c8efbada536c9904f04ec14c2fa5cc53",
+    "derived/masks/lung_right.png": "0bd69900bd3758049ac46fee6dfb34f45351887b29332ddc9271c3ba7643e934"
+   }
+  },
+  {
+   "package": "358a1ee480d540f0d02899fa36f5157d.oip",
+   "image_id": "358a1ee480d540f0d02899fa36f5157d",
+   "source_dicom_sha256": "cc5e11579f935f1c67301cedb2ef2e1a76648f9aa22f6bdc3564ae97fc44a123",
+   "rows": 3000,
+   "columns": 3000,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "4d7ec061cb52797888b4027c5d9f61ff7393ad20f98581116cf301a947964c07",
+    "renders/canonical.png": "412f1a69454765025c47ec9b142a5f6a1baf7f85d4bc13df89dbe8bafbb50b03",
+    "derived/masks/heart.png": "4e4f684b90f2bb1a9a718834fc9e9e166fc40c2b5854f8611e6315a09113fa4e",
+    "derived/masks/lung_left.png": "c642b1ccac29bdb0510db06c8c5da54dd9aec202ef03253994ddc00326e9cefc",
+    "derived/masks/lung_right.png": "a1e6e52710136deccc94571b99578bb3fa6840108996f489bc619a3acb6ae939"
+   }
+  },
+  {
+   "package": "1be94a4e06067c5ecd66488cad60a087.oip",
+   "image_id": "1be94a4e06067c5ecd66488cad60a087",
+   "source_dicom_sha256": "2caf4186a4400f600a0fdeb4b5d1276045a23e96cf28b4ab0ebfcb2f3671d5e5",
+   "rows": 2288,
+   "columns": 2745,
+   "pixel_spacing_mm": null,
+   "spacing_source": "none",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "e2b017506af0aee38cd7315da19590f633f81deba90d0961bddd60c8e1df326b",
+    "renders/canonical.png": "e99101f712686c64c46c06536e3a6536bc15e43657cc719d6dff9143471906bd",
+    "derived/masks/heart.png": "2f058fccae85a338df2b16622f19b52ab689f4746afa1e151c1dbdcf33d0fb62",
+    "derived/masks/lung_left.png": "1748d5b487c352fddfac8ac41eb13bc8a45a97a8e67b4f6ff8c7f4dda7d4ac23",
+    "derived/masks/lung_right.png": "d952e77c9819aee6d00d69969a18749e4d03cd6e6bcf33152a1c3c8f91fc2433"
+   }
+  },
+  {
+   "package": "cdd5d9b02e2b7b41e239cfcfc1519a25.oip",
+   "image_id": "cdd5d9b02e2b7b41e239cfcfc1519a25",
+   "source_dicom_sha256": "d868e8c37e12ff27a18bd1f3d5024c98d9a21bfb3816bbc7aa7a188eb0b97db8",
+   "rows": 2984,
+   "columns": 2538,
+   "pixel_spacing_mm": [
+    0.125,
+    0.125
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "83880b26c7d5736825f84dd83a2f0285a333f9317a6b77eeb1f59192cfec7c61",
+    "renders/canonical.png": "eaf0c7d4d6c9d8b2e7a1dd0f19d2498181a4a208b5352ac234635857189febbd",
+    "derived/masks/heart.png": "57a3575c37eba9fd8e6ebfe475317e622afe2958d944817b8abb33257ea60702",
+    "derived/masks/lung_left.png": "0cfb6e959c9fa37a8d8c70e7bc992500b28fe1aa57b711e3b905c793bb6193c2",
+    "derived/masks/lung_right.png": "753229e424665346be1aac13c263d80984f97b9fbf7ea864116bc5855a1e21e3"
+   }
+  },
+  {
+   "package": "e38f8d2f4519f98e75987b7cf04beacd.oip",
+   "image_id": "e38f8d2f4519f98e75987b7cf04beacd",
+   "source_dicom_sha256": "693986387dc665fc403025e3edc144c30326ee3d5a6f2ddacf2fe0ac31d7f606",
+   "rows": 3072,
+   "columns": 3072,
+   "pixel_spacing_mm": [
+    0.139,
+    0.139
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "e0a5b9fd9cba8863f42492e766ed36503702b6c4341e4db656d7df982e6268e6",
+    "renders/canonical.png": "cd2621b482e7f28af1c8ef0812a9990b5f4988ca95900bbb52080943989a0eeb",
+    "derived/masks/heart.png": "50944258982baef6a24906413a23963b18f0b76053efdff6b2ad53d15ab5010b",
+    "derived/masks/lung_left.png": "5595c7d5a3b18824ad6c65ce0f1396307b021ade5ac8733de76d01db0f27837b",
+    "derived/masks/lung_right.png": "576ac83e3e680d77ef8141895a6e2ccad0339df8fe5ec05c1fb8735aefc723e7"
+   }
+  },
+  {
+   "package": "a6a1cf247e893e09aec4e2d34316c4c3.oip",
+   "image_id": "a6a1cf247e893e09aec4e2d34316c4c3",
+   "source_dicom_sha256": "9f14162c4e9153a007fff9496851fbe3547085c794211ce5d93343f3e5216f64",
+   "rows": 2500,
+   "columns": 2048,
+   "pixel_spacing_mm": [
+    0.168,
+    0.168
+   ],
+   "spacing_source": "PixelSpacing",
+   "edge_labels": {
+    "left": "R",
+    "right": "L",
+    "top": "H",
+    "bottom": "F"
+   },
+   "validation_status": null,
+   "files": {
+    "oip.json": "8d6439bcb72f1ae627a8d4e40cee2c1e76e1b38dce133615d5b32a29d8342489",
+    "renders/canonical.png": "c8b35fe7ae671809aee69231a85a4448f5135c456deefef9766bd1dd6818d483",
+    "derived/masks/heart.png": "3101d5428ad3057a5fe0607e7c9b8db14437419b23110a1f133cd4e43e4dfdad",
+    "derived/masks/lung_left.png": "a4fc5017c36856e2aa72714c1f024bc2921833ff9fa1e35453b72242a522d63b",
+    "derived/masks/lung_right.png": "070f286c499a14fb2bcc7ab4c317136045396704c1f4937c447cb7c52df4de9f"
+   }
+  }
+ ]
+}

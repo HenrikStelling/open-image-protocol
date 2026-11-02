@@ -20,6 +20,9 @@ python bench/run.py --dataset vindr --pkg-dir ~/oip-bench/vindr-confirm --n 80 -
 python bench/confirm/analyze.py --label confirm:
 ```
 
+Draw of 2026-11-02: store 1,000; 122 excluded as used before (100 paper, 19 pilot and smoke, 3 reader-study practice); 150 without
+a clear cardiac cue; 728 eligible; 80 + 10 reserve drawn with seed 20261105; 65 of 80 carry a header pixel spacing; `--verify` OK.
+
 `analyze.py` was dry-run on the exploratory data before registration (round 3a directories with `--conflict-condition ctx3`:
 H1a 5 of 10, H1b 2 of 2, matching table 1 of `docs/reports/round3a-2026-09-30.md`; repeat-subset directories: all ten models
 load, H2a 5 of 10 on 20 images). Its thresholds are constants at the top of the file and mirror the registration.

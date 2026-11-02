@@ -26,7 +26,8 @@ python bench/reader/collect.py            # after the reading: docs/reports/read
 ```
 
 Set composition (seed 20261102, same order for every reader): practice 3 VinDr packages outside the paper set
-(`~/oip-bench/_backup/vindr`); A side 150 (vindr-paper 100 + nih-paper 50); B ctr 100 VinDr; C marker 82 VinDr
+(`~/oip-bench/vindr-practice`: staged 2026-11-02 from the 1,000-package store, never used in a run, not in the confirmatory set
+or its reserve, taken from the packages without a clear cardiac cue so that the confirmatory draw's pool is unchanged); A side 150 (vindr-paper 100 + nih-paper 50); B ctr 100 VinDr; C marker 82 VinDr
 (the conflict-trial set: clear cardiac cue and not excluded by `bench/marker_review.json`), shown as the marker-masked render
 from `run._masked`; D ctr_nih 50; E scint 40 bone scans; F hot the 8 bone scans with a clear left/right count asymmetry
 (`tasks_nm.build_nm`). The 82 conflict-trial packages and the 82 packages with a header pixel spacing are different sets
