@@ -1,6 +1,6 @@
 # OSF form text: confirmatory round (OSF "Preregistration" template, 2025 form)
 
-Copy-paste blocks for draft https://osf.io/registries/drafts/6ae9f8858ef3510c16b4b2b9/ of project https://osf.io/ntgrb/.
+Copy-paste blocks for the registration of project https://osf.io/ntgrb/. Registered 2026-11-03 17:15 CET as https://osf.io/9rxbk (public, no embargo); the registration carries these answers verbatim.
 The blocks follow the pages and field order of the form (Metadata, Overview, Research Design, Sampling, Variables,
 Analysis Plan, Other). Every block is taken from `preregistration-confirmatory-2026-11-03-osf.md` (frozen at tag
 `prereg-confirm-2026-11`); that file, `confirm_set.json`, `PROTOKOLL.md` and `items.json` are attached to the draft.

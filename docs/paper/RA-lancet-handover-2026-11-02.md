@@ -42,7 +42,8 @@ OIP side delivers and in which form, and where the package needs a correction. R
 - Confirmatory round: `docs/paper/preregistration-draft-2026-11-02.md` (draft 0.1: six directional statements with the X and Y
   taken from the exploratory data, image selection rule and seed, models, frozen code; thresholds and n = 80 approved by Henrik on 2026-11-02; the sha256
   list `bench/confirm/confirm_set.json` is drawn and verified (80 + 10 reserve of 728 eligible); analysis `bench/confirm/analyze.py`;
-  frozen at tag `prereg-confirm-2026-11`), then the run directories and
+  frozen at tag `prereg-confirm-2026-11`; registered on OSF 2026-11-03, https://osf.io/9rxbk, public, DOI after approval;
+  OSF copy of the text `preregistration-confirmatory-2026-11-03-osf.md`), then the run directories and
   `docs/reports/confirmatory-<date>.md`.
 - Already there: `docs/reports/repeat-subset-2026-10-24.md` and `docs/paper/RA-addendum-2026-10-25-repeats.md` (all ten
   models, S17), `bench/README.md` sections on model identity and the misleading-label draw.
@@ -75,7 +76,7 @@ OIP side delivers and in which form, and where the package needs a correction. R
 | By | Package | OIP side |
 |---|---|---|
 | 2026-11-07 | readers confirmed | — |
-| 2026-11-09 | protocol and pre-registration public on OSF | protocol frozen (`PROTOKOLL.md` 1.0), pre-registration draft with image hashes to Henrik by 2026-11-06 |
+| 2026-11-09 | protocol and pre-registration public on OSF | done 2026-11-03: registration https://osf.io/9rxbk (public) with the text, `confirm_set.json`, `PROTOKOLL.md` and `items.json` attached; `PROTOKOLL.md` 1.0 still to be confirmed by Henrik |
 | 2026-11-23 | readings and replication run done | reading sessions on Henrik's machine; confirmatory run after Henrik's release; merged CSV, agreement report, re-scoring, addendum to RA |
 | 2026-12-06 | manuscript, figures, supplement, forms | tables for the supplement on request; tagged release and Zenodo version when Henrik says so |
 | 2026-12-12 | all gates passed, package to Ibrahim | — |
