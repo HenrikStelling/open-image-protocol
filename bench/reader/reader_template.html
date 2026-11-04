@@ -174,7 +174,7 @@ function showImage() {
 function render() {
   if (!list.length) { $("task").innerHTML = "<span class='muted'>Kein Block gewählt.</span>"; $("pos").textContent = ""; return; }
   const it = list[idx]; opened = opened || Date.now();
-  $("pos").textContent = `${BLOCKS[block].label}: Bild ${idx + 1} von ${list.length}  (${it.id.slice(0, 12)})`;
+  $("pos").textContent = `${BLOCKS[block].label}: Bild ${idx + 1} von ${list.length}`;
   const n = list.filter(itemDone).length; $("prog").textContent = `${n} von ${list.length} vollständig`; $("barfill").style.width = (100 * n / list.length) + "%";
   showImage();
   const T = $("task"); T.textContent = "";

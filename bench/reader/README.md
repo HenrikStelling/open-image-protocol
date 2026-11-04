@@ -13,7 +13,7 @@ measurement definitions (German, for the readers and the OSF pre-registration): 
 | `serve.py` | local server (127.0.0.1): serves the sheet and appends every answer to `readings/<reader_id>.csv` |
 | `collect.py` | merges the readers' files (latest revision per reader, item, task), adds `heart_mm` from the header spacing, prints counts |
 | `items.json` | the blinded item list: block, image file, size, sha256 of the image (committed: the sha256 list for the pre-registration) |
-| `set_key.json` | the key: pixel spacing, edge labels, view, hot side, package measurements, package path (committed; readers do not open it) |
+| `set_key.json` | the key: pixel spacing, edge labels, view, hot side, package measurements, package path (committed and public, like the package values in the Zenodo bundle; the blinding is procedural, `PROTOKOLL.md` section 2: readers are not pointed to it, the sheet shows no item id, readers attest after the reading) |
 | `set/` | the renders, symlinks into `~/oip-bench` (git-ignored: VinDr-CXR is not redistributed) |
 | `readings/` | the readers' CSV files (git-ignored until the study is frozen; then published with the data bundle) |
 

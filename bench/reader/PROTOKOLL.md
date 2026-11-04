@@ -1,6 +1,9 @@
 # Leseprotokoll: menschliche Referenzlesung für OIP-Bench
 
-Fassung 0.1, 2. November 2026. Entwurf für die Präregistrierung (OSF) und als Anleitung für die Leser. Abschnitte 1 bis 7
+Fassung 0.2, 4. November 2026. Entwurf für die Präregistrierung (OSF) und als Anleitung für die Leser. Fassung 0.1 vom
+2. November ist die der OSF-Registrierung (https://osf.io/9rxbk) angehängte Fassung; Änderungen seither: 04.11. Abschnitt 2,
+Verblindung als prozedural ausgewiesen (Paketwerte sind als Teil der offenen Daten öffentlich), Bestätigung der Leser ergänzt,
+Lesebogen zeigt eine laufende Nummer statt der Item-ID. Fassung 1.0 nach Freigabe durch den Erstautor. Abschnitte 1 bis 7
 sind die Messdefinitionen und der Analyseplan; sie werden vor der ersten Lesung eingefroren. Abschnitt 8 ist die Bedienung.
 
 ## 1. Ziel
@@ -24,7 +27,14 @@ fachärztliche Prüfung.
   ein dritter Leser (R3, Adjudikation, nur die strittigen Bilder).
 - Die Leser sehen ausschließlich das kanonische Rendering des Bildes ohne Annotationen, also genau das Bild, das die Modelle
   gesehen haben. Sie sehen keine Paketwerte (Pixelabstand, Orientierung, Segmentierung), keine Modellantworten und keine
-  Werte des anderen Lesers. Die Datei `set_key.json` mit diesen Werten wird vor Abschluss der Lesung nicht geöffnet.
+  Werte des anderen Lesers.
+- Die Paketwerte sind als Teil der offenen Daten öffentlich (Repository: `bench/reader/set_key.json`; Zenodo-Bündel:
+  `derived/measurements.json` und `context.md` der Pakete). Die Verblindung ist deshalb prozedural: Die Leser werden weder auf
+  das Repository noch auf die Schlüsseldatei oder die Zuordnung der Item-IDs hingewiesen, haben keine Rolle im Projekt und
+  werden vor der Lesung gebeten, zu den gezeigten Bildern keine Werte nachzuschlagen. Der Lesebogen zeigt eine laufende
+  Nummer, keine Item-ID. Jeder Leser bestätigt nach Abschluss mit einem Satz per E-Mail, dass er keine Werte nachgeschlagen
+  hat; die Bestätigungen werden mit den Lesedateien abgelegt. Die Studienleitung öffnet `set_key.json` erst nach Abschluss
+  der Lesung. Der Punkt wird in den Limitationen des Manuskripts genannt.
 - Die Lesung findet auf einem Rechner des Erstautors statt (lokaler Lesebogen im Browser, kein Cloud-Dienst). VinDr-CXR
   wird nicht weitergegeben; die Leser erhalten Lesezugriff auf die Bilder, keine Kopien.
 - Jede Antwort wird mit Zeitstempel und Revisionsnummer gespeichert. Korrekturen nimmt nur der Leser selbst vor; sie

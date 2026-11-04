@@ -70,6 +70,10 @@ OIP side delivers and in which form, and where the package needs a correction. R
    figures, supplement, OSF or Zenodo; `items.json` carries hashes, not images.
 8. **One assistant, two sessions.** The AI declaration and `ai_use_log.md` should name both uses: the RA pipeline for the
    manuscript and the OIP session for harness, tools and runs (model versions from `bench/README.md` and the run_meta files).
+9. **Protocol 0.2 differs from the OSF attachment.** `PROTOKOLL.md` 0.1 is attached to the registration; 0.2 (2026-11-04)
+   states that the blinding is procedural (the key file `bench/reader/set_key.json` and the package values in the Zenodo bundle
+   are public), adds the readers' attestation and replaces the item id on the sheet by a running number. List it as a
+   deviation from the attached version in the supplement and name the public key in the limitations.
 
 ## 4. Dates (from the package) and the OIP side's part
 
