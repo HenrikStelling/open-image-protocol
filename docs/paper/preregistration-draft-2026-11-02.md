@@ -8,7 +8,7 @@
 > Ablauf: Abschnitt 7, Schritte F1–F7. Das Ziehskript braucht die externe SSD "Video Storage"; ohne sie gibt es keine Hash-Liste.
 > Die Dateien `bench/confirm/draw_set.py` und `bench/confirm/analyze.py` sind der eingefrorene Code; ihr Commit-Hash kommt in
 > Abschnitt 4.7, sobald du den Text freigegeben hast (Schritt F3). Englisch, weil der Text auf OSF und als PDF ins Supplement geht.
-> **Stand 03.11.: Schwellen und n = 80 freigegeben (F1), Bildsatz gezogen und verifiziert (F2), Code eingefroren (F3, Hash in 4.7), auf OSF registriert (F4, https://osf.io/9rxbk, public, 03.11. 17:15; DOI nach Freigabe). Offen: Kostenfreigabe (F5), dann Lauf (F6). Der registrierte Text ist die OSF-Kopie; dieser Entwurf wird nur noch in Tabelle 7 (Erledigt-Vermerke) und in dieser Notiz fortgeschrieben.**
+> **Stand 04.11.: Schwellen und n = 80 freigegeben (F1), Bildsatz gezogen und verifiziert (F2), Code eingefroren (F3, Hash in 4.7), auf OSF registriert (F4, https://osf.io/9rxbk, public, 03.11. 17:15; DOI nach Freigabe). Kosten freigegeben (F5, 04.11.; Tokenpreis-Schätzung `docs/paper/cost-estimate-2026-11-04.md`). Lauf gestartet (F6, 04.11.: API-Lanes claude/gpt/gemini mit drei Antworten parallel; Ollama-Cloud-Lanes und lokale Lanes zunächst Antwort 0, Wiederholungen per `--resume`). Der registrierte Text ist die OSF-Kopie; dieser Entwurf wird nur noch in Tabelle 7 (Erledigt-Vermerke) und in dieser Notiz fortgeschrieben.**
 
 ## 1. Study information
 
@@ -225,7 +225,7 @@ Methods, with the reason and its effect.
 | F2 | mount the external SSD, run `draw_set.py` and `draw_set.py --verify`; `confirm_set.json` is written — **done 2026-11-02**: store 1,000, 122 excluded as used, 150 without a clear cardiac cue, 728 eligible; 80 + 10 drawn with seed 20261105, 65 of 80 with a header pixel spacing; verify OK; the draw was recomputed once after the reader-study practice block was added to the exclusion list and reproduced the same 90 packages | Henrik (OIP session runs it) | done 2026-11-02 |
 | F3 | commit the final text, `confirm_set.json` and the scripts; write the commit hash into 4.7; tag `prereg-confirm-2026-11` — **done 2026-11-02**, frozen commit `abcad9f` | OIP session | done 2026-11-02 |
 | F4 | upload this document and `confirm_set.json` to OSF; record the registration DOI and timestamp here and in the manuscript — **done 2026-11-03**: registration https://osf.io/9rxbk (project https://osf.io/ntgrb, template "OSF Preregistration", public, no embargo), registered 2026-11-03 17:15 CET (16:15 UTC), attachments `preregistration-confirmatory-2026-11-03-osf.md`, `confirm_set.json`, `PROTOKOLL.md`, `items.json`; DOI to be added when the registration is approved | Henrik | done 2026-11-03 |
-| F5 | release the API cost (section 8) | Henrik | before F6 |
+| F5 | release the API cost (section 8) — **released 2026-11-04** (ceiling: the section 8 figures; token-priced re-estimate from the published prices `docs/paper/cost-estimate-2026-11-04.md`: about $15 for rep 0 and $46 for three replies on the API lanes; Ollama Pro subscription confirmed for the cloud lanes) | Henrik | done 2026-11-04 |
 | F6 | run rep 0 for all ten lanes, then repeats 1 and 2 until 2026-11-21; refill error rows with `--resume` | OIP session | 2026-11-21 |
 | F7 | `analyze.py` → `docs/reports/confirmatory-<date>.md`; addendum to the RA session with the per-statement verdicts | OIP session | 2026-11-23 |
 

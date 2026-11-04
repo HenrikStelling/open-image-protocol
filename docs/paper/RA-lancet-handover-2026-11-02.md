@@ -60,7 +60,7 @@ OIP side delivers and in which form, and where the package needs a correction. R
 4. **The bone-scan view is not shown.** The reader names anterior/posterior first, then the side. The models were told the
    view; the human read therefore also tests whether the view is recognisable from the image.
 5. **Costs.** The confirmatory round re-runs claude, gpt and gemini on fresh images. Under the project's cost rule this
-   needs Henrik's explicit release once the pre-registration fixes the size; the OIP side will give the token-based estimate
+   needs Henrik's explicit release once the pre-registration fixes the size — released 2026-11-04, run started the same day; token-priced estimate in `docs/paper/cost-estimate-2026-11-04.md`; the OIP side will give the token-based estimate
    and the measured bills of the repeat subset (claude about US$0.60 list price for 696 replies with prompt caching; gpt
    2.38M input tokens, gemini 1.45M input tokens, bills pending).
 6. **Legacy wording in `docs/paper/`.** `RA-revision-addendum-2026-10-18.md`, `round3a-for-paper.md` and
