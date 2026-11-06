@@ -1,5 +1,7 @@
 # Leseprotokoll: menschliche Referenzlesung für OIP-Bench
 
+> **Abgelöst.** Diese deutsche Fassung 0.2 ist historisch. Die gültige Fassung ist `PROTOCOL.md` (englisch, 1.0, Änderungsliste gegenüber 0.1 in deren Abschnitt 9). Fassung 0.1 vom 2. November 2026 (Commit abcad9f) ist die der OSF-Registrierung https://osf.io/9rxbk angehängte Fassung.
+
 Fassung 0.2, 4. November 2026. Entwurf für die Präregistrierung (OSF) und als Anleitung für die Leser. Fassung 0.1 vom
 2. November ist die der OSF-Registrierung (https://osf.io/9rxbk) angehängte Fassung; Änderungen seither: 04.11. Abschnitt 2,
 Verblindung als prozedural ausgewiesen (Paketwerte sind als Teil der offenen Daten öffentlich), Bestätigung der Leser ergänzt,
