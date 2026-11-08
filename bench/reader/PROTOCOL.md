@@ -6,8 +6,9 @@ registration is not edited. Every change of substance since 0.1 is listed in sec
 definitions and the analysis plan; they are frozen before the first reading. Section 8 is the operating guide for the sheet and
 is not part of the frozen definitions. Section 10 records the freeze.
 
-Status at this draft: no reading has taken place (no reader file exists under `bench/reader/readings/`). The ethics answer
-(section 7) is outstanding; nothing is frozen or registered before it arrives and the first author has approved the text.
+Status at this draft (2026-11-09): no reading has taken place (no reader file exists under `bench/reader/readings/`). The
+ethics committee has answered that no vote is required; the written waiver is requested and outstanding (section 7). The
+protocol is frozen before the first reading, after the first author has approved the text.
 
 ## 1. Aim
 
@@ -26,7 +27,8 @@ The reading also replaces the earlier model-assisted visual screen of the masked
 ## 2. Readers and blinding
 
 - Two board-certified radiologists (R1, R2) and one board-certified nuclear medicine physician (NM1). Where the radiologists
-  disagree, a third reader (R3) adjudicates the disputed images only.
+  disagree, a third reader (R3) adjudicates the disputed images only. The readers are co-authors of the manuscript (decision of
+  the authors, 2026-11-09); their contributions are stated in the paper, the readings are published under the pseudonym.
 - The readers see only the canonical render of the image without annotations, that is, exactly the image the models received.
   They see no package values (pixel spacing, orientation, segmentation), no model replies and no values of the other reader.
 - The package values are public as part of the open data (repository: `bench/reader/set_key.json`; Zenodo bundle:
@@ -158,9 +160,11 @@ The question whether a reader study on public data requires an ethics vote was p
 Otto-von-Guericke-Universität Magdeburg through the last author (inquiry of [DATE]). The inquiry also asked whether the answer
 covers the external co-authors and the readers who are not affiliated with that university.
 
-Answer: [COMMITTEE NAME], reference number [REFERENCE], dated [DATE]: [vote granted / written statement that no vote is
-required]. Scope: [applies to all authors and readers / applies to … only]. [Until the answer is on file this section remains a
-placeholder; the protocol is not frozen before it is filled in.]
+Answer: the committee stated that no ethics vote is required for a reader study on public, de-identified data; a written
+waiver was requested on [DATE] and is on file as [REFERENCE, DATE OF THE WAIVER LETTER]. Scope (question 3, external co-authors
+and readers): [TO FILL FROM THE WAIVER]. [Bracketed items are filled in when the waiver letter arrives; if the first reading
+takes place before that, the date of the committee's preliminary answer and the date of the first reading are both recorded
+here.]
 
 The reader CSV files are published with the reader pseudonym.
 
@@ -201,16 +205,21 @@ https://osf.io/9rxbk. Changes of substance since then, with date and reason:
    was put to the Ethics Committee of the Otto-von-Guericke-Universität Magdeburg through the last author, including the question
    whether the answer covers the external co-authors and readers; the committee's answer (name, reference number, date, scope)
    is recorded in section 7. Reason: the inquiry was routed through the last author's institution, not the first author's.
+   Status 2026-11-09: the committee answered that no vote is required; a waiver was requested, the letter is outstanding.
 3. **2026-11-06 (version 1.0), language and wording.** The protocol is now in English (`PROTOCOL.md`); `PROTOKOLL.md` stays in
    the repository as the historical version with a note at the top. Project-internal process terms were removed; persons are
    named by author role, work done by scripts is attributed to the script (`build_set.py`, `collect.py`). Editorial, no change
    to the measurement definitions or the analysis plan.
-4. **2026-11-06 (version 1.0), structure.** Section 8 (operating the sheet) is stated as not belonging to the frozen
+4. **2026-11-09 (version 1.0), section 2, role of the readers.** Version 0.1 left the readers' role open. Added: the readers
+   are co-authors of the manuscript (decision of the authors). No effect on the measurements or the analysis.
+5. **2026-11-06 (version 1.0), structure.** Section 8 (operating the sheet) is stated as not belonging to the frozen
    definitions; sections 9 (this list) and 10 (freeze record) added. No change to sections 1 to 7 beyond items 1 and 2.
 
 Items not changed since 0.1: the reading set (`items.json`, sha256
 `2349a71e6e278e536bc293f170b7550572341cb37b1b0e1b997c0b53fb5281d2`, unchanged since commit `abcad9f`), the blocks, the
-measurement definitions in section 4, the adjudication rule in section 5 and the analysis plan in section 6.
+measurement definitions in section 4, the adjudication rule in section 5 and the analysis plan in section 6. A one-page
+German information sheet for the readers (`leserinformation.html`, `leserinformation.pdf`) summarises sections 1 to 7 and
+contains no pointer to the repository or the key file.
 
 ## 10. Freeze record
 

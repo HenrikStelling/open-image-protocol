@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Leserinformation Referenzlesung</title>
+<style>
+  @page { size: A4; margin: 11mm 15mm 10mm 15mm; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9.1pt; line-height: 1.27; color: #111; margin: 0; }
+  h1 { font-size: 14.5pt; margin: 0 0 2pt 0; }
+  .sub { color: #444; margin: 0 0 8pt 0; font-size: 9pt; }
+  h2 { font-size: 10pt; margin: 6pt 0 2pt 0; border-bottom: 0.6pt solid #999; padding-bottom: 1pt; }
+  p { margin: 0 0 3.5pt 0; }
+  ul { margin: 0 0 3pt 0; padding-left: 14pt; }
+  li { margin-bottom: 1.4pt; }
+  table { border-collapse: collapse; width: 100%; margin: 2pt 0 4pt 0; }
+  th, td { border: 0.5pt solid #999; padding: 1.5pt 4pt; text-align: left; vertical-align: top; font-size: 8.8pt; }
+  th { background: #eee; }
+  .two { display: flex; gap: 14pt; }
+  .two > div { flex: 1; }
+  .foot { margin-top: 7pt; font-size: 8.4pt; color: #444; border-top: 0.5pt solid #bbb; padding-top: 3pt; }
+</style>
+</head>
+<body>
+<h1>Leserinformation: fachärztliche Referenzlesung von Thoraxröntgenbildern</h1>
+<p class="sub">Studie OIP-Bench, Leserstudie, Stand 9. November 2026. Für die Leserinnen und Leser der Radiologie (R1, R2). Ausführliche Fassung: Leseprotokoll 1.0.</p>
+
+<h2>Worum es geht</h2>
+<p>OIP-Bench prüft, wie zuverlässig KI-Systeme einfache Fakten aus Röntgenbildern lesen: Welche Bildseite ist rechts? Wie groß ist das Herz im Verhältnis zum Thorax? Bisher wurden die Antworten der Systeme gegen Werte aus Dateikopf und automatischer Segmentierung gewertet; kein Mensch hat die Bilder gelesen. Ihre Lesung liefert die menschliche Referenz: Sie zeigt, wie gut zwei Fachärzte übereinstimmen, wie gut die Segmentierung zur ärztlichen Messung passt, und ob sich die Aussagen der Studie ändern, wenn alle Systemantworten gegen Ihre Werte neu gewertet werden. Die Leserinnen und Leser sind Mitautoren des Manuskripts.</p>
+
+<h2>Ihre Aufgaben und der Zeitbedarf</h2>
+<table>
+<tr><th>Block</th><th>Bilder</th><th>Aufgabe</th><th>Richtzeit</th></tr>
+<tr><td>Übung</td><td>3 Thoraxbilder außerhalb des Studiensatzes</td><td>Seite und CTR, gemeinsame Kalibrierung beider Radiologen vor Block B</td><td>15 min</td></tr>
+<tr><td>A</td><td>150 Thoraxröntgen</td><td>Seitenorientierung: Welcher Bildrand zeigt die rechte Patientenseite?</td><td>30 min</td></tr>
+<tr><td>B</td><td>100 Thoraxröntgen</td><td>Herz-Thorax-Quotient (CTR) mit zwei Messstrecken, a.p.-Aufnahme markieren</td><td>3 h</td></tr>
+<tr><td>C</td><td>82 maskierte Bilder</td><td>Ist in dem geschwärzten Bild noch ein Seitenmarker (R, L, Text) sichtbar?</td><td>15 min</td></tr>
+<tr><td>D (optional)</td><td>50 Thoraxröntgen</td><td>CTR, nur Verhältnis</td><td>1,5 h</td></tr>
+</table>
+<p>Insgesamt etwa vier bis fünf Stunden, beliebig in Sitzungen teilbar; der Stand bleibt erhalten. Die Reihenfolge der Bilder ist fest und für beide Leser gleich.</p>
+
+<div class="two">
+<div>
+<h2>Messregeln in Kürze</h2>
+<ul>
+<li><b>Seite:</b> Entscheidung nach der Anatomie, wie sie im Bild erscheint (Aortenknopf und Herzspitze links, Magenblase links, Leber und höheres Zwerchfell rechts). Ein eingebrannter Seitenmarker darf benutzt werden; dann bitte als Grundlage "Marker" oder "beides" angeben. Situs inversus oder Dextrokardie nach dem Bild beantworten und kommentieren.</li>
+<li><b>CTR:</b> Herzdurchmesser = horizontaler Abstand der lateralsten Punkte des rechten und linken Herzrands (die Punkte dürfen auf verschiedener Höhe liegen). Thoraxdurchmesser = größte horizontale Innendistanz zwischen den Rippeninnenrändern, meist in Höhe der rechten Zwerchfellkuppel. Perikardfett und Hilusgefäße zählen nicht zur Herzsilhouette.</li>
+<li><b>a.p.-Aufnahme:</b> ankreuzen, wenn erkennbar (Skapulae über den Lungenfeldern, liegender Patient, Beschriftung); trotzdem messen.</li>
+<li><b>Nicht beurteilbar</b> ist immer eine zulässige Antwort (Erguss, Verschattung, Abschneidung, grobe Rotation, kein Anhalt für die Seite).</li>
+<li><b>Marker (Block C):</b> zählt nur, was eine Körperseite bezeichnet (R, L, D, S, "rechts", "links", Pfeile). PA/AP, Datum, Gerätetext zählen nicht. Bei "ja" oder "unsicher" die Stelle anklicken.</li>
+</ul>
+</div>
+<div>
+<h2>Ablauf am Bildschirm</h2>
+<ul>
+<li>Die Lesung findet an einem Rechner des Erstautors statt, in einem lokalen Lesebogen im Browser; nichts geht in eine Cloud. Sie erhalten Lesezugriff auf die Bilder, keine Kopien.</li>
+<li>Sie sehen nur das Bild, ohne Beschriftung, ohne Messwerte, ohne Antworten anderer. Helligkeit, Kontrast, Zoom und Inversion sind frei einstellbar und beeinflussen nur die Anzeige.</li>
+<li>Antworten per Klick oder Taste; CTR mit je zwei Klicks für Herz (h) und Thorax (t), die Werte erscheinen sofort. Pfeiltaste rechts führt zum nächsten Bild.</li>
+<li>Jede Antwort wird mit Zeitstempel gespeichert. Korrekturen nehmen nur Sie selbst vor; sie werden als neue Fassung gespeichert, nichts wird überschrieben.</li>
+<li>Kommentarfeld für Besonderheiten bei jedem Bild.</li>
+</ul>
+<h2>Bitte beachten (Verblindung)</h2>
+<p>Zu einigen Bildern existieren veröffentlichte Messwerte. Bitte schlagen Sie zu den gezeigten Bildern nichts nach und lesen Sie ausschließlich aus dem Bild. Nach Abschluss bitten wir um eine kurze Bestätigung per E-Mail (ein Satz), dass keine Werte nachgeschlagen wurden.</p>
+</div>
+</div>
+
+<h2>Daten, Ethik, Veröffentlichung</h2>
+<p>Alle Bilder stammen aus öffentlichen, anonymisierten Forschungsdatensätzen (VinDr-CXR, NIH ChestX-ray14); es gibt keinen Patientenkontakt und keine Daten aus einer Klinik. Die Ethikkommission der Otto-von-Guericke-Universität Magdeburg wurde über den Letztautor befragt; nach ihrer Auskunft ist kein Votum erforderlich, ein Waiver wurde beantragt. Ihre Lesedateien werden unter Pseudonym (R1, R2) mit den Studiendaten veröffentlicht; Ihr Name erscheint in der Autorenliste, nicht in den Daten.</p>
+
+<p class="foot">Kontakt und Rückfragen: Henrik Stelling (Erstautor). Diese Information fasst das Leseprotokoll 1.0 zusammen; bei Abweichungen gilt das Protokoll.</p>
+</body>
+</html>
