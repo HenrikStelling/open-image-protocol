@@ -41,7 +41,10 @@ Holm within each statement, alpha 0.05. No primary item missing, no error row at
   the file on five fixed images (94 %), glm's verbose replies defeat the frozen number parser on CTR and cardiac width (84 and
   88 %; a scoring artefact the registration anticipated and the scorer is frozen, so it stands), medgemma reads the left edge
   from the file on 69 %. Seven models read every fact at 98–100 %. For Methods: the registered criterion is per model on all four
-  tasks; for Discussion: the fact-reading claim holds for seven of ten models and three of four tasks for all ten.
+  tasks; for Discussion: the fact-reading claim holds for seven of ten models on all four tasks. Per task: scale availability
+  is read at ≥ 95 % by all ten models, CTR class and cardiac width by nine (glm misses both), the left-edge side by eight
+  (claude and medgemma miss). [Corrected 2026-11-09 after RA's check; the earlier text said "three of four tasks for all ten",
+  which the data do not support.]
 - **Drift caveat (6.4).** Exploratory runs 2026-09-26 to 10-24, confirmatory 2026-11-04 to 11-06; no provider pins these models.
 
 ## 3. Deviations to list in Methods (registration 6.7; details in the run report, section 6)

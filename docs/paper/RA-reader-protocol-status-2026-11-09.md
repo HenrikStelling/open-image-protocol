@@ -64,3 +64,14 @@ section 7 and to Methods as a dated addendum; the registration is not edited.
 
 Commit hash and tag; OSF URL (and DOI when issued) with timestamp; ethics wording or reference number; the list of changes
 (section 9); sha256 of `PROTOCOL.md` and `items.json`.
+
+## 7. RA's two points of 2026-11-09 on the confirmatory addendum
+
+1. **H3a sentence corrected.** The addendum said the fact-reading claim holds for "three of four tasks for all ten" models.
+   The frozen table (`docs/reports/confirmatory-2026-11-06.md`, H3a) shows four model × task pairs below 95 %: claude
+   `left_edge` 94 %, medgemma `left_edge` 69 %, glm `ctr` 84 % and `heart_mm` 88 %. Only scale availability is read at ≥ 95 %
+   by all ten; CTR class and cardiac width by nine, the left-edge side by eight. Addendum section 2 now says so; the run report
+   (section 2) was already correct. Thanks for the check.
+2. **Interpretation after H1a and H2a not confirmed.** RA weakened "is therefore believed" to "is often believed" in the
+   Discussion and left the Summary's "take supplied image metadata on trust" unchanged. Proposal from the OIP side, pending the
+   authors' decision: [TO FILL after the discussion; see the proposal in the conversation of 2026-11-09].
