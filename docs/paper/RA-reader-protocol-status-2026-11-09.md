@@ -73,5 +73,14 @@ Commit hash and tag; OSF URL (and DOI when issued) with timestamp; ethics wordin
    by all ten; CTR class and cardiac width by nine, the left-edge side by eight. Addendum section 2 now says so; the run report
    (section 2) was already correct. Thanks for the check.
 2. **Interpretation after H1a and H2a not confirmed.** RA weakened "is therefore believed" to "is often believed" in the
-   Discussion and left the Summary's "take supplied image metadata on trust" unchanged. Proposal from the OIP side, pending the
-   authors' decision: [TO FILL after the discussion; see the proposal in the conversation of 2026-11-09].
+   Discussion and left the Summary's "take supplied image metadata on trust" unchanged. Decision of the authors (2026-11-09):
+   - Summary: replace "take supplied image metadata on trust" by **"most models take supplied image metadata largely on
+     trust; two check it against the image"**. Basis: in the WN cell four models answer from the file alone (0–1 % correct),
+     four partly check (51–76 %), two check (100 %, H1b confirmed); H1a (most models do not check) was not confirmed (4 of 5).
+   - Discussion: replace "is often believed" by the range **"is believed on 28–76 % of images when supplied inside the OIP
+     file and on 74–100 % when supplied as a plain note"** (first reply, 80 fresh images, ten models; medgemma 0 % from the
+     OIP file). H2a (adopted from the OIP file by half the models on half the images) was not confirmed (3 of 5); H2b (OIP
+     file adopted less often than the plain note) was confirmed for 10 of 10.
+   - Keep, where the exploratory results are cited, the sentence that H1a and H2a were not confirmed and that the exploratory
+     wording ("only two of ten check", "69–100 % adopted") is withdrawn in favour of the confirmatory ranges (addendum
+     section 2).
