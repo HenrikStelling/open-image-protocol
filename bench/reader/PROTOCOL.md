@@ -204,9 +204,8 @@ https://osf.io/9rxbk. Changes of substance since then, with date and reason:
    confirmation for reader studies on public data "is clarified beforehand and stated in the paper". Replaced by: the question
    was put to the Ethics Committee of the Otto-von-Guericke-Universität Magdeburg through the co-author at Otto von Guericke University Magdeburg, including the question
    whether the answer covers the external co-authors and readers; the committee's answer (name, reference number, date, scope)
-   is recorded in section 7. Reason: the inquiry was routed through that co-author's institution, not the first author's. [Pending the first author's
-   confirmation, to be added: the first author works in a private practice without an ethics committee of its own; the
-   co-author is a member of the OVGU Faculty of Medicine, whose committee advises its members.]
+   is recorded in section 7. Reason: the first author works in a private practice without an ethics committee of its own; the co-author is a member
+   of the OVGU Faculty of Medicine, whose committee advises its members (confirmed by the first author 2026-11-09).
    Status 2026-11-09: the committee answered that no vote is required; a waiver was requested, the letter is outstanding.
 3. **2026-11-06 (version 1.0), language and wording.** The protocol is now in English (`PROTOCOL.md`); `PROTOKOLL.md` stays in
    the repository as the historical version with a note at the top. Project-internal process terms were removed; persons are
