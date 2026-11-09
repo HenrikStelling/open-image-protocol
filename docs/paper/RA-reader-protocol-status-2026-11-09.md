@@ -84,3 +84,13 @@ Commit hash and tag; OSF URL (and DOI when issued) with timestamp; ethics wordin
    - Keep, where the exploratory results are cited, the sentence that H1a and H2a were not confirmed and that the exploratory
      wording ("only two of ten check", "69–100 % adopted") is withdrawn in favour of the confirmatory ranges (addendum
      section 2).
+
+## 8. RA's reply of 2026-11-09 applied
+
+- "the last author" replaced by "the co-author at Otto von Guericke University Magdeburg" in PROTOCOL.md (sections 7 and 9),
+  in the OSF form text and in the German reader sheet ("Mitautor an der Otto-von-Guericke-Universität Magdeburg").
+- Reason for the ethics route: RA's wording (private practice without its own committee; co-author a member of the OVGU
+  Faculty of Medicine) is entered in section 9 item 2 in brackets, pending the first author's confirmation.
+- "model-assisted visual screen" kept, as RA advises.
+- Ethics: primary document is the OVGU answer; the FAU statement, if cited, only as supporting evidence. No text change now.
+

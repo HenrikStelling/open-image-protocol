@@ -157,7 +157,7 @@ Public, de-identified datasets; no patient contact; no data from a clinic. The r
 no reader data beyond the readings and the pseudonym (R1, R2, R3, NM1) are collected.
 
 The question whether a reader study on public data requires an ethics vote was put to the Ethics Committee of the
-Otto-von-Guericke-Universität Magdeburg through the last author (inquiry of [DATE]). The inquiry also asked whether the answer
+Otto-von-Guericke-Universität Magdeburg through the co-author at Otto von Guericke University Magdeburg (inquiry of [DATE]). The inquiry also asked whether the answer
 covers the external co-authors and the readers who are not affiliated with that university.
 
 Answer: the committee stated that no ethics vote is required for a reader study on public, de-identified data; a written
@@ -202,13 +202,15 @@ https://osf.io/9rxbk. Changes of substance since then, with date and reason:
    named in the limitations. Reason: the earlier sentence described a safeguard that the public data do not provide.
 2. **2026-11-06 (version 1.0), section 7, ethics.** Version 0.1 said that whether the first author's institution requires a
    confirmation for reader studies on public data "is clarified beforehand and stated in the paper". Replaced by: the question
-   was put to the Ethics Committee of the Otto-von-Guericke-Universität Magdeburg through the last author, including the question
+   was put to the Ethics Committee of the Otto-von-Guericke-Universität Magdeburg through the co-author at Otto von Guericke University Magdeburg, including the question
    whether the answer covers the external co-authors and readers; the committee's answer (name, reference number, date, scope)
-   is recorded in section 7. Reason: the inquiry was routed through the last author's institution, not the first author's.
+   is recorded in section 7. Reason: the inquiry was routed through that co-author's institution, not the first author's. [Pending the first author's
+   confirmation, to be added: the first author works in a private practice without an ethics committee of its own; the
+   co-author is a member of the OVGU Faculty of Medicine, whose committee advises its members.]
    Status 2026-11-09: the committee answered that no vote is required; a waiver was requested, the letter is outstanding.
 3. **2026-11-06 (version 1.0), language and wording.** The protocol is now in English (`PROTOCOL.md`); `PROTOKOLL.md` stays in
    the repository as the historical version with a note at the top. Project-internal process terms were removed; persons are
-   named by author role, work done by scripts is attributed to the script (`build_set.py`, `collect.py`). Editorial, no change
+   named by author role or affiliation, work done by scripts is attributed to the script (`build_set.py`, `collect.py`). Editorial, no change
    to the measurement definitions or the analysis plan.
 4. **2026-11-09 (version 1.0), section 2, role of the readers.** Version 0.1 left the readers' role open. Added: the readers
    are co-authors of the manuscript (decision of the authors). No effect on the measurements or the analysis.
