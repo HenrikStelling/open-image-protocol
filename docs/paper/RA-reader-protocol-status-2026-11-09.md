@@ -93,4 +93,9 @@ Commit hash and tag; OSF URL (and DOI when issued) with timestamp; ethics wordin
   Faculty of Medicine) is entered in section 9 item 2 in brackets, pending the first author's confirmation.
 - "model-assisted visual screen" kept, as RA advises.
 - Ethics: primary document is the OVGU answer; the FAU statement, if cited, only as supporting evidence. No text change now.
+- Ethics letter: the first author confirmed on 2026-11-09 that both authors are "Dr. med." and that the VinDr-CXR images were
+  obtained through the Kaggle competition under its terms, not through PhysioNet. RA's PhysioNet note in the letter draft is
+  therefore moot; the letter was updated on the OIP side (readers as co-authors, image counts per block, pointer to 9rxbk,
+  reason for the OVGU route, question 3 naming the readers' practices and the Ärztekammer Brandenburg) and handed to the
+  first author for the co-author to send. Manuscript texts should cite Kaggle as the VinDr-CXR source throughout.
 
