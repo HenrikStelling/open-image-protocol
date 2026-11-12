@@ -2,6 +2,10 @@
 
 The repository grew as a research log. This page sorts it into four kinds of document so that a reader knows what is normative, what is code, what is evidence and what is history.
 
+## 0. Start here
+
+[STORY.md](STORY.md) — the plain-language story: what OIP is, the pipeline from image to landmarks, the tiers of the repository, how the benchmark works, and what went wrong on the way (by lesson). Read it before anything else; it points to the detail. `python scripts/story_map.py` draws recent git activity onto the story's structure (`docs/story-map.html`, generated).
+
 ## 1. Normative: the protocol
 
 | Document | Status |
