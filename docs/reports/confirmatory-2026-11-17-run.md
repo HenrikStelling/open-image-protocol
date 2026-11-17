@@ -1,12 +1,15 @@
-# Confirmatory round — run report (draft, 2026-11-06)
+# Confirmatory round — run report (final, 2026-11-17)
 
-Companion to the frozen analysis output `confirmatory-2026-11-06.md` (written by `bench/confirm/analyze.py --label confirm:`
-on 2026-11-06 14:13 CET, exit status 0: no primary item missing, no error row at rep 0). Registration: https://osf.io/9rxbk
+Companion to the frozen analysis output `confirmatory-2026-11-17.md` (written by `bench/confirm/analyze.py --label confirm:`
+on 2026-11-17 07:5x CET, exit status 0: no primary item missing, no error row, three replies for all ten models). It
+supersedes the interim output `confirmatory-2026-11-06.md` (same script, run on 2026-11-06 14:13 when kimi-k3 had two
+replies); the two files differ in three lines only: the title date, kimi-k3's `harness_commit` list and kimi-k3's row of
+the secondary table. Every primary table is identical. Registration: https://osf.io/9rxbk
 (project https://osf.io/ntgrb), frozen commit `abcad9f`, tag `prereg-confirm-2026-11`; registered text in
 `docs/paper/preregistration-confirmatory-2026-11-03-osf.md`. This report covers what the registration asks to be reported
 next to the verdicts: run dates, deviations (6.7), error-row refills (6.2), incomplete repeats (6.6), the comparison with the
-exploratory values (6.5) and the spend (8). **Draft**: the kimi-k3 repeats are still being collected (section 5) and the real
-spend has not yet been read from the three consoles; the primary analysis is complete and will not change.
+exploratory values (6.5) and the spend (8). **Final** for the data and the analysis. The real spend from the provider consoles is added to section 7 when the invoices
+are in; nothing else is open.
 
 ## 1. Verdicts (rep 0, ten models, 80 fresh VinDr-CXR images)
 
@@ -19,7 +22,7 @@ spend has not yet been read from the three consoles; the primary analysis is com
 | H3a | with the file, each of the four fact tasks ≥ 95 % (test against 80 %) | 7 of 10 | 8 | **not confirmed** |
 | H3b | image only, scale availability < 50 % | 9 of 10 | 8 | **confirmed** |
 
-Per-model estimates, Wilson CIs and both p values: `confirmatory-2026-11-06.md`.
+Per-model estimates, Wilson CIs and both p values: `confirmatory-2026-11-17.md`.
 
 ## 2. What the data say per statement (against the exploratory values of the registration, section 3)
 
@@ -75,10 +78,16 @@ medgemma 81 % (exploratory 82 %, answers "yes" by default).
 | 2026-11-05 09:55, 12:2x | gpt stopped twice more on credits with 12 and 3 rows left; complete 12:29 |
 | 2026-11-05 12:56, 14:50, 16:58 | three replies complete: glm, minimax, mistral |
 | 2026-11-05 17:02, 18:10 | kimi-k3 repeats stopped twice on the session limit (1,285 and 1,551 rows) |
-| 2026-11-06 14:01 | the Ollama probe answers "weekly usage limit"; kimi-k3 repeats paused until the weekly reset (section 5) |
-| 2026-11-06 14:13 | `analyze.py` run (this report) |
+| 2026-11-06 14:01 | the Ollama probe answers "weekly usage limit" (in force since 11-05 18:10); kimi-k3 repeats paused, hourly probes |
+| 2026-11-06 14:13 | interim `analyze.py` run (`confirmatory-2026-11-06.md`, kimi-k3 with two replies) |
+| 2026-11-06 17:01, 19:48; 11-08 19:47 | a probe passed three times, the resumes ended in HTTP 502 / 429 without a new valid row |
+| 2026-11-09 01:34 | weekly limit lifted; kimi-k3 rep 1 complete; session-limit stops 02:28, 05:16, 09:56; resumes 04:08, 07:16, 12:03; 3,105 valid rows at 12:20 |
+| 2026-11-09 21:24 | weekly limit again (the resume of 21:24 brought no valid row; an idle wait of the collection chain was stretched by computer sleep, 11-11 to 11-12) |
+| 2026-11-12 19:59 | one probe passed, no new valid row |
+| 2026-11-16 01:02 | weekly limit lifted; the last 165 items of rep 2 in six minutes; **kimi-k3 complete 01:08: three replies for all ten models** |
+| 2026-11-17 | final `analyze.py` run (`confirmatory-2026-11-17.md`, this report) |
 
-Started timestamps per run directory are in the first table of `confirmatory-2026-11-06.md`; exploratory run dates:
+Started timestamps per run directory are in the first table of `confirmatory-2026-11-17.md`; exploratory run dates:
 round 3a 2026-09-26 to 10-16, repeat subset 2026-10-24 (6.4, drift caveat).
 
 ## 4. Error rows refilled (6.2)
@@ -86,15 +95,16 @@ round 3a 2026-09-26 to 10-16, repeat subset 2026-10-24 (6.4, drift caveat).
 Every refill re-sent the identical prompt (`prompt_sha256` unchanged) with `bench/run.py --resume`, which drops the error row
 and writes the new reply. Counts from the launcher logs: claude 1 and gemini 1 (transport, 11-04); gpt 1 transport plus
 21, 5, 12 and 3 rows of HTTP 429 "no credits" (11-04 17:44, 11-05 08:50, 09:55, 12:2x); glm 1 and 3 (session limit, 11-05);
-kimi-k3 1, 1 and 2 (session limit). No image was replaced (6.3); no error row remains at rep 0 for any model.
+kimi-k3 in thirteen resumes between 11-05 and 11-16, each dropping the 1 to 20 error rows (HTTP 429 usage limit, HTTP 502
+Bad Gateway) left by the stop before it. No image was replaced (6.3); no error row remains in any run directory.
 
 ## 5. Repeats (6.6)
 
-Nine models have three replies per item (3,270 rows, no error rows). kimi-k3 has rep 0 complete and rep 1 for 459 of 1,090
-items (1,551 rows, 2 error rows to be refilled) at the time of the analysis; the Ollama Pro weekly usage limit stops the lane
-since 2026-11-05 18:10. The collection continues automatically when the limit lifts, until 2026-11-21 as registered; the
-secondary table of `confirmatory-2026-11-06.md` marks kimi-k3 with two replies and will be regenerated. The primary analysis
-does not use repeats and is final.
+All ten models have three replies per item (3,270 rows each, no error rows). Nine were complete on 2026-11-05; kimi-k3 was
+held up by the Ollama Pro session and weekly usage limits and closed on 2026-11-16 01:08, inside the registered window
+(until 2026-11-21). The secondary table of `confirmatory-2026-11-17.md` now carries three replies for every model: kimi-k3
+four cells 56 / 52 / 53 %, WN 51 / 54 / 48 %, OIP-file adoption 51 / 55 / 58 %, conflict items identical in all three
+replies 49 % (157/320), next to glm (50 %) the least repeatable model. The primary analysis does not use repeats.
 
 ## 6. Deviations (6.7)
 
@@ -106,12 +116,14 @@ does not use repeats and is final.
 2. **`harness_commit` carries `-dirty`.** At launch (855ad12) and at the resumes (394350e) the working tree held uncommitted
    documentation (the registration cover note, the reader-study protocol 0.2). The launcher refused to start unless
    `git diff prereg-confirm-2026-11 --stat` was empty for `bench/confirm/`, `bench/run.py`, `bench/tasks.py`, `bench/score.py`,
-   `bench/cloudlock.py` and `src/oip/`; it was empty at every start and still is. The flag is cosmetic.
+   `bench/cloudlock.py` and `src/oip/`; it was empty at every start and still is (checked again 2026-11-17). The flag is
+   cosmetic. kimi-k3's rows carry four commit ids (394350e, 03aca29, 2fc68bf, 2f4078f) because documentation was committed
+   between its resumes; the frozen paths were identical to the tag under each of them.
 3. **Process interruption on 2026-11-05 ~08:50** (the session running the harness ended): glm and gpt rows in flight became error
    rows and were refilled; the glm launcher log of 08:17–08:42 was lost. No reply was altered; the run directories were untouched.
-4. **kimi-k3 repeats incomplete at the time of the analysis** (section 5), as foreseen in 6.6. The analysis was run on
-   2026-11-06, before the repeat collection closes on 2026-11-21, because the primary data were complete; it will be re-run
-   when kimi-k3 completes or on 2026-11-21, which changes the secondary table only.
+4. **The analysis was first run before the repeat collection closed.** An interim run on 2026-11-06 used the complete
+   primary data and kimi-k3 with two replies (allowed by 6.6); the verdicts were passed to the manuscript from it. The final
+   run on 2026-11-17, after kimi-k3 closed on 2026-11-16, changed kimi-k3's row of the secondary table and nothing else.
 5. **Scoring observation, not a deviation:** glm-5.3-flash's `ctr` and `heart_mm` misses with the file are parser picks from
    verbose replies (section 2). The scorer is frozen (4.6); the numbers stand as scored and the observation goes to the
    supplement.
@@ -133,11 +145,12 @@ three replies per model unless stated:
 | glm-5.3-flash:cloud | 13.64 M / 3.84 M | $3.97 |
 | minimax-m3:cloud | 14.03 M / 0.011 M | $8.45 |
 | mistral-large-3:675b-cloud | 13.66 M / 0.017 M | $6.86 |
-| kimi-k3:cloud (1,549 rows) | 6.24 M / 0.024 M | $19.08 |
-| **Ollama cloud, Pro credits** | | **$39.17 so far**; kimi-k3's remaining ~1,720 rows about $21 more at list price, which would reach the $60 monthly credit of the subscription |
+| kimi-k3:cloud | 13.86 M / 0.055 M | $42.40 |
+| **Ollama cloud, Pro subscription** | | **$62.49** at list price, against the $60 monthly credit the estimate assumed; billed as the flat subscription, no usage credits were bought |
 
-The local lanes (gemma4:e4b-it-qat, medgemma1.5:4b) cost nothing beyond electricity. The real spend is read from the
-Anthropic, OpenAI and Google consoles and from the Ollama account after the run and reported next to these figures.
+The local lanes (gemma4:e4b-it-qat, medgemma1.5:4b) cost nothing beyond electricity. Total at list price: $116.12 (API
+$53.63, Ollama cloud $62.49). Real spend from the Anthropic, OpenAI and Google consoles and the Ollama account: [to be
+added from the invoices].
 
 ## 8. Reproduction
 

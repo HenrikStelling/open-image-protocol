@@ -205,6 +205,11 @@ Ordered by what we learned, not by date. Each entry: what we saw, what it was, w
   2026-09-28.
 - **An Ollama update changed a default.** gemma4 e4b started thinking by default; the harness now sends thinking off
   explicitly and records the daemon version and environment in every run. 2026-10-07.
+- **A waiting loop waited far longer than it said, and a tiny probe passed while the real run could not.** During the
+  confirmatory round a subscription's weekly cap stopped one model for days; the one-hour wait between probes stretched
+  to 31 hours because the computer slept, and three times a one-word probe got through although every real request
+  was still refused. Now: keep the machine awake for unattended collection, judge a resume by the rows it adds and not
+  by the probe, and plan a registered collection window with a subscription's weekly cap in mind. 2026-11-17.
 
 ### Lesson E: the machine lies quietly; record the environment and keep work off synced folders
 
@@ -222,16 +227,21 @@ Detail: `docs/03-brainstorm/decisions-log.md` for every D and OEP; `bench/README
 
 ---
 
-## 6. Where the work stands (2026-11-12)
+## 6. Where the work stands (2026-11-17)
 
 - Protocol 0.1 draft, implementation 0.2.1, released on GitHub and Zenodo (software DOI 10.5281/zenodo.23490342,
   concept DOI 10.5281/zenodo.23052074, data bundle DOI 10.5281/zenodo.23040047).
 - Paper: revised manuscript produced in the separate Research Automation study; handover to the Lancet track on
   2026-11-02; co-author review actions from 2026-10-23 in `docs/paper/`.
 - Confirmatory round pre-registered on OSF (osf.io/9rxbk, 2026-11-03), code frozen at tag `prereg-confirm-2026-11`,
-  runs started 2026-11-04: three API lanes with three repeats, Ollama cloud chain one model at a time, local chain.
-  Analysis and addendum due 2026-11-23.
-- Open on the owner: Ibrahim's OSF approval and the registration DOI, PROTOKOLL.md 1.0, expert readers.
+  run 2026-11-04 to 11-16: ten models, 80 fresh images, three replies each. Three of six statements confirmed (two
+  models check the file against the image; the OIP file is believed less often than a plain note; scale cannot be
+  read from the image alone), three not confirmed, each short by one or two models. Final report and addendum for the
+  paper written 2026-11-17.
+- Reader study: protocol 1.0 drafted in English (`bench/reader/PROTOCOL.md`), reader information sheet and OSF form
+  text ready; freeze, registration and first reading wait for Ibrahim's check and the ethics committee's answer.
+- Open on the owner: Ibrahim's check of the reader documents, the ethics answer, the provider invoices for the real
+  spend, the Zenodo data-bundle version with the ten run directories, the registration DOI.
 
 Detail: `PLAN.md` section 0 and the run log; the project memory in the Claude session.
 
@@ -244,6 +254,9 @@ Three sentences: what changed, why, which section above it touches. Newest at th
 
 - 2026-11-12 — File created from the repository, the decisions log, the bench README and the session memory.
   Sections 2 and 3 describe the code as of commit 2fc68bf. No behaviour changed.
+- 2026-11-17 — The confirmatory round closed with three replies for all ten models and the final analysis was
+  written; the verdicts did not move against the interim run. One new scar under Lesson D (a waiting loop stretched by
+  computer sleep, a probe that passed while real requests were refused). Section 6 brought up to date.
 
 ---
 

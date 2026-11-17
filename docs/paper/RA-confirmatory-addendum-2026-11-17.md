@@ -1,9 +1,12 @@
-# Addendum for the RA session: confirmatory round, per-statement verdicts (draft, 2026-11-06)
+# Addendum for the RA session: confirmatory round, per-statement verdicts (final, 2026-11-17)
 
 Step F7 of the registration (https://osf.io/9rxbk; `docs/paper/preregistration-confirmatory-2026-11-03-osf.md`). Sources:
-the frozen analysis output `docs/reports/confirmatory-2026-11-06.md` and the run report
-`docs/reports/confirmatory-2026-11-06-run.md`. **Draft** until (a) the kimi-k3 repeats are complete or the collection closes on
-2026-11-21 and (b) the real spend has been read from the consoles; neither changes the primary verdicts below.
+the frozen analysis output `docs/reports/confirmatory-2026-11-17.md` and the run report
+`docs/reports/confirmatory-2026-11-17-run.md`. **Final** for the data and the analysis: the kimi-k3 repeats closed on
+2026-11-16 01:08, all ten models have three replies, and the analysis was re-run on 2026-11-17. Against the interim output
+of 2026-11-06 (which RA reproduced line by line) three lines changed: the title date, kimi-k3's `harness_commit` list and
+kimi-k3's row of the secondary table. Every verdict and every primary number is unchanged. Still open: the real spend from
+the consoles and the Zenodo version DOI (section 5).
 
 ## 1. Verdicts
 
@@ -47,27 +50,38 @@ Holm within each statement, alpha 0.05. No primary item missing, no error row at
   which the data do not support.]
 - **Drift caveat (6.4).** Exploratory runs 2026-09-26 to 10-24, confirmatory 2026-11-04 to 11-06; no provider pins these models.
 
+## 2a. Secondary table, now with three replies for every model
+
+kimi-k3: four cells 56 / 52 / 53 %, WN cell 51 / 54 / 48 %, OIP-file adoption 51 / 55 / 58 %, conflict items identical in
+all three replies 49 % [44–55] (157/320). The interim row read "2 replies, 73 % (57/78)"; that figure covered only the 78
+items rep 1 had reached and should not be quoted. With glm (50 %) kimi-k3 is the least repeatable model; claude, mistral
+and gemma4:e4b are at 100 %, the other five at 81–97 %. The other nine rows are unchanged. For RA: re-copy the ten run
+directories and rebuild; only this row and the run facts move.
+
 ## 3. Deviations to list in Methods (registration 6.7; details in the run report, section 6)
 
 1. Ollama lanes: rep 0 collected first (`--repeats 1`), repeats 1–2 added by `--resume` into the same run directory; no effect on
    the primary analysis.
 2. `harness_commit` recorded with `-dirty` because of uncommitted documentation in the working tree; the frozen code paths were
    identical to the tag at every start (launcher check), still identical on 2026-11-06.
-3. One process interruption (2026-11-05 ~08:50) and eleven provider stops (OpenAI credits four times, Ollama session limit five
-   times, weekly limit once, one transport blip); every affected row refilled with the identical prompt (`--resume`).
-4. kimi-k3 repeats incomplete at the analysis (rep 0 complete, rep 1 at 459 of 1,090 items); allowed by 6.6, affects the
-   secondary table only; the collection continues until 2026-11-21.
-5. The analysis was run before the repeat collection closed, because the primary data were complete; it is re-run at the close.
+3. One process interruption (2026-11-05 ~08:50) and repeated provider stops (OpenAI credits four times; Ollama Pro session
+   and weekly usage limits between 2026-11-04 and 11-16; three transport errors); every affected row refilled with the
+   identical prompt (`--resume`). No error row remains in any run directory.
+4. The analysis was first run on 2026-11-06 on the complete primary data with kimi-k3 at two replies (allowed by 6.6); the
+   verdicts went to the manuscript from that interim run. The final run of 2026-11-17 changed kimi-k3's secondary row only.
+5. kimi-k3's repeats closed on 2026-11-16, inside the registered window (until 2026-11-21); its rows carry four
+   `harness_commit` ids because documentation was committed between resumes (frozen paths identical under each).
 
 ## 4. Spend (registration 8)
 
 List price from recorded tokens: API lanes $53.63 for three replies (claude $18.35, gemini $6.33, gpt $28.95; registered
-ceiling about $80, token-priced estimate $46.46). Ollama cloud lanes $39.17 so far against the $60 monthly credit of the Pro
-subscription (kimi-k3 $19.08 for half its rows). Real spend from the consoles follows; report both in the supplement.
+ceiling about $80, token-priced estimate $46.46). Ollama cloud lanes $62.49 at list price for three replies (kimi-k3 $42.40,
+minimax $8.45, mistral $6.86, glm $3.97, gemma4:31b $0.81), against the $60 monthly credit the estimate assumed; billed as
+the flat Pro subscription, no usage credits bought. Total at list price $116.12. Real spend from the consoles follows;
+report both in the supplement.
 
 ## 5. Open on the OIP side
 
-- kimi-k3 repeats (automatic resume when the Ollama weekly limit lifts); regenerate the report; final version of this addendum.
 - Real spend from the Anthropic, OpenAI, Google consoles and the Ollama account.
 - Freeze the ten run directories and ship them in the next Zenodo data-bundle version with `confirm_set.json` and the
   registration link (registration 9); add the Zenodo version DOI here.
@@ -76,7 +90,8 @@ subscription (kimi-k3 $19.08 for half its rows). Real spend from the consoles fo
 
 ## 6. Pointers
 
-- `docs/reports/confirmatory-2026-11-06.md` — tables per statement and model (frozen analysis output).
-- `docs/reports/confirmatory-2026-11-06-run.md` — timeline, refills, deviations, spend, reproduction.
+- `docs/reports/confirmatory-2026-11-17.md` — tables per statement and model (frozen analysis output, final).
+- `docs/reports/confirmatory-2026-11-06.md` — the interim output (kimi-k3 with two replies), kept for the record.
+- `docs/reports/confirmatory-2026-11-17-run.md` — timeline, refills, deviations, spend, reproduction.
 - `docs/paper/cost-estimate-2026-11-04.md` — prices and the pre-run estimate.
 - `bench/confirm/` — `draw_set.py`, `confirm_set.json`, `analyze.py` (frozen at `abcad9f`).

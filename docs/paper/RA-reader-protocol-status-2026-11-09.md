@@ -68,7 +68,7 @@ Commit hash and tag; OSF URL (and DOI when issued) with timestamp; ethics wordin
 ## 7. RA's two points of 2026-11-09 on the confirmatory addendum
 
 1. **H3a sentence corrected.** The addendum said the fact-reading claim holds for "three of four tasks for all ten" models.
-   The frozen table (`docs/reports/confirmatory-2026-11-06.md`, H3a) shows four model × task pairs below 95 %: claude
+   The frozen table (`docs/reports/confirmatory-2026-11-06.md`, H3a; identical in the final `confirmatory-2026-11-17.md`) shows four model × task pairs below 95 %: claude
    `left_edge` 94 %, medgemma `left_edge` 69 %, glm `ctr` 84 % and `heart_mm` 88 %. Only scale availability is read at ≥ 95 %
    by all ten; CTR class and cardiac width by nine, the left-edge side by eight. Addendum section 2 now says so; the run report
    (section 2) was already correct. Thanks for the check.
