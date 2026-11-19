@@ -7,7 +7,7 @@ definitions and the analysis plan; they are frozen before the first reading. Sec
 is not part of the frozen definitions. Section 10 records the freeze.
 
 Status at this draft (2026-11-09): no reading has taken place (no reader file exists under `bench/reader/readings/`). The
-ethics committee has answered that no vote is required; the written waiver is requested and outstanding (section 7). The
+ethics committee has answered that no vote is required; its written answer is outstanding (section 7). The
 protocol is frozen before the first reading, after the first author has approved the text.
 
 ## 1. Aim
@@ -160,11 +160,9 @@ The question whether a reader study on public data requires an ethics vote was p
 Otto-von-Guericke-Universität Magdeburg through the co-author at Otto von Guericke University Magdeburg (inquiry of [DATE]). The inquiry also asked whether the answer
 covers the external co-authors and the readers who are not affiliated with that university.
 
-Answer: the committee stated that no ethics vote is required for a reader study on public, de-identified data; a written
-waiver was requested on [DATE] and is on file as [REFERENCE, DATE OF THE WAIVER LETTER]. Scope (question 3, external co-authors
-and readers): [TO FILL FROM THE WAIVER]. [Bracketed items are filled in when the waiver letter arrives; if the first reading
-takes place before that, the date of the committee's preliminary answer and the date of the first reading are both recorded
-here.]
+Answer: the committee stated that no ethics vote is required for a reader study on public, de-identified data ([SENDER,
+REFERENCE, DATE OF THE WRITTEN ANSWER]). Scope (question 3, external co-authors and readers): [TO FILL FROM THE WRITTEN
+ANSWER]. [Bracketed items are filled in at the freeze, from the committee's written answer.]
 
 The reader CSV files are published with the reader pseudonym.
 
@@ -206,7 +204,7 @@ https://osf.io/9rxbk. Changes of substance since then, with date and reason:
    whether the answer covers the external co-authors and readers; the committee's answer (name, reference number, date, scope)
    is recorded in section 7. Reason: the first author works in a private practice without an ethics committee of its own; the co-author is a member
    of the OVGU Faculty of Medicine, whose committee advises its members (confirmed by the first author 2026-11-09).
-   Status 2026-11-09: the committee answered that no vote is required; a waiver was requested, the letter is outstanding.
+   Status 2026-11-09: the committee answered that no vote is required; its written answer is outstanding.
 3. **2026-11-06 (version 1.0), language and wording.** The protocol is now in English (`PROTOCOL.md`); `PROTOKOLL.md` stays in
    the repository as the historical version with a note at the top. Project-internal process terms were removed; persons are
    named by author role or affiliation, work done by scripts is attributed to the script (`build_set.py`, `collect.py`). Editorial, no change
